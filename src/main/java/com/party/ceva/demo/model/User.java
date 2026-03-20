@@ -41,11 +41,6 @@ public class User {
 	@JsonManagedReference
 	private UserProfile userProfile;
 
-	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@JoinColumn(name = "level_id", referencedColumnName = "id")
-	@JsonManagedReference
-	private Level level;
-
 	@Column(unique = true, length = 4)
 	private String code;
 
@@ -56,6 +51,4 @@ public class User {
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
 	private Set<Role> roles = new HashSet<>();
 
-	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-	private Set<EventParticipation> eventParticipations = new HashSet<>();
 }

@@ -54,9 +54,6 @@ class UserServiceTest {
 	@Mock
 	private CodeGenerationService codeGenerationService;
 
-	@Mock
-	private LevelingSystemService levelingSystemService;
-
 	@InjectMocks
 	private UserService userService;
 
@@ -205,7 +202,6 @@ class UserServiceTest {
 		assertEquals(Character.valueOf('O'), result.getUserProfile().getSex());
 		assertNotNull(result.getUserProfile().getCreatedAt());
 		assertNotNull(result.getUserProfile().getUpdatedAt());
-		verify(levelingSystemService, never()).addXpToUser(anyLong(), anyInt());
 		verify(userRepository).save(any(User.class));
 	}
 
@@ -299,6 +295,5 @@ class UserServiceTest {
 		assertEquals("Ana", result.getUserProfile().getFirstName());
 		assertEquals("Pop", result.getUserProfile().getLastName());
 		verify(userRepository).findByCode("AB12");
-		verify(levelingSystemService).addXpToUser(10L, 1000);
 	}
 }
