@@ -1,4 +1,25 @@
+import { useState } from 'react';
+import { Link, useNavigate } from '@tanstack/react-router';
+import { useAuth } from '../auth/AuthContext';
+
 const VerveKitchenLogin = () => {
+  const [phone, setPhone] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const auth = useAuth();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setError('');
+    try {
+      await auth.login({ phone, password });
+      navigate({ to: '/' });
+    } catch {
+      setError('Invalid phone number or password.');
+    }
+  };
+
   return (
     <>
       <style>
@@ -71,7 +92,12 @@ const VerveKitchenLogin = () => {
                 </p>
               </header>
 
-              <form className="space-y-6" onSubmit={(event) => event.preventDefault()}>
+              <form className="space-y-6" onSubmit={handleSubmit}>
+                {error && (
+                  <p className="rounded-xl bg-error-container px-4 py-3 text-sm font-medium text-on-error-container">
+                    {error}
+                  </p>
+                )}
                 <div className="space-y-1.5">
                   <label
                     className="ml-1 block font-label text-sm font-bold uppercase tracking-widest text-on-surface-variant"
@@ -85,6 +111,8 @@ const VerveKitchenLogin = () => {
                       id="phone"
                       placeholder="+1 (555) 000-0000"
                       type="tel"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
                     />
                     <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant/30 transition-colors group-focus-within:text-primary">
                       call
@@ -114,6 +142,8 @@ const VerveKitchenLogin = () => {
                       id="password"
                       placeholder={'\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022'}
                       type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
                     />
                     <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant/30 transition-colors group-focus-within:text-primary">
                       lock
@@ -174,13 +204,12 @@ const VerveKitchenLogin = () => {
               <footer className="mt-12 text-center">
                 <p className="text-sm font-medium text-on-surface-variant">
                   New to the collection?
-                  <a
+                  <Link
                     className="ml-1 font-bold text-primary underline decoration-2 underline-offset-4 hover:underline"
-                    href="#"
-                    onClick={(e) => e.preventDefault()}
+                    to="/register"
                   >
                     Create an Account
-                  </a>
+                  </Link>
                 </p>
               </footer>
             </div>

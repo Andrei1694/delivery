@@ -1,4 +1,4 @@
-import { useNavigate } from '@tanstack/react-router';
+import { Link, useNavigate } from '@tanstack/react-router';
 import { useAuth } from '../../auth/AuthContext';
 
 const categories = [
@@ -54,13 +54,29 @@ const restaurants = [
       'https://lh3.googleusercontent.com/aida-public/AB6AXuDxhTKQnbVX-6sB3PwpG-_b4NyZJzLCZt9Jd76X8Pg7JsERy7zMDBnwZqWMm5GhhKpEuCkRzYijLY6ULplPnabQarGTm6O7VTcmFkqCYW8-nZjh_A4yYzn-8FKrwzxS4gRFW26W1MvuTiEZplUX6fBV1T0huU9UY0OkFJ9M9Y7G4jQl7kem2BWOZ2GdrTkyWkdnCCI5VRInW0pL79_AkDDAgCXsvBBBZHeBBYN5RWuKz8ZTs-Ly-vsXTiLnCq93R3W5li_qek6TQwM',
     tag: null,
   },
+  {
+    name: 'Burger Haven',
+    meta: '10-20 min / $',
+    rating: '4.5',
+    image: null,
+    placeholderIcon: 'restaurant',
+    tag: null,
+  },
+  {
+    name: 'Vero Italiano',
+    meta: '25-40 min / $$$',
+    rating: '4.8',
+    image: null,
+    placeholderIcon: 'local_pizza',
+    tag: null,
+  },
 ];
 
 const navItems = [
   { label: 'Explore', icon: 'restaurant', href: '#top', active: true },
   { label: 'Search', icon: 'search', href: '#search' },
   { label: 'Orders', icon: 'receipt_long', href: '#curated' },
-  { label: 'Profile', icon: 'person', href: '#profile' },
+  { label: 'Profile', icon: 'person', to: '/profile' },
 ];
 
 const iconStyle = {
@@ -210,19 +226,26 @@ export default function HomeFeed() {
             </h2>
           </div>
 
-          <div className="flex flex-col gap-10">
+          <div className="grid grid-cols-2 gap-4">
             {restaurants.map((restaurant) => (
               <article key={restaurant.name} className="group relative">
-                <div className="relative mb-4 aspect-[16/10] w-full overflow-hidden rounded-[2rem] shadow-[0_20px_40px_rgba(78,33,33,0.08)]">
-                  <img
-                    src={restaurant.image}
-                    alt={restaurant.name}
-                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
+                <div className="relative mb-2 aspect-[4/3] w-full overflow-hidden rounded-xl shadow-sm">
+                  {restaurant.image ? (
+                    <img
+                      src={restaurant.image}
+                      alt={restaurant.name}
+                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center bg-surface-container">
+                      <SymbolIcon
+                        name={restaurant.placeholderIcon}
+                        className="text-4xl text-on-surface-variant/40"
+                      />
+                    </div>
+                  )}
 
-                  <div className="absolute inset-0 bg-gradient-to-t from-inverse-surface/30 via-transparent to-transparent" />
-
-                  <div className="absolute right-4 top-4 flex items-center gap-1 rounded-full bg-surface-container-lowest/90 px-3 py-1.5 backdrop-blur-md">
+                  <div className="absolute right-2 top-2 flex items-center gap-0.5 rounded-md bg-surface-container-lowest/90 px-1.5 py-0.5 backdrop-blur-md">
                     <SymbolIcon
                       name="star"
                       filled
@@ -234,21 +257,13 @@ export default function HomeFeed() {
                   </div>
                 </div>
 
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <h3 className="font-headline text-2xl font-bold tracking-tight text-on-surface">
-                      {restaurant.name}
-                    </h3>
-                    <p className="mt-1 text-sm font-medium text-on-surface-variant">
-                      {restaurant.meta}
-                    </p>
-                  </div>
-
-                  {restaurant.tag ? (
-                    <span className="rounded-lg bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
-                      {restaurant.tag}
-                    </span>
-                  ) : null}
+                <div>
+                  <h3 className="font-headline text-xs font-bold tracking-tight text-on-surface truncate">
+                    {restaurant.name}
+                  </h3>
+                  <p className="mt-0.5 text-[10px] font-medium text-on-surface-variant truncate">
+                    {restaurant.meta}
+                  </p>
                 </div>
               </article>
             ))}
@@ -309,25 +324,38 @@ export default function HomeFeed() {
       <nav className="fixed bottom-6 left-1/2 z-50 w-[92%] max-w-[400px] -translate-x-1/2 rounded-[2rem] bg-background/80 shadow-[0_8px_24px_rgba(78,33,33,0.06)] backdrop-blur-md">
         <div className="flex items-center justify-around p-2">
           {navItems.map((item) => (
-            <a
-              key={item.label}
-              href={item.href}
-              aria-current={item.active ? 'page' : undefined}
-              className={
-                item.active
-                  ? 'flex flex-col items-center justify-center rounded-full bg-surface-container-high px-5 py-2 text-on-surface transition-opacity duration-300 ease-out hover:opacity-80'
-                  : 'flex flex-col items-center justify-center rounded-full px-5 py-2 text-on-surface/60 transition-colors duration-300 ease-out hover:bg-surface-container-low hover:text-on-surface'
-              }
-            >
-              <SymbolIcon
-                name={item.icon}
-                filled={item.active}
-                className="text-[22px]"
-              />
-              <span className="mt-0.5 font-label text-[11px] font-semibold">
-                {item.label}
-              </span>
-            </a>
+            item.to ? (
+              <Link
+                key={item.label}
+                to={item.to}
+                className="flex flex-col items-center justify-center rounded-full px-5 py-2 text-on-surface/60 transition-colors duration-300 ease-out hover:bg-surface-container-low hover:text-on-surface"
+              >
+                <SymbolIcon name={item.icon} className="text-[22px]" />
+                <span className="mt-0.5 font-label text-[11px] font-semibold">
+                  {item.label}
+                </span>
+              </Link>
+            ) : (
+              <a
+                key={item.label}
+                href={item.href}
+                aria-current={item.active ? 'page' : undefined}
+                className={
+                  item.active
+                    ? 'flex flex-col items-center justify-center rounded-full bg-surface-container-high px-5 py-2 text-on-surface transition-opacity duration-300 ease-out hover:opacity-80'
+                    : 'flex flex-col items-center justify-center rounded-full px-5 py-2 text-on-surface/60 transition-colors duration-300 ease-out hover:bg-surface-container-low hover:text-on-surface'
+                }
+              >
+                <SymbolIcon
+                  name={item.icon}
+                  filled={item.active}
+                  className="text-[22px]"
+                />
+                <span className="mt-0.5 font-label text-[11px] font-semibold">
+                  {item.label}
+                </span>
+              </a>
+            )
           ))}
         </div>
       </nav>

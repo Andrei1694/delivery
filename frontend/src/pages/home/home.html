@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-secondary-fixed": "#6a0e17",
+              "on-primary-fixed": "#000000",
+              "surface-tint": "#ac2c00",
+              "surface-variant": "#ffd2d0",
+              "outline-variant": "#e09c99",
+              "secondary-fixed": "#ffc3c0",
+              "surface-container-highest": "#ffd2d0",
+              "secondary-container": "#ffc3c0",
+              "error": "#b31b25",
+              "surface-container-low": "#ffedeb",
+              "surface": "#fff4f3",
+              "on-secondary-fixed-variant": "#922d30",
+              "surface-bright": "#fff4f3",
+              "on-background": "#4e2121",
+              "on-primary-fixed-variant": "#581200",
+              "on-primary": "#ffefec",
+              "on-primary-container": "#480d00",
+              "tertiary-container": "#e094f8",
+              "primary-fixed": "#ff7852",
+              "on-error": "#ffefee",
+              "on-surface-variant": "#834c4b",
+              "surface-container-lowest": "#ffffff",
+              "tertiary": "#823e9b",
+              "background": "#fff4f3",
+              "error-container": "#fb5151",
+              "error-dim": "#9f0519",
+              "inverse-primary": "#ff5624",
+              "tertiary-fixed": "#e094f8",
+              "secondary-fixed-dim": "#ffafac",
+              "surface-dim": "#ffc7c4",
+              "surface-container-high": "#ffdad8",
+              "outline": "#a26765",
+              "on-tertiary-fixed-variant": "#5c1675",
+              "inverse-surface": "#240304",
+              "on-secondary-container": "#852328",
+              "primary-dim": "#972500",
+              "surface-container": "#ffe1e0",
+              "primary": "#ac2c00",
+              "secondary": "#a0373a",
+              "inverse-on-surface": "#cd8c8a",
+              "primary-fixed-dim": "#ff5d2e",
+              "primary-container": "#ff7852",
+              "on-tertiary-fixed": "#2d003e",
+              "on-surface": "#4e2121",
+              "tertiary-fixed-dim": "#d187e9",
+              "on-error-container": "#570008",
+              "on-secondary": "#ffefee",
+              "secondary-dim": "#902c2f",
+              "on-tertiary": "#ffedfe",
+              "tertiary-dim": "#75318e",
+              "on-tertiary-container": "#52076c"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface font-body text-on-surface min-h-screen">
+<header class="fixed top-0 w-full z-50 bg-[#fff4f3]/80 backdrop-blur-xl border-b border-surface-container">
+<div class="px-4 py-3 w-full max-w-lg mx-auto flex flex-col gap-3">
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-lg" data-icon="location_on">location_on</span>
+<span class="text-on-surface font-bold text-xs">Home • 124 Park Ave</span>
+<span class="material-symbols-outlined text-on-surface-variant text-sm">expand_more</span>
+</div>
+<button class="text-primary active:scale-95 duration-200">
+<span class="material-symbols-outlined" data-icon="shopping_bag">shopping_bag</span>
+</button>
+</div>
+<div class="relative">
+<div class="absolute inset-y-0 left-4 flex items-center pointer-events-none text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]" data-icon="search">search</span>
+</div>
+<input class="w-full bg-surface-container-lowest border-none rounded-xl py-2.5 pl-11 pr-4 shadow-sm focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-on-surface-variant/50 text-sm font-medium" placeholder="Search restaurants, dishes..." type="text"/>
+</div>
+</div>
+</header>
+<main class="pt-32 pb-32 max-w-lg mx-auto">
+<section class="px-4 mb-4">
+<div class="bg-tertiary rounded-xl p-3 text-on-tertiary flex items-center justify-between relative overflow-hidden">
+<div class="flex items-center gap-3 relative z-10">
+<span class="material-symbols-outlined text-xl" data-icon="celebration">celebration</span>
+<div>
+<h2 class="font-headline text-sm font-bold leading-none">Weekend Feast</h2>
+<p class="text-[10px] text-on-tertiary/90 mt-0.5">30% off on all family platters</p>
+</div>
+</div>
+<button class="relative z-10 p-1">
+<span class="material-symbols-outlined text-sm" data-icon="close">close</span>
+</button>
+</div>
+</section>
+<section class="mb-6">
+<div class="flex items-center justify-between px-4 mb-3">
+<h2 class="font-headline text-sm font-bold text-on-surface">Quick Categories</h2>
+<a class="text-primary text-xs font-bold" href="#">View all</a>
+</div>
+<div class="flex gap-4 overflow-x-auto hide-scrollbar px-4">
+<button class="flex-shrink-0 flex flex-col items-center gap-2">
+<div class="w-14 h-14 bg-primary-container rounded-xl flex items-center justify-center overflow-hidden">
+<img alt="Pizza" class="w-10 h-10 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC9WvYbgsn1tjhIzkyRIoR2s7MQHIhkBSuE8on9bpnqq0G9coRVveq_q8jpZ09YFCHyK6ka__M6HVCZF-80vwVkXgmEnIJksjennbmdasnUbM9HzxuvHHGwiCYRu80kV8cgXrKFoa58x7Z09eVI9jAmZsvawFIRRVdiPsUx0kLO5YzkuGEkleAVP5WT8CzmusWbPurnmfGH-ZF-aYFTq-uSBTGEJosen3xuQevwyo_9ubgQnfOVNNH1psh4tY1PhbnRCeHfzAtUfRU"/>
+</div>
+<span class="text-[10px] font-bold text-on-surface">Pizza</span>
+</button>
+<button class="flex-shrink-0 flex flex-col items-center gap-2">
+<div class="w-14 h-14 bg-tertiary-container rounded-xl flex items-center justify-center overflow-hidden">
+<img alt="Sushi" class="w-10 h-10 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4TPMs6CJAwb38XldJYGJJVm87pphR91ixtGOu-YcZRufDNacZtdqYJ1Sy-KDTeHdRl0jPqQVGyfQFczCkOfSXNVTyE1OiQfF2ur6DdVX-4Y6W8pKM8IU-_HIHXUbEzSZCDQVx2Vmtn5XTSVIHupfuKosc9WaAGTqLpZitkPBI-i8TSgqR_SF-_YVQAtQ6k2pt86xpe8zRgDqGh8uc5PEAA0-iMf6bn480PbdWbI82KZwr8M5mViX1blYIldHdO5y9xKBZAUffaJE"/>
+</div>
+<span class="text-[10px] font-bold text-on-surface">Sushi</span>
+</button>
+<button class="flex-shrink-0 flex flex-col items-center gap-2">
+<div class="w-14 h-14 bg-surface-container-high rounded-xl flex items-center justify-center overflow-hidden">
+<img alt="Burger" class="w-10 h-10 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDRagbTdCwn71CjId3G-qc_PI8qB_F3vIkldlvOpIy7KgyXQoOkV9JG4zFdpPIrXDcRhXIOwnobxfq_56EsLHb6fsWhQu_amjBzPrOyYP8qoprimF_DApFndDEkKlDEtycxesGxV8-eNDbU9zAXNSjKpe7zbzggGS3hodHRr4KOZ0qiC2HuMVaP0E-IKfnuDPOOSb06k0oz-P7axX_ulmZ_nk1GSReo8bUUjgRlaOf4SdcWZMUEM3qo7IFpgbZPuuepiLOn7sKu8DI"/>
+</div>
+<span class="text-[10px] font-bold text-on-surface">Burgers</span>
+</button>
+<button class="flex-shrink-0 flex flex-col items-center gap-2">
+<div class="w-14 h-14 bg-surface-container-low rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="restaurant_menu">restaurant_menu</span>
+</div>
+<span class="text-[10px] font-bold text-on-surface">Asian</span>
+</button>
+<button class="flex-shrink-0 flex flex-col items-center gap-2">
+<div class="w-14 h-14 bg-surface-container-low rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="local_cafe">local_cafe</span>
+</div>
+<span class="text-[10px] font-bold text-on-surface">Coffee</span>
+</button>
+<button class="flex-shrink-0 flex flex-col items-center gap-2">
+<div class="w-14 h-14 bg-surface-container-low rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="bakery_dining">bakery_dining</span>
+</div>
+<span class="text-[10px] font-bold text-on-surface">Bakery</span>
+</button>
+</div>
+</section>
+<section class="px-4">
+<h2 class="font-headline text-sm font-bold text-on-surface mb-4">Curated For You</h2>
+<div class="grid grid-cols-2 gap-4">
+<div class="flex flex-col gap-2">
+<div class="relative aspect-[4/3] rounded-xl overflow-hidden shadow-sm">
+<img alt="Restaurant food" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAD25ttG6SC-8VnapaRPDCPvGq9EiPDgWxDX4bj0lameAu2wiky4dQxNJnmb8IVxVQDHK7z6bSqAgl12lSUKiWIQLKsVSRQ8tpwRQVi6s2HLDhfYgKIFS7P2Ppg-seVm_61eWJr5RMnartyaMC6JWalsKs_F-JymEkmJ6gsAVSW7BuX7BdHfW6Tl_DE9AzAVC7iYd8dMFsot3GfymotAWlgIiylVSYS5TNEnCPcVlKERwvzVbR-G0CnA4MaBSbTlmiEOPf_gJ6XODA"/>
+<div class="absolute top-2 right-2 bg-white/95 backdrop-blur-sm px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
+<span class="material-symbols-outlined text-yellow-500 text-[10px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-[10px] font-bold text-on-surface">4.9</span>
+</div>
+</div>
+<div>
+<h3 class="font-headline text-xs font-bold text-on-surface truncate">The Heritage Kitchen</h3>
+<p class="text-[10px] text-on-surface-variant truncate">20-30 min • Free</p>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<div class="relative aspect-[4/3] rounded-xl overflow-hidden shadow-sm">
+<img alt="Interior" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDxhTKQnbVX-6sB3PwpG-_b4NyZJzLCZt9Jd76X8Pg7JsERy7zMDBnwZqWMm5GhhKpEuCkRzYijLY6ULplPnabQarGTm6O7VTcmFkqCYW8-nZjh_A4yYzn-8FKrwzxS4gRFW26W1MvuTiEZplUX6fBV1T0huU9UY0OkFJ9M9Y7G4jQl7kem2BWOZ2GdrTkyWkdnCCI5VRInW0pL79_AkDDAgCXsvBBBZHeBBYN5RWuKz8ZTs-Ly-vsXTiLnCq93R3W5li_qek6TQwM"/>
+<div class="absolute top-2 right-2 bg-white/95 backdrop-blur-sm px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
+<span class="material-symbols-outlined text-yellow-500 text-[10px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-[10px] font-bold text-on-surface">4.7</span>
+</div>
+</div>
+<div>
+<h3 class="font-headline text-xs font-bold text-on-surface truncate">Sakura Bloom</h3>
+<p class="text-[10px] text-on-surface-variant truncate">15-25 min • $$</p>
+</div>
+</div>
+<div class="flex flex-col gap-2 opacity-90">
+<div class="relative aspect-[4/3] rounded-xl overflow-hidden shadow-sm bg-surface-container">
+<div class="absolute inset-0 flex items-center justify-center text-on-surface-variant/20">
+<span class="material-symbols-outlined text-4xl">restaurant</span>
+</div>
+<div class="absolute top-2 right-2 bg-white/95 backdrop-blur-sm px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
+<span class="material-symbols-outlined text-yellow-500 text-[10px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-[10px] font-bold text-on-surface">4.5</span>
+</div>
+</div>
+<div>
+<h3 class="font-headline text-xs font-bold text-on-surface truncate">Burger Haven</h3>
+<p class="text-[10px] text-on-surface-variant truncate">10-20 min • $</p>
+</div>
+</div>
+<div class="flex flex-col gap-2 opacity-90">
+<div class="relative aspect-[4/3] rounded-xl overflow-hidden shadow-sm bg-surface-container">
+<div class="absolute inset-0 flex items-center justify-center text-on-surface-variant/20">
+<span class="material-symbols-outlined text-4xl">local_pizza</span>
+</div>
+<div class="absolute top-2 right-2 bg-white/95 backdrop-blur-sm px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
+<span class="material-symbols-outlined text-yellow-500 text-[10px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-[10px] font-bold text-on-surface">4.8</span>
+</div>
+</div>
+<div>
+<h3 class="font-headline text-xs font-bold text-on-surface truncate">Vero Italiano</h3>
+<p class="text-[10px] text-on-surface-variant truncate">25-40 min • $$$</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-[400px] rounded-[2rem] z-50 bg-[#fff4f3]/80 backdrop-blur-md shadow-lg border border-surface-container">
+<div class="flex justify-around items-center p-2 w-full">
+<a class="flex flex-col items-center justify-center bg-[#ffdad8] text-[#4e2121] rounded-full px-5 py-2 transition-all active:scale-90" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="restaurant" style="font-variation-settings: 'FILL' 1;">restaurant</span>
+<span class="font-semibold text-[10px] mt-0.5">Explore</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#4e2121]/60 px-5 py-2 active:scale-90" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="search">search</span>
+<span class="font-semibold text-[10px] mt-0.5">Search</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#4e2121]/60 px-5 py-2 active:scale-90" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="receipt_long">receipt_long</span>
+<span class="font-semibold text-[10px] mt-0.5">Orders</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#4e2121]/60 px-5 py-2 active:scale-90" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="person">person</span>
+<span class="font-semibold text-[10px] mt-0.5">Profile</span>
+</a>
+</div>
+</nav>
+
+</body></html>

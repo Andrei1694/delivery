@@ -2,7 +2,10 @@ package com.party.ceva.demo.controller;
 
 import com.party.ceva.demo.dto.AuthRequest;
 import com.party.ceva.demo.dto.AuthResponse;
+import com.party.ceva.demo.dto.RegisterRequest;
 import com.party.ceva.demo.dto.UserDto;
+import com.party.ceva.demo.dto.UserProfileDto;
+import com.party.ceva.demo.repository.UserRepository;
 import com.party.ceva.demo.service.JwtService;
 import com.party.ceva.demo.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -27,32 +30,48 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
     private final JwtService jwtService;
+    private final UserRepository userRepository;
 
-    public AuthController(AuthenticationManager authenticationManager, UserService userService, JwtService jwtService) {
+    public AuthController(AuthenticationManager authenticationManager, UserService userService, JwtService jwtService, UserRepository userRepository) {
         this.authenticationManager = authenticationManager;
         this.userService = userService;
         this.jwtService = jwtService;
+        this.userRepository = userRepository;
     }
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
         try {
+            String email = userRepository.findByPhone(request.getPhone())
+                .map(u -> u.getEmail())
+                .orElseThrow(() -> new org.springframework.security.authentication.BadCredentialsException("Invalid phone or password"));
+
             Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+                new UsernamePasswordAuthenticationToken(email, request.getPassword())
             );
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            UserDto user = userService.findByEmail(request.getEmail()).orElse(null);
+            UserDto user = userService.findByEmail(email).orElse(null);
             String token = jwtService.generateToken(authentication);
             return ResponseEntity.ok(new AuthResponse("Login successful", user, token));
         } catch (AuthenticationException ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(new AuthResponse("Invalid email or password", null, null));
+                .body(new AuthResponse("Invalid phone or password", null, null));
         }
     }
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@RequestBody UserDto userDto) {
+    public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
+        UserProfileDto profile = new UserProfileDto();
+        profile.setFirstName(request.getFirstName());
+        profile.setLastName(request.getLastName());
+        profile.setTelefon(request.getPhone());
+
+        UserDto userDto = new UserDto();
+        userDto.setEmail(request.getEmail());
+        userDto.setPassword(request.getPassword());
+        userDto.setUserProfile(profile);
+
         UserDto created = userService.registerUser(userDto);
         String token = jwtService.generateTokenFromUsername(created.getEmail());
         return ResponseEntity.status(HttpStatus.CREATED)

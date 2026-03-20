@@ -1,4 +1,6 @@
 /** @type {import('tailwindcss').Config} */
+const appFontStack = ['"Manrope"', "sans-serif"]
+
 export default {
 	darkMode: "class",
 	content: [
@@ -76,12 +78,12 @@ export default {
 				"cusens-green-light": "#ffdad8"
 			},
 			fontFamily: {
-				sans: ['"Manrope"', "sans-serif"],
-				body: ['"Manrope"', "sans-serif"],
-				label: ['"Manrope"', "sans-serif"],
-				heading: ['"Plus Jakarta Sans"', '"Manrope"', "sans-serif"],
-				display: ['"Plus Jakarta Sans"', '"Manrope"', "sans-serif"],
-				headline: ['"Plus Jakarta Sans"', '"Manrope"', "sans-serif"],
+				sans: appFontStack,
+				body: appFontStack,
+				label: appFontStack,
+				heading: appFontStack,
+				display: appFontStack,
+				headline: appFontStack,
 			},
 			borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
 		},
