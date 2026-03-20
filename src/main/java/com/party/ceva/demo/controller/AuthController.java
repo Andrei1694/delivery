@@ -54,8 +54,9 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@RequestBody UserDto userDto) {
         UserDto created = userService.registerUser(userDto);
+        String token = jwtService.generateTokenFromUsername(created.getEmail());
         return ResponseEntity.status(HttpStatus.CREATED)
-            .body(new AuthResponse("Registration successful", created, null));
+            .body(new AuthResponse("Registration successful", created, token));
     }
 
     @GetMapping("/me")

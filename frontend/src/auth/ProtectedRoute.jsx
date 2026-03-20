@@ -6,7 +6,7 @@ const ProtectedRoute = ({ children }) => {
   const location = useLocation();
 
   if (isLoading) {
-    return <div className="p-6 text-center text-sm text-cusens-text-secondary">Checking session...</div>;
+    return <div className="p-6 text-center text-sm text-on-surface-variant">Checking session...</div>;
   }
 
   if (!isAuthenticated) {

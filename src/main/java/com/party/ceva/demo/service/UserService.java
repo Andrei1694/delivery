@@ -193,30 +193,35 @@ public class UserService {
 	}
 
 	public UserDto registerUser(UserDto userDto) {
-		logger.info("Registering user for email {}", maskEmail(userDto.getEmail()));
-		UserProfileDto registrationProfile = userDto.getUserProfile();
-		if (registrationProfile == null) {
-			logger.warn("Registration rejected: userProfile is required for {}", maskEmail(userDto.getEmail()));
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User profile is required");
+		if (userDto == null) {
+			logger.warn("Registration rejected: payload is missing");
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Registration payload is required");
 		}
 
-		String firstName = normalizeNullable(registrationProfile.getFirstName());
-		if (firstName == null) {
-			logger.warn("Registration rejected: firstName is missing for {}", maskEmail(userDto.getEmail()));
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "First name is required");
+		String email = normalizeNullable(userDto.getEmail());
+		if (email == null) {
+			logger.warn("Registration rejected: email is missing");
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email is required");
 		}
 
-		String lastName = normalizeNullable(registrationProfile.getLastName());
-		if (lastName == null) {
-			logger.warn("Registration rejected: lastName is missing for {}", maskEmail(userDto.getEmail()));
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Last name is required");
+		String password = normalizeNullable(userDto.getPassword());
+		if (password == null) {
+			logger.warn("Registration rejected: password is missing for {}", maskEmail(email));
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password is required");
+		}
+
+		logger.info("Registering user for email {}", maskEmail(email));
+
+		if (userRepository.existsByEmailIgnoreCase(email)) {
+			logger.warn("Registration rejected: email already in use {}", maskEmail(email));
+			throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already in use");
 		}
 
 		// Validate and process referral code if provided
 		User referrer = null;
-		String referralCode = userDto.getReferralCode();
-		if (referralCode != null && !referralCode.trim().isEmpty()) {
-			final String processedCode = referralCode.trim().toUpperCase();
+		String referralCode = normalizeNullable(userDto.getReferralCode());
+		if (referralCode != null) {
+			final String processedCode = referralCode.toUpperCase();
 			referrer = userRepository.findByCode(processedCode)
 					.orElseThrow(() -> {
 						logger.warn("Registration rejected: referral code {} not found", processedCode);
@@ -224,27 +229,38 @@ public class UserService {
 					});
 
 			// Prevent self-referral
-			if (referrer.getEmail().equalsIgnoreCase(userDto.getEmail())) {
-				logger.warn("Registration rejected: self-referral attempt for {}", maskEmail(userDto.getEmail()));
+			if (referrer.getEmail().equalsIgnoreCase(email)) {
+				logger.warn("Registration rejected: self-referral attempt for {}", maskEmail(email));
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot use your own referral code");
 			}
 			logger.info("Valid referral code {} from user {}", referralCode, referrer.getId());
 		}
 
 		User user = new User();
-		user.setEmail(userDto.getEmail());
-		user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+		user.setEmail(email);
+		user.setPassword(passwordEncoder.encode(password));
 		user.setCode(generateUniqueCode());
 		user.setReferredBy(referrer);
 
-		LocalDateTime now = LocalDateTime.now();
-		UserProfile userProfile = new UserProfile();
-		userProfile.setFirstName(firstName);
-		userProfile.setLastName(lastName);
-		userProfile.setSex(normalizeSexOrDefault(registrationProfile.getSex()));
-		userProfile.setCreatedAt(now);
-		userProfile.setUpdatedAt(now);
-		user.setUserProfile(userProfile);
+		UserProfileDto registrationProfile = userDto.getUserProfile();
+		if (registrationProfile != null) {
+			validateProfilePayload(registrationProfile);
+
+			LocalDateTime now = LocalDateTime.now();
+			UserProfile userProfile = new UserProfile();
+			userProfile.setFirstName(normalizeNullable(registrationProfile.getFirstName()));
+			userProfile.setLastName(normalizeNullable(registrationProfile.getLastName()));
+			userProfile.setDateOfBirth(registrationProfile.getDateOfBirth());
+			userProfile.setAddress(normalizeNullable(registrationProfile.getAddress()));
+			userProfile.setProfilePictureUrl(normalizeNullable(registrationProfile.getProfilePictureUrl()));
+			userProfile.setBio(normalizeNullable(registrationProfile.getBio()));
+			userProfile.setTelefon(normalizeNullable(registrationProfile.getTelefon()));
+			userProfile.setCnp(normalizeNullable(registrationProfile.getCnp()));
+			userProfile.setSex(registrationProfile.getSex());
+			userProfile.setCreatedAt(now);
+			userProfile.setUpdatedAt(now);
+			user.setUserProfile(userProfile);
+		}
 
 		User savedUser = userRepository.save(user);
 		cacheManager.getCache("usersById").evict(savedUser.getId());

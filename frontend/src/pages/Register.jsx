@@ -37,9 +37,18 @@ const Register = () => {
   const handleSubmit = useFormSubmitHandler(form);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-cusens-bg p-4">
-      <div className="w-full max-w-md rounded-3xl border border-cusens-border bg-cusens-surface p-8 shadow-xl">
-        <BrandLogo size="lg" subtitle="Create a new account" className="mb-8" />
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background p-4">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute left-[-3rem] top-[-4rem] h-44 w-44 rounded-full bg-primary-fixed/20 blur-3xl"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute bottom-[-4rem] right-[-3rem] h-52 w-52 rounded-full bg-tertiary-fixed/20 blur-3xl"
+      />
+
+      <div className="relative w-full max-w-md rounded-[2rem] border border-outline-variant/60 bg-surface-container-lowest/95 p-8 shadow-[0_24px_60px_rgba(78,33,33,0.08)] backdrop-blur">
+        <BrandLogo subtitle="Create your account to start ordering" className="mb-8" />
 
         <form className="space-y-4" onSubmit={handleSubmit}>
           <form.Field name="email">
@@ -111,7 +120,7 @@ const Register = () => {
           </form.Field>
 
           {error ? (
-            <p className="rounded-xl border border-red-300 bg-red-50 p-3 text-sm text-red-700">
+            <p className="rounded-2xl border border-error/20 bg-error-container/10 p-3 text-sm text-error-dim">
               {error}
             </p>
           ) : null}
@@ -125,9 +134,9 @@ const Register = () => {
           </form.Subscribe>
         </form>
 
-        <p className="mt-6 text-center text-sm text-cusens-text-secondary">
+        <p className="mt-6 text-center text-sm text-on-surface-variant">
           Already registered?{' '}
-          <Link to="/login" className="font-semibold text-cusens-primary hover:text-cusens-primary-hover">
+          <Link to="/login" className="font-semibold text-primary hover:text-primary-fixed-dim">
             Sign in
           </Link>
         </p>

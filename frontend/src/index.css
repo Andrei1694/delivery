@@ -2,7 +2,7 @@
 @config '../tailwind.config.js';
 
 :root {
-  font-family: 'Open Sans', Arial, 'Helvetica Neue', Helvetica, sans-serif;
+  font-family: 'Manrope', sans-serif;
   line-height: 1.5;
   font-weight: 400;
   font-synthesis: none;
@@ -15,9 +15,9 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background-color: #f8ffe9;
-  color: #32443e;
-  font-family: 'Open Sans', Arial, 'Helvetica Neue', Helvetica, sans-serif;
+  background-color: #fff4f3;
+  color: #4e2121;
+  font-family: 'Manrope', sans-serif;
 }
 
 h1,
@@ -26,11 +26,15 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: 'Montserrat', 'Open Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Manrope', sans-serif;
 }
 
 button {
-  font-family: 'Montserrat', 'Open Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Manrope', sans-serif;
+}
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
 
 #root {

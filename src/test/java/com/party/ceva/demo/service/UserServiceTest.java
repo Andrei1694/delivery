@@ -2,10 +2,9 @@ package com.party.ceva.demo.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -174,7 +173,29 @@ class UserServiceTest {
 	}
 
 	@Test
-	void registerUserCreatesUserProfileWithTrimmedNames() {
+	void registerUserCreatesAccountWithEmailAndPasswordOnly() {
+		UserDto payload = new UserDto();
+		payload.setEmail("new@example.com");
+		payload.setPassword("password");
+
+		when(passwordEncoder.encode("password")).thenReturn("encoded-password");
+		when(codeGenerationService.generateCode()).thenReturn("ABCD");
+		when(userRepository.existsByCode("ABCD")).thenReturn(false);
+		when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
+			User savedUser = invocation.getArgument(0);
+			savedUser.setId(15L);
+			return savedUser;
+		});
+
+		UserDto result = userService.registerUser(payload);
+
+		assertEquals("new@example.com", result.getEmail());
+		assertNull(result.getUserProfile());
+		verify(userRepository).save(any(User.class));
+	}
+
+	@Test
+	void registerUserCreatesUserProfileWithTrimmedNamesWhenProvided() {
 		UserDto payload = new UserDto();
 		payload.setEmail("new@example.com");
 		payload.setPassword("password");
@@ -206,9 +227,9 @@ class UserServiceTest {
 	}
 
 	@Test
-	void registerUserRejectsMissingUserProfile() {
+	void registerUserRejectsBlankEmail() {
 		UserDto payload = new UserDto();
-		payload.setEmail("new@example.com");
+		payload.setEmail("   ");
 		payload.setPassword("password");
 
 		ResponseStatusException ex = assertThrows(
@@ -216,49 +237,41 @@ class UserServiceTest {
 				() -> userService.registerUser(payload));
 
 		assertEquals(HttpStatus.BAD_REQUEST, ex.getStatusCode());
-		assertEquals("User profile is required", ex.getReason());
+		assertEquals("Email is required", ex.getReason());
 		verify(userRepository, never()).save(any(User.class));
 		verify(codeGenerationService, never()).generateCode();
 	}
 
 	@Test
-	void registerUserRejectsBlankFirstName() {
+	void registerUserRejectsBlankPassword() {
 		UserDto payload = new UserDto();
 		payload.setEmail("new@example.com");
-		payload.setPassword("password");
-
-		UserProfileDto profilePayload = new UserProfileDto();
-		profilePayload.setFirstName("   ");
-		profilePayload.setLastName("Doe");
-		payload.setUserProfile(profilePayload);
+		payload.setPassword("  ");
 
 		ResponseStatusException ex = assertThrows(
 				ResponseStatusException.class,
 				() -> userService.registerUser(payload));
 
 		assertEquals(HttpStatus.BAD_REQUEST, ex.getStatusCode());
-		assertEquals("First name is required", ex.getReason());
+		assertEquals("Password is required", ex.getReason());
 		verify(userRepository, never()).save(any(User.class));
 		verify(codeGenerationService, never()).generateCode();
 	}
 
 	@Test
-	void registerUserRejectsBlankLastName() {
+	void registerUserRejectsDuplicateEmail() {
 		UserDto payload = new UserDto();
 		payload.setEmail("new@example.com");
 		payload.setPassword("password");
 
-		UserProfileDto profilePayload = new UserProfileDto();
-		profilePayload.setFirstName("Jane");
-		profilePayload.setLastName("   ");
-		payload.setUserProfile(profilePayload);
+		when(userRepository.existsByEmailIgnoreCase("new@example.com")).thenReturn(true);
 
 		ResponseStatusException ex = assertThrows(
 				ResponseStatusException.class,
 				() -> userService.registerUser(payload));
 
-		assertEquals(HttpStatus.BAD_REQUEST, ex.getStatusCode());
-		assertEquals("Last name is required", ex.getReason());
+		assertEquals(HttpStatus.CONFLICT, ex.getStatusCode());
+		assertEquals("Email already in use", ex.getReason());
 		verify(userRepository, never()).save(any(User.class));
 		verify(codeGenerationService, never()).generateCode();
 	}

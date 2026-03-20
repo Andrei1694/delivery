@@ -6,10 +6,10 @@ import {
 import App from './App';
 import ProtectedRoute from './auth/ProtectedRoute';
 import PublicOnlyRoute from './auth/PublicOnlyRoute';
-import AuthHome from './pages/AuthHome';
 import Login from './pages/Login';
 import Register from './pages/Register';
-
+import HomeFeed from './pages/home/HomeFeed';
+import VervetKitchenLogin from './pages/Login';
 const rootRoute = createRootRoute({
   component: App,
 });
@@ -19,7 +19,7 @@ const homeRoute = createRoute({
   path: '/',
   component: () => (
     <ProtectedRoute>
-      <AuthHome />
+      <HomeFeed />
     </ProtectedRoute>
   ),
 });
@@ -29,7 +29,7 @@ const loginRoute = createRoute({
   path: '/login',
   component: () => (
     <PublicOnlyRoute>
-      <Login />
+<VervetKitchenLogin />
     </PublicOnlyRoute>
   ),
 });
