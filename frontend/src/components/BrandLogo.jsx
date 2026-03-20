@@ -1,65 +1,40 @@
-import cusensMark from '../assets/logos/cusens-mark.svg';
-
 const sizeMap = {
-  xs: {
-    mark: 'h-6 w-6',
-    word: 'text-xs',
-    tracking: 'tracking-[0.16em]',
-    tagline: 'text-[10px]',
-  },
   sm: {
-    mark: 'h-8 w-8',
-    word: 'text-sm',
-    tracking: 'tracking-[0.18em]',
-    tagline: 'text-[11px]',
+    badge: 'h-9 w-9 text-xs',
+    title: 'text-base',
+    subtitle: 'text-[11px]',
   },
   md: {
-    mark: 'h-10 w-10',
-    word: 'text-base',
-    tracking: 'tracking-[0.2em]',
-    tagline: 'text-xs',
+    badge: 'h-11 w-11 text-sm',
+    title: 'text-lg',
+    subtitle: 'text-xs',
   },
   lg: {
-    mark: 'h-12 w-12',
-    word: 'text-2xl',
-    tracking: 'tracking-[0.2em]',
-    tagline: 'text-xs',
-  },
-  xl: {
-    mark: 'h-20 w-20',
-    word: 'text-3xl',
-    tracking: 'tracking-[0.24em]',
-    tagline: 'text-sm',
+    badge: 'h-14 w-14 text-base',
+    title: 'text-2xl',
+    subtitle: 'text-sm',
   },
 };
 
-const BrandLogo = ({
-  size = 'md',
-  showWordmark = true,
-  tagline,
-  className = '',
-  wordmarkClassName = '',
-  taglineClassName = '',
-}) => {
+const BrandLogo = ({ size = 'md', className = '', title = 'Auth Starter', subtitle = 'Template' }) => {
   const token = sizeMap[size] ?? sizeMap.md;
 
   return (
     <div className={`inline-flex items-center gap-3 ${className}`.trim()}>
-      <img src={cusensMark} alt="CUSENS logo mark" className={`${token.mark} shrink-0`} />
-      {showWordmark ? (
-        <div className="flex flex-col">
-          <p
-            className={`font-display font-bold uppercase leading-none text-cusens-text-primary ${token.word} ${token.tracking} ${wordmarkClassName}`.trim()}
-          >
-            CUSENS
-          </p>
-          {tagline ? (
-            <p className={`mt-1 leading-none text-cusens-text-secondary ${token.tagline} ${taglineClassName}`.trim()}>
-              {tagline}
-            </p>
-          ) : null}
-        </div>
-      ) : null}
+      <div
+        className={`flex shrink-0 items-center justify-center rounded-full bg-cusens-primary font-bold text-cusens-text-primary ${token.badge}`}
+        aria-hidden
+      >
+        AS
+      </div>
+      <div className="flex flex-col">
+        <p className={`font-display font-bold uppercase tracking-[0.18em] text-cusens-text-primary ${token.title}`.trim()}>
+          {title}
+        </p>
+        <p className={`leading-none text-cusens-text-secondary ${token.subtitle}`.trim()}>
+          {subtitle}
+        </p>
+      </div>
     </div>
   );
 };

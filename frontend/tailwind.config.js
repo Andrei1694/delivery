@@ -7,7 +7,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Core SENS palette
+        // Core palette
         "cusens-primary": "#A2DA5A",
         "cusens-primary-hover": "#86E30F",
         "cusens-accent": "#FED502",
@@ -20,7 +20,7 @@ export default {
         "cusens-dark": "#32443E",
         "cusens-dark-muted": "#293B35",
         "cusens-dark-hover": "#275847",
-        // Backward-compatible aliases used in existing pages/components
+        // Compatibility aliases
         "cusens-blue": "#A2DA5A",
         "cusens-green": "#A2DA5A",
         "cusens-green-light": "#E3EAD3",

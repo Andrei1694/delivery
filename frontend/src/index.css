@@ -33,23 +33,6 @@ button {
   font-family: 'Montserrat', 'Open Sans', sans-serif;
 }
 
-.material-icons {
-  font-family: 'Material Symbols Outlined';
-  font-style: normal;
-  font-weight: 400;
-  font-size: 24px;
-  line-height: 1;
-  letter-spacing: normal;
-  text-transform: none;
-  display: inline-block;
-  white-space: nowrap;
-  direction: ltr;
-  font-feature-settings: 'liga';
-  -webkit-font-feature-settings: 'liga';
-  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
-  -webkit-font-smoothing: antialiased;
-}
-
 #root {
   min-height: 100vh;
 }

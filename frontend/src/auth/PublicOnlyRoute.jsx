@@ -5,11 +5,11 @@ const PublicOnlyRoute = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
-    return <div>Checking session...</div>;
+    return <div className="p-6 text-center text-sm text-cusens-text-secondary">Checking session...</div>;
   }
 
   if (isAuthenticated) {
-    return <Navigate to="/news" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return children;

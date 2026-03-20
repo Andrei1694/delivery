@@ -12,28 +12,11 @@ const api = axios.create({
 });
 
 export const endpoints = {
-  users: '/users',
-  usersLevel: (id) => `/users/${id}/level`,
-  news: '/news',
-  events: '/events',
-  eventsJoined: '/events/joined',
-  eventJoin: (id) => `/events/${id}/join`,
-  newsById: (id) => `/news/news/${id}`,
-  usersProfile: (id) => `/users/${id}/profile`,
-  files: {
-    upload: '/files/upload',
-  },
   auth: {
     login: '/auth/login',
     register: '/auth/register',
     me: '/auth/me',
-    logout: '/auth/logout',
   },
-};
-
-export const registerUser = async (userData) => {
-  const response = await api.post(endpoints.auth.register, userData);
-  return response.data;
 };
 
 export default api;

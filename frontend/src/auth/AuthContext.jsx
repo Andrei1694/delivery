@@ -37,82 +37,96 @@ const writeStoredToken = (token) => {
 const setAuthToken = (token) => {
   if (token) {
     api.defaults.headers.common.Authorization = `Bearer ${token}`;
-  } else {
-    delete api.defaults.headers.common.Authorization;
+    return;
   }
+
+  delete api.defaults.headers.common.Authorization;
 };
+
+const readTokenFromResponse = (data) =>
+  data?.token ?? data?.accessToken ?? data?.jwt ?? null;
+
+const readUserFromResponse = (data) => data?.user ?? data?.account ?? null;
 
 const initialToken = readStoredToken();
 setAuthToken(initialToken);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(Boolean(initialToken));
+  const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  useEffect(() => {
-    const loadMe = async () => {
-      try {
-        const token = readStoredToken();
-        if (!token) {
-          setUser(null);
-          setIsAuthenticated(false);
-          setAuthToken(null);
-          setIsLoading(false);
-          return;
-        }
-
-        setAuthToken(token);
-
-        const { data } = await api.get(endpoints.auth.me);
-        setUser(data);
-        setIsAuthenticated(true);
-      } catch {
-        setUser(null);
-        setIsAuthenticated(false);
-        writeStoredToken(null);
-        setAuthToken(null);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadMe();
-  }, []);
-
-  const login = useCallback(async (credentials) => {
-    const { data } = await api.post(endpoints.auth.login, credentials);
-    setUser(data.user);
-    writeStoredToken(data.token ?? null);
-    setAuthToken(data.token ?? null);
-    setIsAuthenticated(Boolean(data.token));
-    return data;
-  }, []);
-
-  const register = useCallback(async (payload) => {
-    const { data } = await api.post(endpoints.auth.register, payload);
-    setUser(data.user);
-    writeStoredToken(data.token ?? null);
-    setAuthToken(data.token ?? null);
-    setIsAuthenticated(Boolean(data.token));
-    return data;
-  }, []);
-
-  const updateProfile = useCallback(async (profilePayload) => {
-    if (!user?.id) {
-      throw new Error('No authenticated user.');
-    }
-    const { data } = await api.put(endpoints.usersProfile(user.id), profilePayload);
-    setUser(data);
-    return data;
-  }, [user?.id]);
-
-  const logout = useCallback(async () => {
+  const setUnauthenticatedState = useCallback(() => {
     setUser(null);
     setIsAuthenticated(false);
     writeStoredToken(null);
     setAuthToken(null);
   }, []);
+
+  const loadCurrentUser = useCallback(async () => {
+    const { data } = await api.get(endpoints.auth.me);
+    return data;
+  }, []);
+
+  const completeAuthentication = useCallback(async (authPayload) => {
+    const token = readTokenFromResponse(authPayload);
+    const userFromPayload = readUserFromResponse(authPayload);
+
+    writeStoredToken(token ?? null);
+    setAuthToken(token ?? null);
+
+    let resolvedUser = userFromPayload;
+    if (!resolvedUser) {
+      resolvedUser = await loadCurrentUser();
+    }
+
+    if (!resolvedUser) {
+      throw new Error('Authentication succeeded but user details are missing.');
+    }
+
+    setUser(resolvedUser);
+    setIsAuthenticated(true);
+
+    return {
+      token,
+      user: resolvedUser,
+    };
+  }, [loadCurrentUser]);
+
+  useEffect(() => {
+    const restoreSession = async () => {
+      try {
+        const restoredUser = await loadCurrentUser();
+        if (!restoredUser) {
+          setUnauthenticatedState();
+          return;
+        }
+
+        setUser(restoredUser);
+        setIsAuthenticated(true);
+      } catch {
+        setUnauthenticatedState();
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    restoreSession();
+  }, [loadCurrentUser, setUnauthenticatedState]);
+
+  const login = useCallback(async (credentials) => {
+    const { data } = await api.post(endpoints.auth.login, credentials);
+    return completeAuthentication(data);
+  }, [completeAuthentication]);
+
+  const register = useCallback(async (payload) => {
+    const { data } = await api.post(endpoints.auth.register, payload);
+    return completeAuthentication(data);
+  }, [completeAuthentication]);
+
+  const logout = useCallback(async () => {
+    setUnauthenticatedState();
+  }, [setUnauthenticatedState]);
 
   const value = useMemo(
     () => ({
@@ -121,10 +135,9 @@ export const AuthProvider = ({ children }) => {
       isAuthenticated,
       login,
       register,
-      updateProfile,
       logout,
     }),
-    [user, isLoading, isAuthenticated, login, register, updateProfile, logout],
+    [user, isLoading, isAuthenticated, login, register, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
