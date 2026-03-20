@@ -15,6 +15,7 @@ import OrderHistory from './pages/OrderHistory';
 import OrderDetails from './pages/OrderDetails';
 import SecureCheckout from './pages/SecureCheckout';
 import HomeFeed from './pages/home/HomeFeed';
+import SearchResults from './pages/SearchResults';
 
 const rootRoute = createRootRoute({
   component: App,
@@ -80,6 +81,16 @@ const basketRoute = createRoute({
   ),
 });
 
+const searchRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/search',
+  component: () => (
+    <ProtectedRoute>
+      <SearchResults />
+    </ProtectedRoute>
+  ),
+});
+
 const orderHistoryRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/order-history',
@@ -117,6 +128,7 @@ const routeTree = rootRoute.addChildren([
   profileRoute,
   restaurantMenuRoute,
   basketRoute,
+  searchRoute,
   orderHistoryRoute,
   orderDetailsRoute,
   checkoutRoute,

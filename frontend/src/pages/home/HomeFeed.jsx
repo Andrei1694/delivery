@@ -1,11 +1,6 @@
 import { Link } from '@tanstack/react-router';
 import BottomNav from '../../components/BottomNav';
-
-const homeNavItems = [
-  { label: 'Explore', icon: 'restaurant', to: '/' },
-  { label: 'Search', icon: 'search' },
-  { label: 'Orders', icon: 'receipt_long', to: '/order-history' },
-];
+import { NAV_ITEMS } from '../../navigation/navItems';
 
 const categories = [
   {
@@ -83,7 +78,7 @@ const SymbolIcon = ({ name, className = '', filled = false }) => (
 export default function HomeFeed() {
   return (
     <div className="bg-surface font-body text-on-surface min-h-screen">
-      <header className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-xl border-b border-surface-container">
+      <header className="fixed top-0 w-full z-50 bg-surface/70 backdrop-blur-xl border-b border-surface-container">
         <div className="px-4 py-3 w-full max-w-lg mx-auto flex flex-col gap-3">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
@@ -91,13 +86,13 @@ export default function HomeFeed() {
               <span className="text-on-surface font-bold text-xs">Home • 124 Park Ave</span>
               <SymbolIcon name="expand_more" className="text-on-surface-variant text-sm" />
             </div>
-            <button
-              type="button"
+            <Link
+              to="/basket"
               className="text-primary active:scale-95 duration-200"
               aria-label="Open bag"
             >
               <SymbolIcon name="shopping_bag" />
-            </button>
+            </Link>
           </div>
 
           <div className="relative">
@@ -194,7 +189,7 @@ export default function HomeFeed() {
         </section>
       </main>
 
-      <BottomNav navItems={homeNavItems} />
+      <BottomNav navItems={NAV_ITEMS} />
     </div>
   );
 }

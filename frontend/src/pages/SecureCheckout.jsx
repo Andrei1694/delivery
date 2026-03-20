@@ -1,10 +1,11 @@
+import { useRouter } from '@tanstack/react-router';
+
 export default function SecureCheckout() {
+  const router = useRouter();
   return (
     <>
       <style>
         {`
-          @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700&family=Material+Symbols+Outlined:wght@100..700&display=swap');
-
           .secure-checkout-page {
             min-height: max(884px, 100dvh);
             font-family: 'Manrope', sans-serif;
@@ -50,11 +51,12 @@ export default function SecureCheckout() {
       </style>
 
       <div className="secure-checkout-page bg-surface font-body text-on-surface antialiased min-h-screen flex flex-col overflow-x-hidden">
-        <header className="bg-surface-bright sticky top-0 z-50 px-4 py-4 flex items-center justify-between">
+        <header className="sticky top-0 z-50 flex items-center justify-between px-4 py-4 bg-surface/70 backdrop-blur-xl border-b border-surface-container">
           <button
             aria-label="Go back"
             className="flex items-center justify-center w-12 h-12 rounded-full bg-surface-container-low text-on-surface hover:bg-surface-container transition-colors"
             type="button"
+            onClick={() => router.history.back()}
           >
             <span className="material-symbols-outlined text-2xl" data-icon="arrow_back">
               arrow_back

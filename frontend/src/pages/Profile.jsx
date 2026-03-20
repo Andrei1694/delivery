@@ -1,10 +1,6 @@
+import { useNavigate } from '@tanstack/react-router';
 import BottomNav from '../components/BottomNav';
-
-const profileNavItems = [
-  { label: 'Explore', icon: 'restaurant', to: '/' },
-  { label: 'Orders', icon: 'receipt_long', to: '/order-history' },
-  { label: 'Saved', icon: 'favorite' },
-];
+import { NAV_ITEMS } from '../navigation/navItems';
 
 const orders = [
   {
@@ -22,6 +18,7 @@ const orders = [
 ];
 
 export default function Profile() {
+  const navigate = useNavigate();
   return (
     <>
       <style>
@@ -35,19 +32,13 @@ export default function Profile() {
         className="bg-surface font-body text-on-surface selection:bg-primary-container selection:text-on-primary-container"
         style={{ minHeight: 'max(884px, 100dvh)' }}
       >
-        <header className="fixed top-0 z-50 flex h-16 w-full items-center justify-between bg-[#fff4f3]/60 px-6 backdrop-blur-xl dark:bg-[#4e2121]/60">
-          <button className="text-[#ac2c00] transition-opacity transition-transform hover:opacity-80 active:scale-95">
-            <span className="material-symbols-outlined">arrow_back</span>
-          </button>
-          <h1 className="font-headline text-lg font-bold tracking-tight text-[#ac2c00] dark:text-[#ff7852]">
+        <header className="fixed top-0 z-50 flex h-16 w-full items-center justify-center bg-surface/70 backdrop-blur-xl border-b border-surface-container px-6 dark:bg-on-surface/70">
+          <h1 className="font-headline text-lg font-bold tracking-tight text-primary">
             Profile
           </h1>
-          <button className="text-[#ac2c00] transition-opacity transition-transform hover:opacity-80 active:scale-95">
-            <span className="material-symbols-outlined">settings</span>
-          </button>
         </header>
 
-        <main className="mx-auto max-w-2xl space-y-10 px-6 pb-32 pt-24">
+        <main className="mx-auto max-w-lg space-y-10 px-6 pb-32 pt-24">
           <section className="flex flex-col items-center">
             <div className="relative mb-6">
               <div className="h-32 w-32 overflow-hidden rounded-full ring-4 ring-surface-container-high ring-offset-4 ring-offset-surface">
@@ -139,7 +130,10 @@ export default function Profile() {
                       {order.summary}
                     </p>
                     <div className="flex gap-2">
-                      <button className="rounded-full bg-surface-container-high px-4 py-2 text-xs font-bold transition-colors hover:bg-surface-container-highest">
+                      <button
+                        className="rounded-full bg-surface-container-high px-4 py-2 text-xs font-bold transition-colors hover:bg-surface-container-highest"
+                        onClick={() => navigate({ to: '/order-details' })}
+                      >
                         Details
                       </button>
                       <button className="rounded-full bg-primary px-4 py-2 text-xs font-bold text-white transition-opacity hover:opacity-90">
@@ -267,7 +261,7 @@ export default function Profile() {
           </div>
         </main>
 
-        <BottomNav navItems={profileNavItems} />
+        <BottomNav navItems={NAV_ITEMS} />
       </div>
     </>
   );

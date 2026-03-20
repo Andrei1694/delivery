@@ -53,7 +53,7 @@ export default function OrderDetails() {
       </style>
 
       <div className="order-details-page min-h-screen bg-background font-body text-on-surface selection:bg-primary-container selection:text-on-primary-container">
-        <header className="fixed top-0 z-50 w-full border-b border-outline-variant/10 bg-background/80 backdrop-blur-xl">
+        <header className="fixed top-0 z-50 w-full bg-surface/70 backdrop-blur-xl border-b border-surface-container">
           <div className="mx-auto flex h-16 w-full max-w-lg items-center justify-between px-6">
             <button
               aria-label="Go back"

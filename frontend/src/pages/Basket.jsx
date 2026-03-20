@@ -31,8 +31,6 @@ const cartItems = [
   },
 ];
 
-const profileImage =
-  'https://lh3.googleusercontent.com/aida-public/AB6AXuDz3kdPrg-yIqpGQXOj_YePGz3ozKe3NB2kzZhUWYiqvlIcpFj-AvSghouW-VmxabJ9YRXmL05HJo-1sB7GoOO3Ct_5ApKK8phTLmWUFDNvBHRahDStikI2sJB3H8AtrA2lfKz5YenMPcTYTULNOgaDEGFrIqOrkbgkD9BMSILa0da9a2xg1RnrJKxYw7cyjB0dCroKWgpWuFtgmEUHKYzR39dCel8eCh2QtLSBxava1V6tRXWxN-qQJswE1TvAPCDeCSwDd4O-OsI';
 
 const serviceFee = 4.2;
 const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -116,8 +114,6 @@ export default function Basket() {
     <>
       <style>
         {`
-          @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700&family=Material+Symbols+Outlined:wght@100..700&display=swap');
-
           .basket-page {
             font-family: 'Manrope', sans-serif;
             -webkit-tap-highlight-color: transparent;
@@ -136,11 +132,6 @@ export default function Basket() {
             vertical-align: middle;
           }
 
-          .basket-page .glass-header {
-            background: rgba(255, 244, 243, 0.6);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-          }
 
           .basket-page .ambient-shadow {
             box-shadow: 0 8px 24px rgba(78, 33, 33, 0.06);
@@ -152,35 +143,20 @@ export default function Basket() {
         className="basket-page bg-surface font-body text-on-surface antialiased"
         style={{ minHeight: 'max(884px, 100dvh)' }}
       >
-        <header className="glass-header fixed top-0 z-50 w-full">
+        <header className="fixed top-0 z-50 w-full bg-surface/70 backdrop-blur-xl border-b border-surface-container">
           <div className="mx-auto flex w-full max-w-lg items-center justify-between px-6 py-4">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 overflow-hidden rounded-full bg-surface-container-high">
-                <img
-                  alt="User profile picture of a young man"
-                  className="h-full w-full object-cover"
-                  src={profileImage}
-                />
-              </div>
-              <h1 className="font-headline text-xl font-extrabold tracking-tight text-on-background">
-                The Culinary Curator
-              </h1>
-            </div>
-
-            <div className="flex items-center gap-4">
-              <button
-                aria-label="Open bag"
-                className="text-primary transition-opacity duration-200 hover:opacity-80 active:scale-95"
-                type="button"
-              >
-                <span
-                  className="material-symbols-outlined"
-                  style={{ fontVariationSettings: "'FILL' 1" }}
-                >
-                  shopping_bag
-                </span>
-              </button>
-            </div>
+            <button
+              aria-label="Go back"
+              className="text-primary transition-opacity duration-200 hover:opacity-80 active:scale-95"
+              type="button"
+              onClick={() => navigate({ to: '/restaurant-menu' })}
+            >
+              <span className="material-symbols-outlined">arrow_back</span>
+            </button>
+            <h1 className="font-headline text-xl font-extrabold tracking-tight text-on-surface">
+              Your Basket
+            </h1>
+            <div className="w-10" />
           </div>
         </header>
 

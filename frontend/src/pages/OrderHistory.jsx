@@ -1,15 +1,5 @@
-import { useEffect } from 'react';
-
-const FONT_ASSETS = [
-  {
-    id: 'order-history-google-fonts',
-    href: 'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700&display=swap',
-  },
-  {
-    id: 'order-history-material-symbols',
-    href: 'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap',
-  },
-];
+import BottomNav from '../components/BottomNav';
+import { NAV_ITEMS } from '../navigation/navItems';
 
 const FILTERS = ['All Orders', 'Delivered', 'Processing', 'Cancelled'];
 
@@ -81,28 +71,11 @@ const ORDERS = [
   },
 ];
 
-const NAV_ITEMS = [
-  { label: 'Explore', icon: 'restaurant' },
-  { label: 'Orders', icon: 'receipt_long', active: true },
-  { label: 'Saved', icon: 'favorite' },
-  { label: 'Profile', icon: 'person' },
-];
 
 const iconStyle = {
   fontVariationSettings: "'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24",
 };
 
-function ensureStylesheet(id, href) {
-  if (typeof document === 'undefined' || document.getElementById(id)) {
-    return;
-  }
-
-  const link = document.createElement('link');
-  link.id = id;
-  link.rel = 'stylesheet';
-  link.href = href;
-  document.head.appendChild(link);
-}
 
 function SymbolIcon({ name, className = '' }) {
   return (
@@ -203,10 +176,6 @@ function OrderCard({ order }) {
 }
 
 export default function OrderHistory() {
-  useEffect(() => {
-    FONT_ASSETS.forEach(({ id, href }) => ensureStylesheet(id, href));
-  }, []);
-
   return (
     <>
       <style>{`
@@ -218,12 +187,7 @@ export default function OrderHistory() {
           font-family: 'Plus Jakarta Sans', 'Manrope', sans-serif;
         }
 
-        .order-history-page .glass-nav {
-          backdrop-filter: blur(16px);
-          -webkit-backdrop-filter: blur(16px);
-        }
-
-        .order-history-page .no-scrollbar::-webkit-scrollbar {
+.order-history-page .no-scrollbar::-webkit-scrollbar {
           display: none;
         }
 
@@ -234,25 +198,16 @@ export default function OrderHistory() {
       `}</style>
 
       <div className="order-history-page bg-surface font-body text-on-surface selection:bg-primary-container selection:text-on-primary-container">
-        <header className="fixed top-0 w-full z-50 bg-[#fff4f3]/60 backdrop-blur-xl">
+        <header className="fixed top-0 w-full z-50 bg-surface/70 backdrop-blur-xl border-b border-surface-container">
           <div className="flex items-center justify-between px-6 h-16 w-full max-w-lg mx-auto">
-            <div className="flex items-center gap-4">
-              <button
-                type="button"
-                className="p-2 -ml-2 text-[#ac2c00] active:scale-95 duration-200 transition-colors hover:bg-[#ffedeb]"
-                aria-label="Go back"
-              >
-                <SymbolIcon name="arrow_back" />
-              </button>
-              <h1 className="font-headline font-bold tracking-tight text-[#4e2121] text-xl">
-                Order History
-              </h1>
-            </div>
+            <h1 className="font-headline font-bold tracking-tight text-on-surface text-xl">
+              Order History
+            </h1>
 
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                className="p-2 text-[#ac2c00] active:scale-95 duration-200 transition-colors hover:bg-[#ffedeb]"
+                className="p-2 text-primary active:scale-95 duration-200 transition-colors hover:bg-surface-container-low"
                 aria-label="Search orders"
               >
                 <SymbolIcon name="search" />
@@ -308,33 +263,7 @@ export default function OrderHistory() {
           </button>
         </main>
 
-        <nav className="fixed bottom-0 w-full px-6 pb-8 flex justify-around items-center glass-nav bg-[#fff4f3]/70">
-          <div className="fixed bottom-4 left-4 right-4 rounded-full z-50 bg-[#fff4f3]/70 backdrop-blur-lg flex justify-around items-center py-2 shadow-[0_8px_24px_rgba(78,33,33,0.06)] h-20">
-            {NAV_ITEMS.map((item) => (
-              <button
-                key={item.label}
-                type="button"
-                className={
-                  item.active
-                    ? 'flex flex-col items-center justify-center bg-[#ac2c00] text-white rounded-full w-14 h-14 shadow-lg shadow-primary/30'
-                    : 'flex flex-col items-center justify-center text-[#4e2121]/50 hover:text-[#ac2c00] transition-all'
-                }
-              >
-                <SymbolIcon
-                  name={item.icon}
-                  className={item.active ? 'text-2xl' : 'text-2xl mb-1'}
-                />
-                <span
-                  className={`font-headline font-bold uppercase tracking-wider ${
-                    item.active ? 'text-[8px] mt-0.5' : 'text-[10px]'
-                  }`}
-                >
-                  {item.label}
-                </span>
-              </button>
-            ))}
-          </div>
-        </nav>
+        <BottomNav navItems={NAV_ITEMS} />
       </div>
     </>
   );

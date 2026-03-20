@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router';
 import BottomNav from '../components/BottomNav';
+import { NAV_ITEMS } from '../navigation/navItems';
 
 const categoryTabs = [
   { label: 'Appetizers', active: true },
@@ -40,11 +41,6 @@ const secondaryMainCourse = {
   imageAlt: 'Exquisitely prepared lobster thermidor on a silver platter',
 };
 
-const navItems = [
-  { label: 'Explore', icon: 'restaurant', to: '/' },
-  { label: 'Search', icon: 'search' },
-  { label: 'Orders', icon: 'receipt_long', to: '/order-history' },
-];
 
 function MenuCard({ item, alertIcon = false }) {
   return (
@@ -94,10 +90,6 @@ export default function RestaurantMenu() {
     <>
       <style>
         {`
-          .restaurant-menu-page .font-headline {
-            font-family: 'Plus Jakarta Sans', 'Manrope', sans-serif;
-          }
-
           .restaurant-menu-page .no-scrollbar::-webkit-scrollbar {
             display: none;
           }
@@ -120,7 +112,7 @@ export default function RestaurantMenu() {
         className="restaurant-menu-page bg-surface font-body text-on-surface selection:bg-primary-container selection:text-on-primary-container"
         style={{ minHeight: 'max(884px, 100dvh)' }}
       >
-        <nav className="fixed top-0 z-50 w-full bg-[#fff4f3]/60 backdrop-blur-xl transition-all duration-300 dark:bg-stone-950/60">
+        <nav className="fixed top-0 z-50 w-full bg-surface/70 backdrop-blur-xl transition-all duration-300 dark:bg-inverse-surface/70">
           <div className="mx-auto flex w-full max-w-lg items-center justify-between px-6 py-4">
             <button
               aria-label="Go back"
@@ -131,14 +123,14 @@ export default function RestaurantMenu() {
               <span className="material-symbols-outlined">arrow_back</span>
             </button>
 
-            <span className="font-headline text-xl font-extrabold tracking-tight text-[#4e2121] dark:text-[#f9ebea]">
+            <span className="font-headline text-xl font-extrabold tracking-tight text-on-surface dark:text-on-surface">
               The Culinary Curator
             </span>
 
             <div className="relative">
               <button
                 aria-label="Shopping bag"
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-container-lowest text-[#ac2c00] transition-opacity duration-200 hover:opacity-80 active:scale-95"
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-container-lowest text-primary transition-opacity duration-200 hover:opacity-80 active:scale-95"
                 type="button"
               >
                 <span className="material-symbols-outlined">shopping_bag</span>
@@ -289,7 +281,7 @@ export default function RestaurantMenu() {
           </section>
         </main>
 
-        <BottomNav navItems={navItems} />
+        <BottomNav navItems={NAV_ITEMS} />
 
         <div className="fixed bottom-28 left-0 z-40 flex w-full justify-center px-6">
           <Link
