@@ -9,8 +9,13 @@ import PublicOnlyRoute from './auth/PublicOnlyRoute';
 import Login from './pages/Login';
 import Profile from './pages/Profile';
 import Register from './pages/Register';
+import RestaurantMenu from './pages/RestaurantMenu';
+import Basket from './pages/Basket';
+import OrderHistory from './pages/OrderHistory';
+import OrderDetails from './pages/OrderDetails';
+import SecureCheckout from './pages/SecureCheckout';
 import HomeFeed from './pages/home/HomeFeed';
-import VervetKitchenLogin from './pages/Login';
+
 const rootRoute = createRootRoute({
   component: App,
 });
@@ -30,7 +35,7 @@ const loginRoute = createRoute({
   path: '/login',
   component: () => (
     <PublicOnlyRoute>
-<VervetKitchenLogin />
+      <Login />
     </PublicOnlyRoute>
   ),
 });
@@ -55,11 +60,66 @@ const profileRoute = createRoute({
   ),
 });
 
+const restaurantMenuRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/restaurant-menu',
+  component: () => (
+    <ProtectedRoute>
+      <RestaurantMenu />
+    </ProtectedRoute>
+  ),
+});
+
+const basketRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/basket',
+  component: () => (
+    <ProtectedRoute>
+      <Basket />
+    </ProtectedRoute>
+  ),
+});
+
+const orderHistoryRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/order-history',
+  component: () => (
+    <ProtectedRoute>
+      <OrderHistory />
+    </ProtectedRoute>
+  ),
+});
+
+const orderDetailsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/order-details',
+  component: () => (
+    <ProtectedRoute>
+      <OrderDetails />
+    </ProtectedRoute>
+  ),
+});
+
+const checkoutRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/checkout',
+  component: () => (
+    <ProtectedRoute>
+      <SecureCheckout />
+    </ProtectedRoute>
+  ),
+});
+
 const routeTree = rootRoute.addChildren([
   homeRoute,
   loginRoute,
   registerRoute,
   profileRoute,
+  restaurantMenuRoute,
+  basketRoute,
+  orderHistoryRoute,
+  orderDetailsRoute,
+  checkoutRoute,
 ]);
 
 export const router = createRouter({

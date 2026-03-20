@@ -85,7 +85,13 @@ export default {
 				display: appFontStack,
 				headline: appFontStack,
 			},
-			borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+			borderRadius: {
+				"DEFAULT": "0.25rem",
+				"lg": "0.5rem",
+				"xl": "0.75rem",
+				"xxl": "1.5rem",
+				"full": "9999px"
+			},
 		},
 	},
 	plugins: [],

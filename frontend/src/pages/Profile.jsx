@@ -1,4 +1,10 @@
-import { Link } from '@tanstack/react-router';
+import BottomNav from '../components/BottomNav';
+
+const profileNavItems = [
+  { label: 'Explore', icon: 'restaurant', to: '/' },
+  { label: 'Orders', icon: 'receipt_long', to: '/order-history' },
+  { label: 'Saved', icon: 'favorite' },
+];
 
 const orders = [
   {
@@ -13,12 +19,6 @@ const orders = [
       'https://lh3.googleusercontent.com/aida-public/AB6AXuA5zsPXrJ3-yR4grc-Y76sKgywdO0O0IOx_JbvHJiRqD9KmsY4zp3l0jQqGWqkIf0bGQn-VozLY9ZIuKl-bJoUh7ZrRFF1gBtNIMYchbGEKQDdFl_9uVk7ZymG1E_30d9x18i4k4Mttt2GsNcBQZl9HpR8Fi000KrOkfPKuuMrHYPwp5HgZOJtjFp7kYGgbouJjHwi7Dilwp7tiHm2AkIU6wLoHTMmUu2gC-5xsVesn-ft8nnvdqLZlTuZ3hNYoHSyFpNhHlMNyf5c',
     summary: '1 item \u2022 $18.50',
   },
-];
-
-const navItems = [
-  { label: 'Explore', icon: 'restaurant', to: '/' },
-  { label: 'Orders', icon: 'receipt_long' },
-  { label: 'Saved', icon: 'favorite' },
 ];
 
 export default function Profile() {
@@ -267,49 +267,7 @@ export default function Profile() {
           </div>
         </main>
 
-        <nav className="fixed bottom-0 z-50 flex w-full items-center justify-around px-6 pb-8 pointer-events-none">
-          <div className="mx-auto flex w-full max-w-md items-center justify-around overflow-hidden rounded-full border border-white/20 bg-[#fff4f3]/80 shadow-[0_8px_32px_rgba(78,33,33,0.12)] backdrop-blur-xl pointer-events-auto dark:bg-[#4e2121]/80">
-            {navItems.map((item) =>
-              item.to ? (
-                <Link
-                  key={item.label}
-                  className="flex flex-col items-center justify-center p-4 text-[#4e2121] transition-all dark:text-[#ffdad8] hover:bg-[#ffedeb] active:scale-90 dark:hover:bg-[#ffdad8]/10"
-                  to={item.to}
-                >
-                  <span className="material-symbols-outlined">{item.icon}</span>
-                  <span className="mt-1 font-['Manrope'] text-[10px] font-bold uppercase tracking-wide">
-                    {item.label}
-                  </span>
-                </Link>
-              ) : (
-                <a
-                  key={item.label}
-                  className="flex flex-col items-center justify-center p-4 text-[#4e2121] transition-all dark:text-[#ffdad8] hover:bg-[#ffedeb] active:scale-90 dark:hover:bg-[#ffdad8]/10"
-                  href="#"
-                >
-                  <span className="material-symbols-outlined">{item.icon}</span>
-                  <span className="mt-1 font-['Manrope'] text-[10px] font-bold uppercase tracking-wide">
-                    {item.label}
-                  </span>
-                </a>
-              ),
-            )}
-
-            <div className="p-1 pr-3">
-              <Link
-                className="flex h-14 w-14 flex-col items-center justify-center rounded-full bg-gradient-to-br from-[#ac2c00] to-[#ff7852] text-white shadow-lg transition-all duration-200 active:scale-90"
-                to="/profile"
-              >
-                <span
-                  className="material-symbols-outlined"
-                  style={{ fontVariationSettings: "'FILL' 1" }}
-                >
-                  person
-                </span>
-              </Link>
-            </div>
-          </div>
-        </nav>
+        <BottomNav navItems={profileNavItems} />
       </div>
     </>
   );

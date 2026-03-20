@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(find /c/Users/Andrei/Desktop/Projects/delivery/frontend -type f \\\\\\(-name *.js -o -name *.jsx \\\\\\))"
+      "Bash(find /c/Users/Andrei/Desktop/Projects/delivery/frontend -type f \\\\\\(-name *.js -o -name *.jsx \\\\\\))",
+      "Bash(npm run:*)",
+      "Bash(find /c/Users/Andrei/Desktop/Projects/delivery/frontend/src/components -name *Layout* -o -name *layout*)"
     ]
   }
 }
