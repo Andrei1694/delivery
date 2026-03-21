@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
 import BottomNav from '../components/BottomNav';
 import PageHeader from '../components/PageHeader';
@@ -7,6 +7,181 @@ import Toast from '../components/Toast';
 import { useToast } from '../components/useToast';
 import { getRestaurantById, getRestaurantMenuById } from '../mocks';
 import { NAV_ITEMS } from '../navigation/navItems';
+
+function parsePriceLabel(priceLabel) {
+  return Number.parseFloat(priceLabel.replace(/[^0-9.]/g, '')) || 0;
+}
+
+function formatPrice(value) {
+  return `$${value.toFixed(2)}`;
+}
+
+function buildItemHighlightTags(item, sectionLabel, restaurant) {
+  const lookup = `${restaurant.cuisine} ${sectionLabel} ${item.name} ${item.description}`.toLowerCase();
+  const tags = [sectionLabel];
+
+  if (
+    /(vegetarian|veggie|eggplant|aubergine|lentil|hummus|mushroom|truffle|salad|spinach|paneer|tofu|edamame|burrata|caprese|ricotta|feta|mozzarella)/.test(
+      lookup,
+    )
+  ) {
+    tags.push('Vegetarian');
+  } else if (
+    /(sea bass|prawn|shrimp|fish|tuna|salmon|seafood|octopus|clam|crab|lobster)/.test(
+      lookup,
+    )
+  ) {
+    tags.push('Seafood');
+  } else if (
+    /(chicken|lamb|beef|pork|wagyu|salami|pepperoni|burger|meatball|guanciale|bacon|short ribs)/.test(
+      lookup,
+    )
+  ) {
+    tags.push('Chef Protein');
+  } else {
+    tags.push('Fresh Today');
+  }
+
+  if (
+    /(yogurt|feta|halloumi|cheese|mascarpone|cream|bechamel|gelato|burrata|mozzarella|ricotta|parmesan|pecorino|milkshake|ice cream)/.test(
+      lookup,
+    )
+  ) {
+    tags.push('Contains Dairy');
+  }
+
+  tags.push(item.alertIcon ? 'Limited Batch' : item.badgeLabel ?? restaurant.heroBadge?.label ?? 'House Favorite');
+
+  return [...new Set(tags)].slice(0, 3);
+}
+
+function buildSizeOptions(item, sectionLabel, restaurant) {
+  const lookup = `${restaurant.cuisine} ${sectionLabel} ${item.name} ${item.description}`.toLowerCase();
+  const normalizedSection = sectionLabel.toLowerCase();
+
+  if (/(pizza|wood-fired|margherita|salami|pepperoni|nduja|truffle pizza)/.test(lookup)) {
+    return [
+      { id: 'classic', label: '12 inch', priceDelta: 0, helper: 'Included' },
+      { id: 'grande', label: '16 inch', priceDelta: 6 },
+    ];
+  }
+
+  if (/(burger|smash|patty)/.test(lookup)) {
+    return [
+      { id: 'single-stack', label: 'Single Stack', priceDelta: 0, helper: 'Included' },
+      { id: 'double-stack', label: 'Double Stack', priceDelta: 4.5 },
+    ];
+  }
+
+  if (/(sushi|maki|roll|gyoza|tataki|japanese)/.test(lookup)) {
+    return [
+      { id: 'eight-piece', label: '8 Pieces', priceDelta: 0, helper: 'Included' },
+      { id: 'twelve-piece', label: '12 Pieces', priceDelta: 6 },
+    ];
+  }
+
+  if (/(dessert|sweet|cake|gelato|sundae|mochi|milkshake|tiramisu|baklava|panna cotta)/.test(lookup) || /(sweets|desserts|shakes)/.test(normalizedSection)) {
+    return [
+      { id: 'classic', label: 'Classic', priceDelta: 0, helper: 'Included' },
+      { id: 'sharing', label: 'To Share', priceDelta: 3.5 },
+    ];
+  }
+
+  if (/(small plates|mezze|starters|sides|appetizers|breads)/.test(normalizedSection)) {
+    return [
+      { id: 'standard', label: 'Standard', priceDelta: 0, helper: 'Included' },
+      { id: 'sharing-plate', label: 'Sharing Plate', priceDelta: 5 },
+    ];
+  }
+
+  return [
+    { id: 'regular', label: 'Regular', priceDelta: 0, helper: 'Included' },
+    { id: 'large', label: 'Large', priceDelta: 7 },
+  ];
+}
+
+function buildExtraOptions(item, sectionLabel, restaurant) {
+  const lookup = `${restaurant.cuisine} ${sectionLabel} ${item.name} ${item.description}`.toLowerCase();
+  const cuisine = restaurant.cuisine.toLowerCase();
+
+  if (/(pizza|wood-fired|margherita|salami|pepperoni|nduja|truffle pizza)/.test(lookup)) {
+    return [
+      { id: 'extra-mozzarella', label: 'Extra Mozzarella', priceDelta: 2 },
+      { id: 'chili-honey', label: 'Chili Honey Drizzle', priceDelta: 2.5 },
+      { id: 'truffle-oil', label: 'Truffle Oil', priceDelta: 3 },
+    ];
+  }
+
+  if (/(burger|smash|patty)/.test(lookup)) {
+    return [
+      { id: 'smoked-bacon', label: 'Smoked Bacon', priceDelta: 3 },
+      { id: 'extra-cheddar', label: 'Extra Cheddar', priceDelta: 2 },
+      { id: 'house-pickles', label: 'House Pickles', priceDelta: 1.5 },
+    ];
+  }
+
+  if (/(sushi|maki|roll|gyoza|tataki|japanese)/.test(lookup)) {
+    return [
+      { id: 'avocado', label: 'Avocado', priceDelta: 2 },
+      { id: 'crispy-onion', label: 'Crispy Onion', priceDelta: 1.5 },
+      { id: 'spicy-mayo', label: 'Spicy Mayo', priceDelta: 1.5 },
+    ];
+  }
+
+  if (cuisine.includes('indian')) {
+    return [
+      { id: 'garlic-naan', label: 'Garlic Naan', priceDelta: 3 },
+      { id: 'cooling-raita', label: 'Cooling Raita', priceDelta: 2 },
+      { id: 'extra-basmati', label: 'Extra Basmati Rice', priceDelta: 3.5 },
+    ];
+  }
+
+  if (cuisine.includes('korean')) {
+    return [
+      { id: 'fried-egg', label: 'Fried Egg', priceDelta: 2 },
+      { id: 'extra-kimchi', label: 'Extra Kimchi', priceDelta: 2 },
+      { id: 'gochujang', label: 'Gochujang Drizzle', priceDelta: 1.5 },
+    ];
+  }
+
+  if (/(dessert|sweet|cake|gelato|sundae|mochi|milkshake|tiramisu|baklava|panna cotta)/.test(lookup) || /(sweets|desserts|shakes)/.test(sectionLabel.toLowerCase())) {
+    return [
+      { id: 'vanilla-cream', label: 'Vanilla Cream', priceDelta: 2 },
+      { id: 'berry-compote', label: 'Berry Compote', priceDelta: 1.5 },
+      { id: 'pistachio-crumble', label: 'Pistachio Crumble', priceDelta: 2.5 },
+    ];
+  }
+
+  if (cuisine.includes('mediterranean') || cuisine.includes('greek')) {
+    return [
+      { id: 'warm-pita', label: 'Warm Pita', priceDelta: 2 },
+      { id: 'chili-oil', label: 'Chili Oil', priceDelta: 1.5 },
+      { id: 'herb-salad', label: 'Herb Salad', priceDelta: 4 },
+    ];
+  }
+
+  if (cuisine.includes('italian')) {
+    return [
+      { id: 'extra-parmesan', label: 'Extra Parmesan', priceDelta: 2 },
+      { id: 'basil-oil', label: 'Basil Oil', priceDelta: 1.5 },
+      { id: 'roasted-mushrooms', label: 'Roasted Mushrooms', priceDelta: 4 },
+    ];
+  }
+
+  return [
+    { id: 'extra-sauce', label: 'Extra Sauce', priceDelta: 2 },
+    { id: 'house-slaw', label: 'House Slaw', priceDelta: 3 },
+    { id: 'roasted-veg', label: 'Roasted Vegetables', priceDelta: 4 },
+  ];
+}
+
+function buildDrawerConfig(item, sectionLabel, restaurant) {
+  return {
+    highlightTags: buildItemHighlightTags(item, sectionLabel, restaurant),
+    sizeOptions: buildSizeOptions(item, sectionLabel, restaurant),
+    extraOptions: buildExtraOptions(item, sectionLabel, restaurant),
+  };
+}
 
 function MenuCard({ item, onAdd }) {
   return (
@@ -93,6 +268,255 @@ function FeaturedMenuCard({ item, onAdd }) {
   );
 }
 
+function DrawerOptionRow({ option, type, name, checked, onChange }) {
+  return (
+    <label
+      className={`flex cursor-pointer items-center justify-between rounded-[1.35rem] border p-4 transition-colors ${
+        checked
+          ? 'border-primary/15 bg-surface-bright'
+          : 'border-transparent bg-surface-container-lowest hover:border-primary/10 hover:bg-surface-bright'
+      }`}
+    >
+      <div className="flex items-center gap-3">
+        <input
+          checked={checked}
+          className={`h-5 w-5 border-outline-variant/30 bg-surface text-primary focus:ring-primary focus:ring-offset-surface-container-lowest ${
+            type === 'checkbox' ? 'rounded' : ''
+          }`}
+          name={name}
+          type={type}
+          onChange={onChange}
+        />
+        <span className="text-base font-semibold text-on-surface">{option.label}</span>
+      </div>
+      <span className="text-sm font-medium text-on-surface-variant">
+        {option.helper ?? (option.priceDelta > 0 ? `+${formatPrice(option.priceDelta)}` : 'Included')}
+      </span>
+    </label>
+  );
+}
+
+function MenuItemDrawer({ restaurant, selection, onClose, onConfirm }) {
+  const { item, sectionLabel } = selection;
+  const { highlightTags, sizeOptions, extraOptions } = buildDrawerConfig(
+    item,
+    sectionLabel,
+    restaurant,
+  );
+  const [selectedSizeId, setSelectedSizeId] = useState(sizeOptions[0]?.id ?? null);
+  const [selectedExtraIds, setSelectedExtraIds] = useState([]);
+  const [quantity, setQuantity] = useState(1);
+
+  useEffect(() => {
+    if (typeof document === 'undefined') {
+      return undefined;
+    }
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return undefined;
+    }
+
+    function handleKeyDown(event) {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [onClose]);
+
+  const selectedSize = sizeOptions.find((option) => option.id === selectedSizeId) ?? sizeOptions[0];
+  const extraTotal = extraOptions.reduce(
+    (total, option) => total + (selectedExtraIds.includes(option.id) ? option.priceDelta : 0),
+    0,
+  );
+  const unitPrice = parsePriceLabel(item.price) + (selectedSize?.priceDelta ?? 0) + extraTotal;
+  const orderTotal = unitPrice * quantity;
+
+  function handleToggleExtra(optionId) {
+    setSelectedExtraIds((current) =>
+      current.includes(optionId)
+        ? current.filter((id) => id !== optionId)
+        : [...current, optionId],
+    );
+  }
+
+  function handleConfirm() {
+    onConfirm({ quantity, totalPrice: orderTotal });
+  }
+
+  return (
+    <div className="fixed inset-0 z-[90]">
+      <button
+        aria-label={`Close ${item.name} details`}
+        className="animate-item-drawer-overlay absolute inset-0 bg-inverse-surface/40 backdrop-blur-[2px]"
+        type="button"
+        onClick={onClose}
+      />
+
+      <div
+        aria-labelledby="menu-item-drawer-title"
+        aria-modal="true"
+        className="animate-item-drawer-enter absolute bottom-0 left-0 right-0 z-10 mx-auto flex h-[92dvh] w-full max-w-lg flex-col overflow-hidden rounded-t-[32px] bg-surface shadow-[0_-8px_40px_rgba(0,0,0,0.15)]"
+        role="dialog"
+      >
+        <div className="sticky top-0 z-20 flex flex-col items-center bg-surface pb-2 pt-3">
+          <div className="h-1.5 w-12 rounded-full bg-outline/20" />
+          <div className=" -mt-2 flex w-full justify-end px-4">
+            <button
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-container transition-colors hover:bg-surface-container-high"
+              type="button"
+              onClick={onClose}
+            >
+              <span className="material-symbols-outlined text-xl text-on-surface">close</span>
+            </button>
+          </div>
+        </div>
+
+        <div className="drawer-content-scroll flex-1 overflow-y-auto">
+          <div className="px-4">
+            <div className="h-[280px] w-full overflow-hidden rounded-[1.75rem] shadow-sm">
+              <img
+                alt={item.imageAlt ?? item.name}
+                className="h-full w-full object-cover"
+                src={item.image}
+                title={item.imageAlt}
+              />
+            </div>
+          </div>
+
+          <div className="px-6 pb-6 pt-6">
+            <div className="mb-3 flex items-start justify-between gap-4">
+              <div>
+                <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.28em] text-primary-dim">
+                  {sectionLabel}
+                </p>
+                <h2
+                  id="menu-item-drawer-title"
+                  className="font-headline text-3xl font-bold leading-tight tracking-tight text-on-surface"
+                >
+                  {item.name}
+                </h2>
+              </div>
+              <span className="mt-1 font-headline text-xl font-bold text-on-surface">
+                {item.price}
+              </span>
+            </div>
+
+            <div className="mb-6 flex flex-wrap gap-2">
+              {highlightTags.map((tag) => (
+                <span
+                  key={tag}
+                  className="rounded-full border border-outline-variant/15 bg-surface-container-low px-3 py-1 text-[13px] font-semibold text-on-surface"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+
+            <p className="text-base font-normal leading-relaxed text-on-surface-variant">
+              {item.description}
+            </p>
+          </div>
+
+          <div className="mx-2 space-y-8 rounded-t-[1.75rem] bg-surface-container-low px-4 py-6 shadow-[0_-4px_16px_rgba(78,33,33,0.04)]">
+            <section>
+              <div className="mb-4 flex items-center justify-between px-2">
+                <h3 className="font-headline text-lg font-bold text-on-surface">Choose Size</h3>
+                <span className="rounded bg-primary-container/20 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-primary">
+                  Required
+                </span>
+              </div>
+              <div className="space-y-3">
+                {sizeOptions.map((option) => (
+                  <DrawerOptionRow
+                    key={option.id}
+                    checked={selectedSize?.id === option.id}
+                    name="menu-item-size"
+                    option={option}
+                    type="radio"
+                    onChange={() => setSelectedSizeId(option.id)}
+                  />
+                ))}
+              </div>
+            </section>
+
+            <section className="pb-12">
+              <div className="mb-4 flex items-center justify-between px-2">
+                <h3 className="font-headline text-lg font-bold text-on-surface">Extras</h3>
+                <span className="text-sm font-medium text-on-surface-variant">Optional</span>
+              </div>
+              <div className="space-y-3">
+                {extraOptions.map((option) => (
+                  <DrawerOptionRow
+                    key={option.id}
+                    checked={selectedExtraIds.includes(option.id)}
+                    name={`menu-item-extra-${option.id}`}
+                    option={option}
+                    type="checkbox"
+                    onChange={() => handleToggleExtra(option.id)}
+                  />
+                ))}
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <div className="z-30 border-t border-outline-variant/15 bg-surface p-4 pb-8">
+          <div className="mx-auto flex max-w-3xl items-center gap-3">
+            <div className="flex min-w-[110px] items-center justify-between rounded-full bg-surface-container-low px-3 py-2.5">
+              <button
+                className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors ${
+                  quantity === 1
+                    ? 'cursor-not-allowed text-on-surface-variant/40'
+                    : 'text-on-surface hover:text-primary'
+                }`}
+                disabled={quantity === 1}
+                type="button"
+                onClick={() => setQuantity((current) => Math.max(1, current - 1))}
+              >
+                <span className="material-symbols-outlined text-lg">remove</span>
+              </button>
+              <span className="w-6 text-center font-headline text-base font-bold text-on-surface">
+                {quantity}
+              </span>
+              <button
+                className="flex h-8 w-8 items-center justify-center rounded-full text-on-surface transition-colors hover:text-primary"
+                type="button"
+                onClick={() => setQuantity((current) => current + 1)}
+              >
+                <span className="material-symbols-outlined text-lg">add</span>
+              </button>
+            </div>
+
+            <button
+              className="flex flex-1 items-center justify-between rounded-full bg-gradient-to-br from-primary to-primary-dim px-6 py-3.5 font-body text-base font-bold text-on-primary shadow-lg transition-all hover:shadow-xl active:scale-[0.99]"
+              type="button"
+              onClick={handleConfirm}
+            >
+              <span>Add to Order</span>
+              <span>{formatPrice(orderTotal)}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function RestaurantNotFound({ onBack }) {
   return (
     <>
@@ -138,6 +562,7 @@ export default function RestaurantMenu() {
   const menu = getRestaurantMenuById(restaurantId);
   const [cartCount, setCartCount] = useState(0);
   const [cartTotal, setCartTotal] = useState(0);
+  const [drawerSelection, setDrawerSelection] = useState(null);
   const [selectedSectionId, setSelectedSectionId] = useState(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const { visible, fading, show } = useToast(3000);
@@ -150,10 +575,14 @@ export default function RestaurantMenu() {
     ? selectedSectionId
     : menu.sections[0]?.id;
 
-  function handleAddToCart(item) {
-    const price = Number.parseFloat(item.price.replace('$', ''));
-    setCartCount((count) => count + 1);
-    setCartTotal((total) => total + price);
+  function handleAddToCart(item, sectionLabel) {
+    setDrawerSelection({ item, sectionLabel });
+  }
+
+  function handleConfirmAddToCart({ quantity, totalPrice }) {
+    setCartCount((count) => count + quantity);
+    setCartTotal((total) => total + totalPrice);
+    setDrawerSelection(null);
     show();
   }
 
@@ -186,6 +615,38 @@ export default function RestaurantMenu() {
             overflow: hidden;
             -webkit-box-orient: vertical;
             -webkit-line-clamp: 2;
+          }
+
+          .restaurant-menu-page .drawer-content-scroll {
+            max-height: calc(92dvh - 112px);
+          }
+
+          @keyframes item-drawer-enter {
+            from {
+              transform: translateY(100%);
+            }
+
+            to {
+              transform: translateY(0);
+            }
+          }
+
+          @keyframes item-drawer-overlay {
+            from {
+              opacity: 0;
+            }
+
+            to {
+              opacity: 1;
+            }
+          }
+
+          .restaurant-menu-page .animate-item-drawer-enter {
+            animation: item-drawer-enter 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+          }
+
+          .restaurant-menu-page .animate-item-drawer-overlay {
+            animation: item-drawer-overlay 0.24s ease-out;
           }
         `}
       </style>
@@ -420,11 +881,18 @@ export default function RestaurantMenu() {
                 <h2 className="font-headline text-2xl font-bold">{section.label}</h2>
 
                 {section.featuredItem ? (
-                  <FeaturedMenuCard item={section.featuredItem} onAdd={handleAddToCart} />
+                  <FeaturedMenuCard
+                    item={section.featuredItem}
+                    onAdd={(item) => handleAddToCart(item, section.label)}
+                  />
                 ) : null}
 
                 {section.items.map((item) => (
-                  <MenuCard key={item.name} item={item} onAdd={handleAddToCart} />
+                  <MenuCard
+                    key={item.name}
+                    item={item}
+                    onAdd={(selectedItem) => handleAddToCart(selectedItem, section.label)}
+                  />
                 ))}
               </div>
             ))}
@@ -447,6 +915,16 @@ export default function RestaurantMenu() {
             <span className="text-lg font-extrabold">${cartTotal.toFixed(2)}</span>
           </Link>
         </Toast>
+
+        {drawerSelection ? (
+          <MenuItemDrawer
+            key={`${drawerSelection.sectionLabel}-${drawerSelection.item.name}`}
+            restaurant={restaurant}
+            selection={drawerSelection}
+            onClose={() => setDrawerSelection(null)}
+            onConfirm={handleConfirmAddToCart}
+          />
+        ) : null}
       </div>
     </>
   );
