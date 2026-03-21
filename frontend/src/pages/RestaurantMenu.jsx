@@ -139,6 +139,7 @@ export default function RestaurantMenu() {
   const [cartCount, setCartCount] = useState(0);
   const [cartTotal, setCartTotal] = useState(0);
   const [selectedSectionId, setSelectedSectionId] = useState(null);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const { visible, fading, show } = useToast(3000);
 
   if (!restaurant || !menu) {
@@ -263,25 +264,127 @@ export default function RestaurantMenu() {
           </header>
 
           <section className="px-6 py-4">
-            <div className="flex items-center justify-between rounded-xxl bg-surface-container-low p-5">
-              <div>
-                <p className="mb-1 text-xs font-bold uppercase tracking-widest text-primary-dim">
-                  Cuisine
-                </p>
-                <p className="text-sm font-semibold">{restaurant.cuisine}</p>
+            <div className="flex flex-col overflow-hidden rounded-xxl bg-surface-container-low transition-colors">
+              <div
+                className="flex items-center justify-between p-5 cursor-pointer active:bg-surface-container-highest transition-colors"
+                onClick={() => setIsDetailsOpen(!isDetailsOpen)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setIsDetailsOpen(!isDetailsOpen);
+                  }
+                }}
+              >
+                <div className="flex items-center gap-4">
+                  <div>
+                    <p className="mb-1 text-xs font-bold uppercase tracking-widest text-primary-dim">
+                      Cuisine
+                    </p>
+                    <p className="text-sm font-semibold">{restaurant.cuisine}</p>
+                  </div>
+                  <div className="h-8 w-px bg-outline-variant/30" />
+                  <div>
+                    <p className="mb-1 text-xs font-bold uppercase tracking-widest text-primary-dim">
+                      Safety
+                    </p>
+                    <p className="text-sm font-semibold">{restaurant.safetyLabel}</p>
+                  </div>
+                </div>
+                <button
+                  className="flex h-10 items-center justify-center gap-1 rounded-full px-2 text-sm font-bold text-primary transition-colors hover:bg-primary/10 active:bg-primary/20"
+                  type="button"
+                  aria-expanded={isDetailsOpen}
+                >
+                  Details
+                  <span className={`material-symbols-outlined text-[18px] transition-transform duration-300 ${isDetailsOpen ? 'rotate-90' : ''}`}>
+                    chevron_right
+                  </span>
+                </button>
               </div>
-              <div className="h-8 w-px bg-outline-variant/30" />
-              <div>
-                <p className="mb-1 text-xs font-bold uppercase tracking-widest text-primary-dim">
-                  Safety
-                </p>
-                <p className="text-sm font-semibold">{restaurant.safetyLabel}</p>
+
+              {/* Expandable About Section */}
+              <div
+                className="grid transition-all duration-300 ease-in-out"
+                style={{ gridTemplateRows: isDetailsOpen ? '1fr' : '0fr' }}
+              >
+                <div className="overflow-hidden">
+                  <div className="border-t border-outline-variant/20 px-5 pb-5 pt-4">
+                    {/* About */}
+                    <div className="mb-6">
+                      <h3 className="mb-2 font-headline text-lg font-bold text-on-surface">About</h3>
+                      <p className="text-sm font-medium leading-relaxed text-on-surface-variant">
+                        {restaurant.about}
+                      </p>
+                    </div>
+
+                    {/* Info */}
+                    <div className="mb-6 flex flex-col gap-3">
+                      <div className="flex items-start gap-4">
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                          <span className="material-symbols-outlined text-[18px]">location_on</span>
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold text-on-surface">Address</p>
+                          <p className="text-sm font-medium text-on-surface-variant">{restaurant.address}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-4">
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                          <span className="material-symbols-outlined text-[18px]">schedule</span>
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold text-on-surface">Operating Hours</p>
+                          <p className="text-sm font-medium text-on-surface-variant">{restaurant.hours}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Photos Gallery */}
+                    {restaurant.gallery?.length > 0 && (
+                      <div className="mb-6">
+                        <h3 className="mb-3 font-headline text-lg font-bold text-on-surface">Photos</h3>
+                        <div className="no-scrollbar -mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-2">
+                          {restaurant.gallery.map((img, i) => (
+                            <div key={i} className="h-32 w-48 shrink-0 snap-center overflow-hidden rounded-xl">
+                              <img src={img} alt={`${restaurant.name} photo ${i + 1}`} className="h-full w-full object-cover" />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Reviews */}
+                    {restaurant.reviews?.length > 0 && (
+                      <div>
+                        <div className="mb-3 flex items-end justify-between">
+                          <h3 className="font-headline text-lg font-bold text-on-surface">Reviews</h3>
+                          <span className="text-xs font-bold text-primary">{restaurant.ratingCountLabel} Total</span>
+                        </div>
+                        <div className="flex flex-col gap-3">
+                          {restaurant.reviews.map((review) => (
+                            <div key={review.id} className="rounded-xl border border-outline-variant/20 bg-surface p-4 text-left">
+                              <div className="mb-2 flex items-center justify-between">
+                                <span className="font-bold text-on-surface">{review.author}</span>
+                                <span className="text-xs font-medium text-on-surface-variant">{review.date}</span>
+                              </div>
+                              <div className="mb-2 flex items-center gap-0.5">
+                                {[...Array(5)].map((_, i) => (
+                                  <span key={i} className={`material-symbols-outlined text-[16px] ${i < review.rating ? 'text-primary' : 'text-outline-variant/50'}`} style={{ fontVariationSettings: i < review.rating ? "'FILL' 1" : "'FILL' 0" }}>
+                                    star
+                                  </span>
+                                ))}
+                              </div>
+                              <p className="text-sm font-medium text-on-surface-variant">"{review.text}"</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
-              <div className="h-8 w-px bg-outline-variant/30" />
-              <button className="flex items-center gap-1 text-sm font-bold text-primary" type="button">
-                Details
-                <span className="material-symbols-outlined text-[18px]">chevron_right</span>
-              </button>
             </div>
           </section>
 

@@ -3,6 +3,17 @@ const restaurants = [
     id: 'heritage-kitchen',
     name: 'The Heritage Kitchen',
     cuisine: 'Mediterranean Comfort',
+    about: 'Experience the finest Mediterranean culinary traditions crafted with passion and fresh, locally sourced ingredients. Our chefs bring years of expertise to every dish, ensuring an unforgettable dining experience.',
+    hours: 'Mon-Sun: 11:00 AM - 10:00 PM',
+    address: '124 Culinary Ave, Food District, FD 10001',
+    gallery: [
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuDSKAcwn7mMURkFt8Qr6wbP7rSvtRDpX3fstIkkL6a7ASGxtpqEDXnevAcm2x9syJKJkIES2TkBoC6AZfPaTbC5xwO-IuvsCbF4SmOFmTzHC9SQdR-lUleahnu0z6x4bi1YEE9xXFNYCfFS93RzfJ17APwFMEbs7HbQCbOOAm_78JHFf3Reujct8GnLC61iUuiA2tgTmMJ6PVOe_rgYQkZ0whv4WlZTHA5VxNDLxdomWIWmkGTMkRhWwb_GmTnp9W_8GXsZUCkTh5Y',
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuCF8tMsimKProTSfGeCtER7FZw4Dlgs8SbSQE3MX_kkPhUmjymSsDP8sI-7bFOJu-dERR-Zj6ZMy7lShKH0PHwFDWVdPjC8RRS5C4EWL4KABTw-ksQJJUwFbyRIjN7H4UHn7-ElJS927X9GxwGvxaxCYvhe3YoQFTKHjNTFo9yY7Vk29fsPaz7PVszhikr2SZiOtWI17Z6jiczqUsGoYyLk_QtkLC7gml-11qwBxHXV8_TH1rSunlhAwLQyTWL1iycquGZrUun3Qxs',
+    ],
+    reviews: [
+      { id: '1', author: 'Alex J.', rating: 5, text: 'Absolutely fantastic! The flavors were perfectly balanced and the service was amazing.', date: '2 days ago' },
+      { id: '2', author: 'Sam T.', rating: 4, text: 'Great food and quick delivery. The meats were tender and perfectly seasoned.', date: '1 week ago' }
+    ],
     priceTier: '$$',
     rating: '4.9',
     ratingCountLabel: '980+',
