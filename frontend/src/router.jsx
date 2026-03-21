@@ -20,6 +20,7 @@ import SavedAddresses from './pages/SavedAddresses';
 import HomeFeed from './pages/home/HomeFeed';
 import SearchResults from './pages/SearchResults';
 import Categories from './pages/Categories';
+import OrderTracking from './pages/OrderTracking';
 
 const rootRoute = createRootRoute({
   component: App,
@@ -165,6 +166,16 @@ const categoriesRoute = createRoute({
   ),
 });
 
+const orderTrackingRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/order-tracking',
+  component: () => (
+    <ProtectedRoute>
+      <OrderTracking />
+    </ProtectedRoute>
+  ),
+});
+
 const routeTree = rootRoute.addChildren([
   homeRoute,
   loginRoute,
@@ -180,6 +191,7 @@ const routeTree = rootRoute.addChildren([
   orderDetailsRoute,
   checkoutRoute,
   categoriesRoute,
+  orderTrackingRoute,
 ]);
 
 export const router = createRouter({

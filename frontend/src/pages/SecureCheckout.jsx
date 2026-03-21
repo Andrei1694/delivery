@@ -185,6 +185,7 @@ export default function SecureCheckout() {
           <button
             className="w-full btn-gradient text-on-primary py-4 px-6 rounded-full font-headline text-lg font-bold flex items-center justify-between ambient-shadow transition-transform active:scale-[0.98]"
             type="button"
+            onClick={() => router.navigate({ to: '/order-tracking' })}
           >
             <span>Place Order</span>
             <span>$82.70</span>

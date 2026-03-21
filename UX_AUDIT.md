@@ -10,7 +10,7 @@
 
 | # | Page | Route | Status | Notes |
 |---|------|--------|--------|-------|
-| 1 | HomeFeed | `/` | ✅ Implemented | Mock data; categories non-functional |
+| 1 | HomeFeed | `/` | ✅ Implemented | Mock data; categories non-functional; file at `pages/home/HomeFeed.jsx` |
 | 2 | Login | `/login` | ✅ Implemented | Connected to API |
 | 3 | Register | `/register` | ✅ Implemented | Connected to API |
 | 4 | SearchResults | `/search` | ✅ Implemented | Mock data; filter chips non-functional |
@@ -18,8 +18,13 @@
 | 6 | Cart | `/cart` | ✅ Implemented | Mock data; quantity controls non-functional |
 | 7 | OrderHistory | `/order-history` | ✅ Implemented | Mock data; search/filter non-functional |
 | 8 | OrderDetails | `/order-details` | ✅ Implemented | Mock data; static, no dynamic param |
-| 9 | SecureCheckout | `/checkout` | ✅ Implemented | Mock data; "Place Order" is a no-op |
+| 9 | SecureCheckout | `/checkout` | ✅ Implemented | Mock data; "Place Order" now navigates to `/order-tracking` |
 | 10 | Profile | `/profile` | ✅ Implemented | Mock data; most actions are no-ops |
+| 11 | OrderTracking | `/order-tracking` | ✅ Implemented | Mock data; no real-time; no orderId param |
+| 12 | ForgotPassword | `/forgot-password` | ✅ Implemented | UI only; form submit is a no-op |
+| 13 | AccountSettings | `/account-settings` | ✅ Implemented | Reads real user data from API; preferences in localStorage; change-password/delete not built |
+| 14 | SavedAddresses | `/saved-addresses` | ✅ Implemented | Mock data; edit/delete buttons are no-ops; no add-address form |
+| 15 | Categories | `/categories` | ✅ Implemented | Mock data; all cards link to `/search` without a filter param |
 
 ---
 
@@ -28,33 +33,33 @@
 ### 2.1 Critical Path (Blockers to core user journey)
 
 #### `POST-ORDER-CONFIRMATION` — `/order-confirmation`
-- **Gap**: After "Place Order" in SecureCheckout, there is nowhere to go. Users have no confirmation the order was placed.
+- **Gap**: After "Place Order" in SecureCheckout, there is no dedicated confirmation page. `Place Order` now navigates to `/order-tracking`, which partially substitutes, but there is no explicit order number, success state, or summary before tracking begins.
 - **Needed UI**: Order number, estimated delivery time, map with driver pin, summary of items ordered, CTA to "Track Order".
-- **Priority**: 🔴 P0 — without this, the checkout flow has no resolution.
+- **Priority**: 🔴 P0 — checkout still has no proper resolution step.
 
-#### `ORDER-TRACKING` — `/order/:orderId/track`
-- **Gap**: No live order tracking exists. Competitors (Uber Eats, Deliveroo) consider this table-stakes. Users have no visibility into order status after placing.
-- **Needed UI**: Step progress indicator (Order Placed → Preparing → On the Way → Delivered), estimated arrival countdown, driver name/photo/rating, map view.
-- **Priority**: 🔴 P0 — core differentiator for delivery apps.
+#### `ORDER-TRACKING` — `/order-tracking` ⚠️ Partially Built
+- **Status**: Page exists (`OrderTracking.jsx`). Shows 4-step progress indicator, driver card, map placeholder, and order cost breakdown.
+- **Remaining gaps**: All data is hardcoded mock. No `orderId` param — the page always shows the same order regardless of which order was placed. No real-time updates. Route differs from original design (`/order-tracking` instead of `/order/:orderId/track`).
+- **Priority**: 🟠 P1 (downgraded) — shell exists; needs to be wired to a real order ID and live status.
 
 ---
 
 ### 2.2 High Priority (Broken flows referenced in existing UI)
 
-#### `FORGOT-PASSWORD` — `/forgot-password`
-- **Gap**: The "Forgot Password?" link exists on the Login page but goes nowhere.
-- **Needed UI**: Phone or email input → OTP verification → new password form → success state.
-- **Priority**: 🟠 P1 — active link that dead-ends causes frustration and support load.
+#### `FORGOT-PASSWORD` — `/forgot-password` ⚠️ Partially Built
+- **Status**: Page exists (`ForgotPassword.jsx`). "Forgot Password?" link on Login now navigates correctly.
+- **Remaining gaps**: Form submit handler is empty — no API call, no OTP step, no new-password form, no success state.
+- **Priority**: 🟠 P1 — link no longer dead-ends, but the flow has no actual effect.
 
-#### `ACCOUNT-SETTINGS` — `/settings`
-- **Gap**: The "Account Settings" card in Profile is a tappable element with no destination. Users cannot update name, phone, email, or password.
-- **Needed UI**: Editable fields for personal info, change password section, notification preferences, delete account option.
-- **Priority**: 🟠 P1 — basic account management expectation.
+#### `ACCOUNT-SETTINGS` — `/account-settings` ⚠️ Partially Built
+- **Status**: Page exists (`AccountSettings.jsx`). Profile "Account Settings" card now navigates correctly. Page reads real user profile data from the API and stores notification preferences in localStorage.
+- **Remaining gaps**: Change password section not present. Delete account option not present. Save actions need API wiring.
+- **Priority**: 🟠 P1 — basic info display works; write operations not yet live.
 
-#### `ADDRESS-MANAGEMENT` — `/addresses`
-- **Gap**: "Saved Addresses" card in Profile shows mock addresses with no way to add, edit, or delete them. The HomeFeed location picker also has no functional destination.
-- **Needed UI**: List of saved addresses with edit/delete, "Add new address" form (with map picker or autocomplete), set-as-default toggle.
-- **Priority**: 🟠 P1 — delivery address is critical data.
+#### `ADDRESS-MANAGEMENT` — `/saved-addresses` ⚠️ Partially Built
+- **Status**: Page exists (`SavedAddresses.jsx`). Profile "Saved Addresses" card now navigates correctly. Displays a list of mock saved addresses.
+- **Remaining gaps**: Edit and delete buttons have no `onClick` handlers (still no-ops). No "Add new address" form. No set-as-default toggle. HomeFeed location picker still has no functional destination.
+- **Priority**: 🟠 P1 — page is a visual shell; all write operations are blocked.
 
 #### `PAYMENT-METHODS` — `/payment-methods`
 - **Gap**: "Payment Methods" in Profile and "Add New Method" in SecureCheckout both dead-end. Users cannot manage cards.
@@ -137,10 +142,10 @@
     │                   │
     │               [HomeFeed]
     │
-    └── "Forgot Password?" ──→ ❌ Dead link (no page)
+    └── "Forgot Password?" ──→ ✅ [ForgotPassword] page (form submit still no-op)
 ```
 
-**Issues**: No password recovery. No email verification step after registration. No session expiry handling (what happens when JWT expires?).
+**Issues**: Password recovery UI exists but has no logic — no OTP flow, no API call. No email verification step after registration. No session expiry handling (what happens when JWT expires?).
 
 ---
 
@@ -185,14 +190,16 @@
                                                 │
                                         Select payment method
                                                 │
-                                        "Place Order" ──→ ❌ No-op (no confirmation page)
+                                        "Place Order" ──→ ✅ [OrderTracking] (mock; no orderId)
+                                                │
+                                        ❌ Missing [OrderConfirmation] step
 ```
 
 **Issues**:
 - Cart data is mock — not persisted from RestaurantMenu
 - No delivery address confirmation step
 - No promo/voucher code step
-- Checkout has no resolution (order confirmation page missing)
+- No explicit order confirmation page — tracking page used as a substitute but shows no order number or success message
 - No error state if payment fails
 
 ---
@@ -228,9 +235,9 @@
             ├── "View History" ──→ ❌ No-op
             ├── Order "Details" ──→ ✅ Navigates to [OrderDetails] (but always same mock order)
             ├── Order "Reorder" ──→ ❌ No-op
-            ├── Account Settings card ──→ ❌ No-op
-            ├── Saved Addresses card ──→ ❌ No-op
-            ├── Payment Methods card ──→ ❌ No-op
+            ├── Account Settings card ──→ ✅ Navigates to [AccountSettings]
+            ├── Saved Addresses card ──→ ✅ Navigates to [SavedAddresses]
+            ├── Payment Methods card ──→ ❌ No-op (page not built)
             └── "Sign Out" ──→ ❌ No-op (auth.logout() not wired)
 ```
 
@@ -242,13 +249,13 @@
 
 | Location | Element | Expected Behaviour | Current State |
 |----------|---------|--------------------|---------------|
-| Login | "Forgot Password?" | Navigate to forgot-password flow | ❌ No-op |
+| Login | "Forgot Password?" | Navigate to forgot-password flow | ✅ Navigates to `/forgot-password` (form still no-op) |
 | HomeFeed | Location label | Open address picker | ❌ No-op |
-| HomeFeed | Category chips | Filter restaurants | ❌ No-op |
+| HomeFeed | Category chips | Filter restaurants | ❌ No-op (links to `/categories` page, not filtered) |
 | SearchResults | Filter chips | Filter search results | ❌ No-op |
 | RestaurantMenu | Cart bag icon | Navigate to Cart | ✅ Works |
 | Cart | Quantity +/- | Update item count & total | ❌ No-op |
-| SecureCheckout | "Place Order" | Submit order, navigate to confirmation | ❌ No-op |
+| SecureCheckout | "Place Order" | Submit order, navigate to confirmation | ✅ Navigates to `/order-tracking` (no confirmation page; mock data) |
 | OrderHistory | Search bar | Filter orders by text | ❌ No-op |
 | OrderHistory | Filter chips | Filter by status | ❌ No-op |
 | OrderHistory | "View Details" | Open order details | ❌ No-op |
@@ -258,10 +265,16 @@
 | Profile | Edit avatar | Upload new photo | ❌ No-op |
 | Profile | "Add Funds" | Add Verve Credits | ❌ No-op |
 | Profile | "View History" | Navigate to OrderHistory | ❌ No-op |
-| Profile | Account Settings | Navigate to settings | ❌ No-op |
-| Profile | Saved Addresses | Navigate to address manager | ❌ No-op |
-| Profile | Payment Methods | Navigate to payment manager | ❌ No-op |
-| Profile | "Sign Out" | Log out user | ❌ No-op |
+| Profile | Account Settings | Navigate to `/account-settings` | ✅ Works |
+| Profile | Saved Addresses | Navigate to `/saved-addresses` | ✅ Works |
+| Profile | Payment Methods | Navigate to payment manager | ❌ No-op (page not built) |
+| Profile | "Sign Out" | Log out user | ❌ No-op (no onClick handler) |
+| SavedAddresses | Edit button | Edit saved address | ❌ No-op |
+| SavedAddresses | Delete button | Delete saved address | ❌ No-op |
+| SavedAddresses | "Add Address" | Add new address | ❌ Not present |
+| AccountSettings | Save / submit | Persist profile changes to API | ❌ Needs wiring |
+| AccountSettings | Change password | Update password | ❌ Section not present |
+| ForgotPassword | "Send Reset Link" | Trigger OTP / password reset | ❌ No-op |
 
 ---
 
@@ -294,32 +307,32 @@ After login, users should be redirected to the page they originally tried to vis
 
 ```
 Sprint 1 — Unblock the Core Loop
-  ✦ Wire global cart state (context or Zustand)
-  ✦ Fix Sign Out in Profile
-  ✦ Build /order-confirmation page
-  ✦ Make OrderDetails accept dynamic :orderId param
+  ✦ Wire global cart state (context or Zustand)              ← ❌ Not done
+  ✦ Fix Sign Out in Profile                                   ← ❌ Not done
+  ✦ Build /order-confirmation page                            ← ❌ Not done
+  ✦ Make OrderDetails accept dynamic :orderId param           ← ❌ Not done
 
 Sprint 2 — Close Broken Links
-  ✦ Build /forgot-password flow (request → OTP → reset)
-  ✦ Build /order/:id/track (static status steps first, live later)
-  ✦ Wire OrderHistory "View Details" to /order-details/:orderId
-  ✦ Wire Profile "View History" link
+  ✦ Build /forgot-password flow (request → OTP → reset)      ← ⚠️ Page built; logic missing
+  ✦ Build /order/:id/track (static steps first, live later)  ← ⚠️ Page built; no orderId param, mock data only
+  ✦ Wire OrderHistory "View Details" to /order-details/:id   ← ❌ Not done
+  ✦ Wire Profile "View History" link                          ← ❌ Not done
 
 Sprint 3 — Account Management
-  ✦ Build /settings (account info, change password)
-  ✦ Build /addresses (add, edit, delete)
-  ✦ Build /payment-methods (add, remove)
+  ✦ Build /settings (account info, change password)           ← ⚠️ Page built; read works, write/change-password missing
+  ✦ Build /addresses (add, edit, delete)                      ← ⚠️ Page built; all write ops are no-ops
+  ✦ Build /payment-methods (add, remove)                      ← ❌ Not done
 
 Sprint 4 — Engagement & Polish
-  ✦ Item detail modal (modifiers, allergens)
-  ✦ /wallet (credits + loyalty tier)
-  ✦ /notifications
-  ✦ /order/:id/review
-  ✦ Empty states, loading skeletons, 404 page
+  ✦ Item detail modal (modifiers, allergens)                  ← ❌ Not done
+  ✦ /wallet (credits + loyalty tier)                          ← ❌ Not done
+  ✦ /notifications                                            ← ❌ Not done
+  ✦ /order/:id/review                                         ← ❌ Not done
+  ✦ Empty states, loading skeletons, 404 page                 ← ❌ Not done
 
 Sprint 5 — Discovery Enhancement
-  ✦ Wire category filter on HomeFeed
-  ✦ Wire SearchResults filters
-  ✦ /onboarding flow for new users
-  ✦ /restaurant/:id/info page
+  ✦ Wire category filter on HomeFeed                          ← ❌ Not done (Categories page exists but no filter)
+  ✦ Wire SearchResults filters                                ← ❌ Not done
+  ✦ /onboarding flow for new users                            ← ❌ Not done
+  ✦ /restaurant/:id/info page                                 ← ❌ Not done
 ```
