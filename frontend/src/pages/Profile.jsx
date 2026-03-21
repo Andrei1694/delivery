@@ -149,7 +149,11 @@ export default function Profile() {
               Personal Management
             </h3>
 
-            <div className="group cursor-pointer rounded-[2rem] border border-outline/10 bg-surface-container-lowest p-6 transition-all hover:shadow-md">
+            <button
+              className="group w-full rounded-[2rem] border border-outline/10 bg-surface-container-lowest p-6 text-left transition-all hover:shadow-md"
+              type="button"
+              onClick={() => navigate({ to: '/account-settings' })}
+            >
               <div className="mb-4 flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-surface-container-high text-primary">
@@ -177,9 +181,13 @@ export default function Profile() {
                 <div className="truncate text-xs font-medium">+1 (555) 012-3456</div>
                 <div className="truncate text-xs font-medium">elena@kitchen.com</div>
               </div>
-            </div>
+            </button>
 
-            <div className="group cursor-pointer rounded-[2rem] border border-outline/10 bg-surface-container-lowest p-6 transition-all hover:shadow-md">
+            <button
+              className="group w-full rounded-[2rem] border border-outline/10 bg-surface-container-lowest p-6 text-left transition-all hover:shadow-md"
+              type="button"
+              onClick={() => navigate({ to: '/saved-addresses' })}
+            >
               <div className="mb-4 flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-surface-container-high text-primary">
@@ -215,7 +223,7 @@ export default function Profile() {
                   </p>
                 </div>
               </div>
-            </div>
+            </button>
 
             <div className="group cursor-pointer rounded-[2rem] border border-outline/10 bg-surface-container-lowest p-6 transition-all hover:shadow-md">
               <div className="mb-4 flex items-center justify-between">

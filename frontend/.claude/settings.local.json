@@ -3,7 +3,11 @@
     "allow": [
       "Bash(find /c/Users/Andrei/Desktop/Projects/delivery/frontend -type f \\\\\\(-name *.js -o -name *.jsx \\\\\\))",
       "Bash(npm run:*)",
-      "Bash(find /c/Users/Andrei/Desktop/Projects/delivery/frontend/src/components -name *Layout* -o -name *layout*)"
+      "Bash(find /c/Users/Andrei/Desktop/Projects/delivery/frontend/src/components -name *Layout* -o -name *layout*)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(where npm:*)",
+      "Bash(netstat -ano)",
+      "Bash(findstr :5173)"
     ]
   }
 }

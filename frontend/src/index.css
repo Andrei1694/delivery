@@ -15,8 +15,8 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background-color: #fff4f3;
-  color: #4e2121;
+  background-color: var(--color-surface);
+  color: var(--color-on-surface);
   font-family: 'Manrope', sans-serif;
 }
 

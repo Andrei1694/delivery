@@ -4,11 +4,13 @@ import { useAuth } from '../auth/AuthContext';
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const auth = useAuth();
   const navigate = useNavigate();
@@ -16,6 +18,14 @@ const Register = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError('');
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters.');
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
     try {
       await auth.register({ firstName, lastName, email, phone, password });
       navigate({ to: '/' });
@@ -191,6 +201,38 @@ const Register = () => {
                     >
                       <span className="material-symbols-outlined text-xl">
                         {showPassword ? 'visibility_off' : 'visibility'}
+                      </span>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label
+                    className="ml-1 block font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant"
+                    htmlFor="confirm-password"
+                  >
+                    Confirm Password
+                  </label>
+                  <div className="relative flex items-center">
+                    <span className="material-symbols-outlined absolute left-4 text-xl text-on-surface-variant">
+                      lock
+                    </span>
+                    <input
+                      className="w-full rounded-xl border-none bg-surface-container-low py-4 pl-12 pr-12 font-medium text-on-surface placeholder:text-on-surface-variant/40 focus:outline-none focus:ring-2 focus:ring-primary-container transition-all"
+                      id="confirm-password"
+                      placeholder={'\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022'}
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                    />
+                    <button
+                      aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                      className="absolute right-4 cursor-pointer text-on-surface-variant transition-colors hover:text-primary"
+                      type="button"
+                      onClick={() => setShowConfirmPassword((current) => !current)}
+                    >
+                      <span className="material-symbols-outlined text-xl">
+                        {showConfirmPassword ? 'visibility_off' : 'visibility'}
                       </span>
                     </button>
                   </div>

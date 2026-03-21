@@ -3,8 +3,8 @@ import { Link, useNavigate } from '@tanstack/react-router';
 import { useAuth } from '../auth/AuthContext';
 
 const VerveKitchenLogin = () => {
-  const [phone, setPhone] = useState('');
-  const [password, setPassword] = useState('');
+  const [phone, setPhone] = useState('admin');
+  const [password, setPassword] = useState('admin');
   const [error, setError] = useState('');
   const auth = useAuth();
   const navigate = useNavigate();

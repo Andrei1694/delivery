@@ -9,12 +9,14 @@ import PublicOnlyRoute from './auth/PublicOnlyRoute';
 import ForgotPassword from './pages/ForgotPassword';
 import Login from './pages/Login';
 import Profile from './pages/Profile';
+import AccountSettings from './pages/AccountSettings';
 import Register from './pages/Register';
 import RestaurantMenu from './pages/RestaurantMenu';
 import Cart from './pages/Cart';
 import OrderHistory from './pages/OrderHistory';
 import OrderDetails from './pages/OrderDetails';
 import SecureCheckout from './pages/SecureCheckout';
+import SavedAddresses from './pages/SavedAddresses';
 import HomeFeed from './pages/home/HomeFeed';
 import SearchResults from './pages/SearchResults';
 
@@ -68,6 +70,26 @@ const profileRoute = createRoute({
   component: () => (
     <ProtectedRoute>
       <Profile />
+    </ProtectedRoute>
+  ),
+});
+
+const accountSettingsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/account-settings',
+  component: () => (
+    <ProtectedRoute>
+      <AccountSettings />
+    </ProtectedRoute>
+  ),
+});
+
+const savedAddressesRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/saved-addresses',
+  component: () => (
+    <ProtectedRoute>
+      <SavedAddresses />
     </ProtectedRoute>
   ),
 });
@@ -138,6 +160,8 @@ const routeTree = rootRoute.addChildren([
   registerRoute,
   forgotPasswordRoute,
   profileRoute,
+  accountSettingsRoute,
+  savedAddressesRoute,
   restaurantMenuRoute,
   cartRoute,
   searchRoute,
