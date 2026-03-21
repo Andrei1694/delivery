@@ -1,6 +1,4 @@
 import { useNavigate } from '@tanstack/react-router';
-import BottomNav from '../components/BottomNav';
-import { NAV_ITEMS } from '../navigation/navItems';
 
 const orders = [
   {
@@ -261,7 +259,6 @@ export default function Profile() {
           </div>
         </main>
 
-        <BottomNav navItems={NAV_ITEMS} />
       </div>
     </>
   );

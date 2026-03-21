@@ -1,5 +1,3 @@
-import BottomNav from '../components/BottomNav';
-import { NAV_ITEMS } from '../navigation/navItems';
 
 const FILTERS = ['All Orders', 'Delivered', 'Processing', 'Cancelled'];
 
@@ -263,7 +261,6 @@ export default function OrderHistory() {
           </button>
         </main>
 
-        <BottomNav navItems={NAV_ITEMS} />
       </div>
     </>
   );

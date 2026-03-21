@@ -1,6 +1,4 @@
 import { Link } from '@tanstack/react-router';
-import BottomNav from '../components/BottomNav';
-import { NAV_ITEMS } from '../navigation/navItems';
 
 const FILTERS = [
   { label: 'Rating 4.5+', icon: 'star', active: true, filled: true },
@@ -227,7 +225,6 @@ export default function SearchResults() {
           </div>
         </main>
 
-        <BottomNav navItems={NAV_ITEMS} />
       </div>
     </>
   );

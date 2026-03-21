@@ -46,3 +46,14 @@ select {
 
 .hide-scrollbar::-webkit-scrollbar { display: none; }
 .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+@keyframes page-enter-right {
+  from { opacity: 0; transform: translateX(16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes page-enter-left {
+  from { opacity: 0; transform: translateX(-16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.page-enter-right { animation: page-enter-right 190ms ease-out both; }
+.page-enter-left  { animation: page-enter-left  190ms ease-out both; }

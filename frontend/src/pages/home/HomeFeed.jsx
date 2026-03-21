@@ -1,6 +1,4 @@
 import { Link } from '@tanstack/react-router';
-import BottomNav from '../../components/BottomNav';
-import { NAV_ITEMS } from '../../navigation/navItems';
 
 const categories = [
   {
@@ -189,7 +187,6 @@ export default function HomeFeed() {
         </section>
       </main>
 
-      <BottomNav navItems={NAV_ITEMS} />
     </div>
   );
 }
