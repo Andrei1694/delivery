@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
-import { useAuth } from '../auth/AuthContext';
-import InputField from '../components/InputField';
-import PageHeader from '../components/PageHeader';
-import SymbolIcon from '../components/SymbolIcon';
-import Toast from '../components/Toast';
-import { useToast } from '../components/useToast';
-import api from '../requests';
+import { useAuth } from '../../auth/AuthContext';
+import InputField from '../../components/InputField';
+import PageHeader from '../../components/PageHeader';
+import SymbolIcon from '../../components/SymbolIcon';
+import Toast from '../../components/Toast';
+import { useToast } from '../../components/useToast';
+import api from '../../requests';
 
 const PREFERENCE_STORAGE_KEY = 'account-settings-preferences';
 

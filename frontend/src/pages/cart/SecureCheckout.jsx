@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useRouter } from '@tanstack/react-router';
-import PageHeader from '../components/PageHeader';
+import PageHeader from '../../components/PageHeader';
 
 const ORDER_TOTAL = '$82.70';
 

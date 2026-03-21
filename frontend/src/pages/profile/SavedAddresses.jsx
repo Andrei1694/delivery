@@ -1,5 +1,5 @@
 import { useNavigate } from '@tanstack/react-router';
-import SymbolIcon from '../components/SymbolIcon';
+import SymbolIcon from '../../components/SymbolIcon';
 
 const SAVED_ADDRESSES = [
   {

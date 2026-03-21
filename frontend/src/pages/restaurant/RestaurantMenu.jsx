@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
-import BottomNav from '../components/BottomNav';
-import PageHeader from '../components/PageHeader';
-import SymbolIcon from '../components/SymbolIcon';
-import Toast from '../components/Toast';
-import { useToast } from '../components/useToast';
-import { getRestaurantById, getRestaurantMenuById } from '../mocks';
-import { NAV_ITEMS } from '../navigation/navItems';
+import BottomNav from '../../components/BottomNav';
+import PageHeader from '../../components/PageHeader';
+import SymbolIcon from '../../components/SymbolIcon';
+import Toast from '../../components/Toast';
+import { useToast } from '../../components/useToast';
+import { getRestaurantById, getRestaurantMenuById } from '../../mocks';
+import { NAV_ITEMS } from '../../navigation/navItems';
 
 function parsePriceLabel(priceLabel) {
   return Number.parseFloat(priceLabel.replace(/[^0-9.]/g, '')) || 0;
@@ -656,7 +656,7 @@ export default function RestaurantMenu() {
         style={{ minHeight: 'max(884px, 100dvh)' }}
       >
         <PageHeader
-          title="The Culinary Curator"
+          title={restaurant.name}
           onBack={() => window.history.back()}
           rightAction={
             <div className="relative">

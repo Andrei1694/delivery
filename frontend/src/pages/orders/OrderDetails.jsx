@@ -1,6 +1,6 @@
-import PageHeader from '../components/PageHeader';
-import OrderSummary from '../components/OrderSummary';
-import SymbolIcon from '../components/SymbolIcon';
+import PageHeader from '../../components/PageHeader';
+import OrderSummary from '../../components/OrderSummary';
+import SymbolIcon from '../../components/SymbolIcon';
 
 const ORDER_ITEMS = [
   {

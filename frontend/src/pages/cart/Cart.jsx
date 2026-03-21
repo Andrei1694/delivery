@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
-import PageHeader from '../components/PageHeader';
-import OrderSummary from '../components/OrderSummary';
+import PageHeader from '../../components/PageHeader';
+import OrderSummary from '../../components/OrderSummary';
 
 const initialCartItems = [
   {

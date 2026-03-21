@@ -1,5 +1,5 @@
 import { useRouter } from '@tanstack/react-router';
-import PageHeader from '../components/PageHeader';
+import PageHeader from '../../components/PageHeader';
 
 export default function OrderConfirmation() {
   const router = useRouter();

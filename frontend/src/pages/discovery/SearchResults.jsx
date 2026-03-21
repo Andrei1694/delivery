@@ -1,9 +1,9 @@
 import { Link, useNavigate } from '@tanstack/react-router';
-import SymbolIcon from '../components/SymbolIcon';
-import PageHeader from '../components/PageHeader';
-import FilterChip from '../components/FilterChip';
-import HorizontalScroller from '../components/HorizontalScroller';
-import { getSearchResultsData } from '../mocks';
+import SymbolIcon from '../../components/SymbolIcon';
+import PageHeader from '../../components/PageHeader';
+import FilterChip from '../../components/FilterChip';
+import HorizontalScroller from '../../components/HorizontalScroller';
+import { getSearchResultsData } from '../../mocks';
 
 function RestaurantCard({ restaurant }) {
   return (

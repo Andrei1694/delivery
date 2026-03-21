@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router';
-import SymbolIcon from '../components/SymbolIcon';
-import { getAllCategories } from '../mocks';
+import SymbolIcon from '../../components/SymbolIcon';
+import { getAllCategories } from '../../mocks';
 
 export default function Categories() {
   const categories = getAllCategories();

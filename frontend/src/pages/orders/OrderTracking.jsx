@@ -1,6 +1,6 @@
 import { useRouter, useParams } from '@tanstack/react-router';
-import PageHeader from '../components/PageHeader';
-import SymbolIcon from '../components/SymbolIcon';
+import PageHeader from '../../components/PageHeader';
+import SymbolIcon from '../../components/SymbolIcon';
 
 const filledStyle = { fontVariationSettings: "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24" };
 

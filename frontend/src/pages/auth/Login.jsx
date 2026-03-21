@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from '@tanstack/react-router';
-import { useAuth } from '../auth/AuthContext';
+import { useAuth } from '../../auth/AuthContext';
 
 const VerveKitchenLogin = () => {
   const [phone, setPhone] = useState('admin');
