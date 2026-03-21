@@ -22,6 +22,9 @@ import SearchResults from './pages/SearchResults';
 import Categories from './pages/Categories';
 import OrderTracking from './pages/OrderTracking';
 import OrderConfirmation from './pages/OrderConfirmation';
+import OnboardingLocation from './pages/onboarding/OnboardingLocation';
+import OnboardingCuisine from './pages/onboarding/OnboardingCuisine';
+import OnboardingAddress from './pages/onboarding/OnboardingAddress';
 
 const rootRoute = createRootRoute({
   component: App,
@@ -64,6 +67,36 @@ const forgotPasswordRoute = createRoute({
     <PublicOnlyRoute>
       <ForgotPassword />
     </PublicOnlyRoute>
+  ),
+});
+
+const onboardingLocationRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/onboarding/location',
+  component: () => (
+    <ProtectedRoute>
+      <OnboardingLocation />
+    </ProtectedRoute>
+  ),
+});
+
+const onboardingCuisineRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/onboarding/cuisine',
+  component: () => (
+    <ProtectedRoute>
+      <OnboardingCuisine />
+    </ProtectedRoute>
+  ),
+});
+
+const onboardingAddressRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/onboarding/address',
+  component: () => (
+    <ProtectedRoute>
+      <OnboardingAddress />
+    </ProtectedRoute>
   ),
 });
 
@@ -192,6 +225,9 @@ const routeTree = rootRoute.addChildren([
   loginRoute,
   registerRoute,
   forgotPasswordRoute,
+  onboardingLocationRoute,
+  onboardingCuisineRoute,
+  onboardingAddressRoute,
   profileRoute,
   accountSettingsRoute,
   savedAddressesRoute,

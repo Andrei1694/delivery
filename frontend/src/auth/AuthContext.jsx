@@ -4,6 +4,7 @@ import api, { endpoints } from '../requests';
 
 const AuthContext = createContext(null);
 const TOKEN_KEY = 'auth_token';
+const ONBOARDING_PENDING_KEY = 'onboarding_pending';
 
 const readStoredToken = () => {
   if (typeof window === 'undefined') {
@@ -34,6 +35,35 @@ const writeStoredToken = (token) => {
   }
 };
 
+const readStoredOnboardingPending = () => {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  try {
+    return window.localStorage.getItem(ONBOARDING_PENDING_KEY) === 'true';
+  } catch {
+    return false;
+  }
+};
+
+const writeStoredOnboardingPending = (isPending) => {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  try {
+    if (isPending) {
+      window.localStorage.setItem(ONBOARDING_PENDING_KEY, 'true');
+      return;
+    }
+
+    window.localStorage.removeItem(ONBOARDING_PENDING_KEY);
+  } catch {
+    // Ignore storage failures and rely on in-memory onboarding state.
+  }
+};
+
 const setAuthToken = (token) => {
   if (token) {
     api.defaults.headers.common.Authorization = `Bearer ${token}`;
@@ -55,13 +85,20 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isOnboardingPending, setIsOnboardingPending] = useState(readStoredOnboardingPending);
+
+  const persistOnboardingPending = useCallback((isPending) => {
+    setIsOnboardingPending(isPending);
+    writeStoredOnboardingPending(isPending);
+  }, []);
 
   const setUnauthenticatedState = useCallback(() => {
     setUser(null);
     setIsAuthenticated(false);
     writeStoredToken(null);
+    persistOnboardingPending(false);
     setAuthToken(null);
-  }, []);
+  }, [persistOnboardingPending]);
 
   const loadCurrentUser = useCallback(async () => {
     const { data } = await api.get(endpoints.auth.me);
@@ -136,32 +173,53 @@ export const AuthProvider = ({ children }) => {
       setAuthToken(mockToken);
       setUser(mockUser);
       setIsAuthenticated(true);
+      persistOnboardingPending(false);
       return { token: mockToken, user: mockUser };
     }
     const { data } = await api.post(endpoints.auth.login, credentials);
-    return completeAuthentication(data);
-  }, [completeAuthentication]);
+    const authState = await completeAuthentication(data);
+    persistOnboardingPending(false);
+    return authState;
+  }, [completeAuthentication, persistOnboardingPending]);
 
   const register = useCallback(async (payload) => {
     const { data } = await api.post(endpoints.auth.register, payload);
-    return completeAuthentication(data);
-  }, [completeAuthentication]);
+    const authState = await completeAuthentication(data);
+    persistOnboardingPending(true);
+    return authState;
+  }, [completeAuthentication, persistOnboardingPending]);
 
   const logout = useCallback(async () => {
     setUnauthenticatedState();
   }, [setUnauthenticatedState]);
+
+  const completeOnboarding = useCallback(() => {
+    persistOnboardingPending(false);
+  }, [persistOnboardingPending]);
 
   const value = useMemo(
     () => ({
       user,
       isLoading,
       isAuthenticated,
+      isOnboardingPending,
       login,
       register,
       logout,
       refreshUser,
+      completeOnboarding,
     }),
-    [user, isLoading, isAuthenticated, login, register, logout, refreshUser],
+    [
+      user,
+      isLoading,
+      isAuthenticated,
+      isOnboardingPending,
+      login,
+      register,
+      logout,
+      refreshUser,
+      completeOnboarding,
+    ],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

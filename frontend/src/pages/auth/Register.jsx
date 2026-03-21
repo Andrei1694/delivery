@@ -28,7 +28,7 @@ const Register = () => {
     }
     try {
       await auth.register({ firstName, lastName, email, phone, password });
-      navigate({ to: '/' });
+      navigate({ to: '/onboarding/location' });
     } catch {
       setError('Registration failed. Please check your details and try again.');
     }

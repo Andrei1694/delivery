@@ -1,8 +1,13 @@
+import { useState } from 'react';
 import { useRouter } from '@tanstack/react-router';
 import PageHeader from '../components/PageHeader';
 
+const ORDER_TOTAL = '$82.70';
+
 export default function SecureCheckout() {
   const router = useRouter();
+  const [selectedMethod, setSelectedMethod] = useState('card_4242');
+
   return (
     <>
       <style>
@@ -71,15 +76,15 @@ export default function SecureCheckout() {
                 <p className="text-sm text-on-surface-variant">Including taxes and fees</p>
               </div>
             </div>
-            <p className="font-headline text-lg font-bold">$82.70</p>
+            <p className="font-headline text-lg font-bold">{ORDER_TOTAL}</p>
           </section>
 
           <section className="mt-8">
             <h3 className="font-headline text-xl font-bold mb-5 tracking-tight">Saved Cards</h3>
             <div className="space-y-4">
               <label className="block cursor-pointer">
-                <div className="flex items-center p-4 rounded-xl bg-surface-container-lowest ambient-shadow ghost-border relative overflow-hidden transition-all border-2 border-primary">
-                  <div className="absolute inset-0 bg-primary/5" />
+                <div className={`flex items-center p-4 rounded-xl bg-surface-container-lowest ambient-shadow relative overflow-hidden transition-all ${selectedMethod === 'card_4242' ? 'border-2 border-primary' : 'ghost-border hover:bg-surface-container'}`}>
+                  {selectedMethod === 'card_4242' && <div className="absolute inset-0 bg-primary/5" />}
                   <div
                     className="w-12 h-8 bg-surface-container rounded flex items-center justify-center shrink-0 mr-4"
                     data-alt="Visa Card Logo abstract"
@@ -97,7 +102,8 @@ export default function SecureCheckout() {
                   <div className="relative z-10">
                     <input
                       className="w-5 h-5 text-primary border-outline-variant focus:ring-primary focus:ring-offset-surface bg-surface-container-lowest"
-                      defaultChecked
+                      checked={selectedMethod === 'card_4242'}
+                      onChange={() => setSelectedMethod('card_4242')}
                       name="payment_method"
                       type="radio"
                     />
@@ -106,7 +112,8 @@ export default function SecureCheckout() {
               </label>
 
               <label className="block cursor-pointer">
-                <div className="flex items-center p-4 rounded-xl bg-surface-container-low ghost-border transition-all hover:bg-surface-container-lowest">
+                <div className={`flex items-center p-4 rounded-xl bg-surface-container-low relative overflow-hidden transition-all ${selectedMethod === 'card_5555' ? 'border-2 border-primary' : 'ghost-border hover:bg-surface-container-lowest'}`}>
+                  {selectedMethod === 'card_5555' && <div className="absolute inset-0 bg-primary/5" />}
                   <div
                     className="w-12 h-8 bg-surface-container rounded flex items-center justify-center shrink-0 mr-4"
                     data-alt="Mastercard Logo abstract"
@@ -115,15 +122,17 @@ export default function SecureCheckout() {
                       credit_card
                     </span>
                   </div>
-                  <div className="flex-1">
+                  <div className="flex-1 relative z-10">
                     <p className="font-headline text-base font-semibold text-on-surface">
                       •••• 5555
                     </p>
                     <p className="text-xs text-on-surface-variant">Expires 08/26</p>
                   </div>
-                  <div>
+                  <div className="relative z-10">
                     <input
                       className="w-5 h-5 text-primary border-outline-variant focus:ring-primary focus:ring-offset-surface bg-surface-container-lowest"
+                      checked={selectedMethod === 'card_5555'}
+                      onChange={() => setSelectedMethod('card_5555')}
                       name="payment_method"
                       type="radio"
                     />
@@ -139,8 +148,9 @@ export default function SecureCheckout() {
             </h3>
             <div className="space-y-4">
               <label className="block cursor-pointer">
-                <div className="flex items-center p-4 rounded-xl bg-surface-container-low ghost-border transition-all hover:bg-surface-container-lowest">
-                  <div className="w-12 h-12 bg-surface-container-lowest rounded-full flex items-center justify-center shrink-0 mr-4 text-on-surface shadow-sm">
+                <div className={`flex items-center p-4 rounded-xl bg-surface-container-low relative overflow-hidden transition-all ${selectedMethod === 'apple_pay' ? 'border-2 border-primary' : 'ghost-border hover:bg-surface-container-lowest'}`}>
+                  {selectedMethod === 'apple_pay' && <div className="absolute inset-0 bg-primary/5" />}
+                  <div className="w-12 h-12 bg-surface-container-lowest rounded-full flex items-center justify-center shrink-0 mr-4 text-on-surface shadow-sm relative z-10">
                     <span
                       className="material-symbols-outlined text-2xl"
                       data-icon="account_balance_wallet"
@@ -148,12 +158,14 @@ export default function SecureCheckout() {
                       account_balance_wallet
                     </span>
                   </div>
-                  <div className="flex-1">
+                  <div className="flex-1 relative z-10">
                     <p className="font-headline text-base font-semibold">Apple Pay</p>
                   </div>
-                  <div>
+                  <div className="relative z-10">
                     <input
                       className="w-5 h-5 text-primary border-outline-variant focus:ring-primary focus:ring-offset-surface bg-surface-container-lowest"
+                      checked={selectedMethod === 'apple_pay'}
+                      onChange={() => setSelectedMethod('apple_pay')}
                       name="payment_method"
                       type="radio"
                     />
@@ -185,10 +197,11 @@ export default function SecureCheckout() {
           <button
             className="w-full btn-gradient text-on-primary py-4 px-6 rounded-full font-headline text-lg font-bold flex items-center justify-between ambient-shadow transition-transform active:scale-[0.98]"
             type="button"
-            onClick={() => router.navigate({ to: '/order-confirmation' })}
+            onClick={() => selectedMethod && router.navigate({ to: '/order-confirmation' })}
+            disabled={!selectedMethod}
           >
             <span>Place Order</span>
-            <span>$82.70</span>
+            <span>{ORDER_TOTAL}</span>
           </button>
         </div>
       </div>

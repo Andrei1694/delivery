@@ -1,8 +1,9 @@
+import { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import PageHeader from '../components/PageHeader';
 import OrderSummary from '../components/OrderSummary';
 
-const cartItems = [
+const initialCartItems = [
   {
     name: 'Wild Harvest Grain Bowl',
     note: 'Extra Avocado, No Onions',
@@ -44,7 +45,6 @@ const cartItems = [
 
 
 const serviceFee = 4.2;
-const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
 function formatCurrency(value) {
   return new Intl.NumberFormat('en-US', {
@@ -53,12 +53,13 @@ function formatCurrency(value) {
   }).format(value);
 }
 
-function QuantityControl({ quantity }) {
+function QuantityControl({ quantity, onDecrease, onIncrease }) {
   return (
     <div className="flex items-center rounded-full bg-surface-container-low px-1 py-1">
       <button
         aria-label="Decrease quantity"
         className="flex h-8 w-8 items-center justify-center text-on-surface-variant transition-colors hover:text-primary"
+        onClick={onDecrease}
         type="button"
       >
         <span className="material-symbols-outlined text-sm">remove</span>
@@ -67,6 +68,7 @@ function QuantityControl({ quantity }) {
       <button
         aria-label="Increase quantity"
         className="flex h-8 w-8 items-center justify-center text-on-surface-variant transition-colors hover:text-primary"
+        onClick={onIncrease}
         type="button"
       >
         <span className="material-symbols-outlined text-sm">add</span>
@@ -75,7 +77,7 @@ function QuantityControl({ quantity }) {
   );
 }
 
-function CartItem({ item }) {
+function CartItem({ item, onDecrease, onIncrease }) {
   return (
     <div
       className={
@@ -111,7 +113,11 @@ function CartItem({ item }) {
           <span className="font-headline text-lg font-bold text-primary">
             {formatCurrency(item.price)}
           </span>
-          <QuantityControl quantity={item.quantity} />
+          <QuantityControl
+            quantity={item.quantity}
+            onDecrease={onDecrease}
+            onIncrease={onIncrease}
+          />
         </div>
       </div>
     </div>
@@ -120,6 +126,27 @@ function CartItem({ item }) {
 
 export default function Cart() {
   const navigate = useNavigate();
+  const [cartItems, setCartItems] = useState(initialCartItems);
+  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+  const handleQuantityChange = (itemName, delta) => {
+    setCartItems((currentItems) =>
+      currentItems.flatMap((item) => {
+        if (item.name !== itemName) {
+          return [item];
+        }
+
+        const nextQuantity = item.quantity + delta;
+
+        if (nextQuantity <= 0) {
+          return [];
+        }
+
+        return [{ ...item, quantity: nextQuantity }];
+      })
+    );
+  };
+
   return (
     <>
       <style>
@@ -169,21 +196,38 @@ export default function Cart() {
           </div>
 
           <div className="space-y-6">
-            {cartItems.map((item) => (
-              <CartItem key={item.name} item={item} />
-            ))}
+            {cartItems.length > 0 ? (
+              cartItems.map((item) => (
+                <CartItem
+                  key={item.name}
+                  item={item}
+                  onDecrease={() => handleQuantityChange(item.name, -1)}
+                  onIncrease={() => handleQuantityChange(item.name, 1)}
+                />
+              ))
+            ) : (
+              <div className="rounded-3xl border border-dashed border-outline/40 bg-surface-container-lowest px-6 py-10 text-center ambient-shadow">
+                <p className="font-headline text-xl font-bold text-on-surface">Your cart is empty</p>
+                <p className="mt-2 text-sm text-on-surface-variant">
+                  Add a few dishes to continue to checkout.
+                </p>
+              </div>
+            )}
           </div>
 
-          <div className="mt-12 space-y-4">
-            <h4 className="font-headline text-lg font-bold text-on-surface">Order Summary</h4>
-            <OrderSummary subtotal={subtotal} serviceFee={serviceFee} />
-          </div>
+          {cartItems.length > 0 ? (
+            <div className="mt-12 space-y-4">
+              <h4 className="font-headline text-lg font-bold text-on-surface">Order Summary</h4>
+              <OrderSummary subtotal={subtotal} serviceFee={serviceFee} />
+            </div>
+          ) : null}
         </main>
 
         <div className="pointer-events-none fixed bottom-0 left-0 right-0 z-40 bg-gradient-to-t from-surface via-surface/90 to-transparent p-6">
           <div className="pointer-events-auto mx-auto max-w-lg">
             <button
-              className="ambient-shadow flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-primary-container px-6 py-4 font-headline text-lg font-bold text-on-primary transition-all duration-300 active:scale-95"
+              className="ambient-shadow flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-primary-container px-6 py-4 font-headline text-lg font-bold text-on-primary transition-all duration-300 active:scale-95 disabled:pointer-events-none disabled:opacity-50"
+              disabled={cartItems.length === 0}
               type="button"
               onClick={() => navigate({ to: '/checkout' })}
             >
