@@ -201,7 +201,7 @@ export default function RestaurantMenu() {
               <Link
                 aria-label="Shopping bag"
                 className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-container-lowest text-primary transition-opacity duration-200 hover:opacity-80 active:scale-95"
-                to="/basket"
+                to="/cart"
               >
                 <span className="material-symbols-outlined">shopping_bag</span>
               </Link>
@@ -333,7 +333,7 @@ export default function RestaurantMenu() {
         <Toast visible={visible} fading={fading}>
           <Link
             className="flex w-full items-center justify-between rounded-xxl bg-inverse-surface px-8 py-4 text-on-primary shadow-[0_12px_40px_rgba(0,0,0,0.2)] transition-all active:scale-[0.98]"
-            to="/basket"
+            to="/cart"
           >
             <div className="flex items-center gap-3">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-bold">

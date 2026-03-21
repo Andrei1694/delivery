@@ -10,7 +10,7 @@ import Login from './pages/Login';
 import Profile from './pages/Profile';
 import Register from './pages/Register';
 import RestaurantMenu from './pages/RestaurantMenu';
-import Basket from './pages/Basket';
+import Cart from './pages/Cart';
 import OrderHistory from './pages/OrderHistory';
 import OrderDetails from './pages/OrderDetails';
 import SecureCheckout from './pages/SecureCheckout';
@@ -71,12 +71,12 @@ const restaurantMenuRoute = createRoute({
   ),
 });
 
-const basketRoute = createRoute({
+const cartRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/basket',
+  path: '/cart',
   component: () => (
     <ProtectedRoute>
-      <Basket />
+      <Cart />
     </ProtectedRoute>
   ),
 });
@@ -127,7 +127,7 @@ const routeTree = rootRoute.addChildren([
   registerRoute,
   profileRoute,
   restaurantMenuRoute,
-  basketRoute,
+  cartRoute,
   searchRoute,
   orderHistoryRoute,
   orderDetailsRoute,

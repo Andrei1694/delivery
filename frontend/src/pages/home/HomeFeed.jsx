@@ -16,7 +16,7 @@ export default function HomeFeed() {
               <SymbolIcon name="expand_more" className="text-on-surface-variant text-sm" />
             </div>
             <Link
-              to="/basket"
+              to="/cart"
               className="text-primary active:scale-95 duration-200"
               aria-label="Open bag"
             >

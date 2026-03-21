@@ -66,7 +66,7 @@ function QuantityControl({ quantity }) {
   );
 }
 
-function BasketItem({ item }) {
+function CartItem({ item }) {
   return (
     <div
       className={
@@ -109,50 +109,50 @@ function BasketItem({ item }) {
   );
 }
 
-export default function Basket() {
+export default function Cart() {
   const navigate = useNavigate();
   return (
     <>
       <style>
         {`
-          .basket-page {
+          .cart-page {
             font-family: 'Manrope', sans-serif;
             -webkit-tap-highlight-color: transparent;
           }
 
-          .basket-page .font-headline {
+          .cart-page .font-headline {
             font-family: 'Plus Jakarta Sans', 'Manrope', sans-serif;
           }
 
-          .basket-page .font-label {
+          .cart-page .font-label {
             font-family: 'Manrope', sans-serif;
           }
 
-          .basket-page .material-symbols-outlined {
+          .cart-page .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
             vertical-align: middle;
           }
 
 
-          .basket-page .ambient-shadow {
+          .cart-page .ambient-shadow {
             box-shadow: 0 8px 24px rgba(78, 33, 33, 0.06);
           }
         `}
       </style>
 
       <div
-        className="basket-page bg-surface font-body text-on-surface antialiased"
+        className="cart-page bg-surface font-body text-on-surface antialiased"
         style={{ minHeight: 'max(884px, 100dvh)' }}
       >
         <PageHeader
-          title="Your Basket"
+          title="Your Cart"
           onBack={() => window.history.back()}
         />
 
         <main className="mx-auto min-h-screen max-w-lg px-6 pb-40 pt-24">
           <div className="mb-8">
             <h2 className="mb-2 font-headline text-3xl font-bold tracking-tight text-on-surface">
-              Your Basket
+              Your Cart
             </h2>
             <p className="font-medium text-on-surface-variant">
               Review your curated selection
@@ -161,7 +161,7 @@ export default function Basket() {
 
           <div className="space-y-6">
             {cartItems.map((item) => (
-              <BasketItem key={item.name} item={item} />
+              <CartItem key={item.name} item={item} />
             ))}
           </div>
 
