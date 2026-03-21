@@ -1,3 +1,4 @@
+import { useNavigate } from '@tanstack/react-router';
 import SymbolIcon from '../components/SymbolIcon';
 import PageHeader from '../components/PageHeader';
 import FilterChip from '../components/FilterChip';
@@ -72,11 +73,59 @@ const ORDERS = [
     secondaryAction: 'View Details',
     primaryAction: 'Reorder',
   },
+  {
+    id: 5,
+    restaurant: 'Spice Route',
+    status: 'Processing',
+    statusClassName:
+      'bg-tertiary-container/30 text-on-tertiary-container',
+    dateTime: 'Oct 12, 2023 • 18:20',
+    items: 'Lamb Rogan Josh, Garlic Naan × 2, Mango Lassi',
+    totalLabel: 'Total Amount',
+    total: '$41.00',
+    image:
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuDLpujvp0IA7gE9ve_P9C-tg26Za3nQX8seJ81H99cQGZVZ_ovZdGq_CaQOVH5meMjMG2OGW7qdiLH_kUbqQVsWVxJojRHc74ZDBqPmUTO0V70NXlCWb1yhvijvZafuFmuUDVcW2Hk170BUCTSVXd9qLsyCj-kgoWIfnoZHAuMCNxzAalzKzKaAaGP5G5dauUnwbBrYIfkftClAZPzKYHUDLt1QToC4J8So5gdwsevlrf4BnsTUxVsDqj-uWYyx60lSZo3YcHzR0is',
+    imageAlt: 'Aromatic Indian lamb curry with naan bread',
+    secondaryAction: 'Track Order',
+  },
+  {
+    id: 6,
+    restaurant: 'Seoul Bowl',
+    status: 'Delivered',
+    statusClassName:
+      'bg-primary-container/20 text-on-primary-container',
+    dateTime: 'Oct 9, 2023 • 13:00',
+    items: 'The Seoul Bowl, Korean Fried Chicken, Bingsu',
+    totalLabel: 'Total Amount',
+    total: '$47.00',
+    image:
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuARxURdYlCEbFNERnCpgU3OsyDtkZi4iZtoDVRFc7ToxMzuWgVon1O2Nht8PJiMCs5aBkVJ8pJW_8sCjHvz1kHlL4H2GDBtCw6RQkb9HsYDTvObi4kW9lj19VpQ5KdaoupfRAjJvk6lghn5MM65g06cATD_INweNmEf1J8hG12DnKPBW99IDB5Rej8Qpyv5TNQ0fE93lzywfK53OpPfxyUInHH6MGGnn4TjWreLzpJgYyTWpPggb8MTd2CVgoOQiE8DGeyyXLGlVro',
+    imageAlt: 'Colourful Korean bibimbap bowl',
+    secondaryAction: 'View Details',
+    primaryAction: 'Reorder',
+  },
+  {
+    id: 7,
+    restaurant: 'Sakura Bloom',
+    status: 'Cancelled',
+    statusClassName:
+      'bg-surface-container-high text-on-surface-variant',
+    dateTime: 'Oct 5, 2023 • 20:45',
+    items: 'Sakura Luxe Roll, Crispy Rice Tuna, Matcha Cheesecake',
+    totalLabel: 'Refunded',
+    total: '$48.00',
+    image:
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuDxhTKQnbVX-6sB3PwpG-_b4NyZJzLCZt9Jd76X8Pg7JsERy7zMDBnwZqWMm5GhhKpEuCkRzYijLY6ULplPnabQarGTm6O7VTcmFkqCYW8-nZjh_A4yYzn-8FKrwzxS4gRFW26W1MvuTiEZplUX6fBV1T0huU9UY0OkFJ9M9Y7G4jQl7kem2BWOZ2GdrTkyWkdnCCI5VRInW0pL79_AkDDAgCXsvBBBZHeBBYN5RWuKz8ZTs-Ly-vsXTiLnCq93R3W5li_qek6TQwM',
+    imageAlt: 'Japanese sushi platter with salmon and tuna',
+    secondaryAction: 'View Reason',
+    dimmed: true,
+    imageClassName: 'grayscale',
+  },
 ];
 
 
 
-function OrderCard({ order }) {
+function OrderCard({ order, onViewDetails }) {
   return (
     <article
       className={[
@@ -140,6 +189,7 @@ function OrderCard({ order }) {
                 ? 'text-on-surface-variant hover:bg-surface-container-low'
                 : 'text-primary hover:bg-primary-container/10',
             ].join(' ')}
+            onClick={order.secondaryAction === 'View Details' ? onViewDetails : undefined}
           >
             {order.secondaryAction}
           </button>
@@ -159,6 +209,7 @@ function OrderCard({ order }) {
 }
 
 export default function OrderHistory() {
+  const navigate = useNavigate();
   return (
     <>
       <style>{`
@@ -219,7 +270,11 @@ export default function OrderHistory() {
 
           <div className="space-y-10">
             {ORDERS.map((order) => (
-              <OrderCard key={order.id} order={order} />
+              <OrderCard
+                key={order.id}
+                order={order}
+                onViewDetails={() => navigate({ to: '/order-details' })}
+              />
             ))}
           </div>
 

@@ -143,6 +143,84 @@ const restaurants = [
       icon: 'stars',
     },
   },
+  {
+    id: 'spice-route',
+    name: 'Spice Route',
+    cuisine: 'Modern Indian',
+    priceTier: '$$$',
+    rating: '4.8',
+    ratingCountLabel: '720+',
+    deliveryTime: '25-40 min',
+    deliveryFeeLabel: '$4.49 delivery',
+    safetyLabel: 'Halal Certified',
+    cardImage:
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuDLpujvp0IA7gE9ve_P9C-tg26Za3nQX8seJ81H99cQGZVZ_ovZdGq_CaQOVH5meMjMG2OGW7qdiLH_kUbqQVsWVxJojRHc74ZDBqPmUTO0V70NXlCWb1yhvijvZafuFmuUDVcW2Hk170BUCTSVXd9qLsyCj-kgoWIfnoZHAuMCNxzAalzKzKaAaGP5G5dauUnwbBrYIfkftClAZPzKYHUDLt1QToC4J8So5gdwsevlrf4BnsTUxVsDqj-uWYyx60lSZo3YcHzR0is',
+    cardImageAlt: 'Aromatic lamb curry in a copper bowl with naan',
+    heroImage:
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuDLpujvp0IA7gE9ve_P9C-tg26Za3nQX8seJ81H99cQGZVZ_ovZdGq_CaQOVH5meMjMG2OGW7qdiLH_kUbqQVsWVxJojRHc74ZDBqPmUTO0V70NXlCWb1yhvijvZafuFmuUDVcW2Hk170BUCTSVXd9qLsyCj-kgoWIfnoZHAuMCNxzAalzKzKaAaGP5G5dauUnwbBrYIfkftClAZPzKYHUDLt1QToC4J8So5gdwsevlrf4BnsTUxVsDqj-uWYyx60lSZo3YcHzR0is',
+    heroImageAlt: 'Indian feast spread with curries and breads',
+    heroImageTitle: 'Spiced lamb and fresh naan on a saffron-draped table',
+    heroBadge: {
+      label: 'Tandoor Fresh',
+      icon: 'stars',
+    },
+    searchBadge: {
+      label: 'New Arrival',
+      icon: 'new_releases',
+      className: 'bg-primary-container/50 text-on-primary-container',
+      iconClassName: 'text-on-primary-container',
+    },
+  },
+  {
+    id: 'seoul-bowl',
+    name: 'Seoul Bowl',
+    cuisine: 'Contemporary Korean',
+    priceTier: '$$',
+    rating: '4.6',
+    ratingCountLabel: '510+',
+    deliveryTime: '15-25 min',
+    deliveryFeeLabel: '$2.99 delivery',
+    safetyLabel: 'House-Fermented',
+    cardImage:
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuARxURdYlCEbFNERnCpgU3OsyDtkZi4iZtoDVRFc7ToxMzuWgVon1O2Nht8PJiMCs5aBkVJ8pJW_8sCjHvz1kHlL4H2GDBtCw6RQkb9HsYDTvObi4kW9lj19VpQ5KdaoupfRAjJvk6lghn5MM65g06cATD_INweNmEf1J8hG12DnKPBW99IDB5Rej8Qpyv5TNQ0fE93lzywfK53OpPfxyUInHH6MGGnn4TjWreLzpJgYyTWpPggb8MTd2CVgoOQiE8DGeyyXLGlVro',
+    cardImageAlt: 'Korean bibimbap bowl with colourful vegetables and beef',
+    heroImage:
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuARxURdYlCEbFNERnCpgU3OsyDtkZi4iZtoDVRFc7ToxMzuWgVon1O2Nht8PJiMCs5aBkVJ8pJW_8sCjHvz1kHlL4H2GDBtCw6RQkb9HsYDTvObi4kW9lj19VpQ5KdaoupfRAjJvk6lghn5MM65g06cATD_INweNmEf1J8hG12DnKPBW99IDB5Rej8Qpyv5TNQ0fE93lzywfK53OpPfxyUInHH6MGGnn4TjWreLzpJgYyTWpPggb8MTd2CVgoOQiE8DGeyyXLGlVro',
+    heroImageAlt: 'Korean rice bowls and banchan on a wooden table',
+    heroImageTitle: 'Wagyu bulgogi and pickled banchan arranged on slate',
+    heroBadge: {
+      label: 'K-Food Rising',
+      icon: 'stars',
+    },
+  },
+  {
+    id: 'olive-vine',
+    name: 'Olive & Vine',
+    cuisine: 'Greek Mediterranean',
+    priceTier: '$$',
+    rating: '4.7',
+    ratingCountLabel: '430+',
+    deliveryTime: '20-30 min',
+    deliveryFeeLabel: 'Free Delivery',
+    safetyLabel: 'Import Certified',
+    cardImage:
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuAD25ttG6SC-8VnapaRPDCPvGq9EiPDgWxDX4bj0lameAu2wiky4dQxNJnmb8IVxVQDHK7z6bSqAgl12lSUKiWIQLKsVSRQ8tpwRQVi6s2HLDhfYgKIFS7P2Ppg-seVm_61eWJr5RMnartyaMC6JWalsKs_F-JymEkmJ6gsAVSW7BuX7BdHfW6Tl_DE9AzAVC7iYd8dMFsot3GfymotAWlgIiylVSYS5TNEnCPcVlKERwvzVbR-G0CnA4MaBSbTlmiEOPf_gJ6XODA',
+    cardImageAlt: 'Greek mezedes spread with olives and grilled octopus',
+    heroImage:
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuAD25ttG6SC-8VnapaRPDCPvGq9EiPDgWxDX4bj0lameAu2wiky4dQxNJnmb8IVxVQDHK7z6bSqAgl12lSUKiWIQLKsVSRQ8tpwRQVi6s2HLDhfYgKIFS7P2Ppg-seVm_61eWJr5RMnartyaMC6JWalsKs_F-JymEkmJ6gsAVSW7BuX7BdHfW6Tl_DE9AzAVC7iYd8dMFsot3GfymotAWlgIiylVSYS5TNEnCPcVlKERwvzVbR-G0CnA4MaBSbTlmiEOPf_gJ6XODA',
+    heroImageAlt: 'Mediterranean table with lamb kleftiko and mezedes',
+    heroImageTitle: 'Slow-roasted lamb and vine leaves on a stone terrace',
+    heroBadge: {
+      label: 'Aegean Inspired',
+      icon: 'stars',
+    },
+    searchBadge: {
+      label: "Curator's Choice",
+      icon: 'verified',
+      className: 'bg-white/40 text-on-tertiary-container',
+      iconClassName: 'text-tertiary',
+    },
+  },
 ];
 
 const homeCategories = [
@@ -179,14 +257,22 @@ const homeFeedConfig = {
     subtitle: '30% off on all family platters',
     icon: 'celebration',
   },
-  restaurantIds: ['heritage-kitchen', 'sakura-bloom', 'burger-haven', 'vero-italiano'],
+  restaurantIds: [
+    'heritage-kitchen',
+    'sakura-bloom',
+    'burger-haven',
+    'vero-italiano',
+    'spice-route',
+    'seoul-bowl',
+    'olive-vine',
+  ],
 };
 
 const searchResultsConfig = {
   queryIcon: 'local_pizza',
   queryTitle: 'Artisan Italian Pizza',
   querySubtitle: 'Searching for',
-  restaurantIds: ['bella-vita-trattoria', 'vero-italiano', 'forno-brace'],
+  restaurantIds: ['bella-vita-trattoria', 'vero-italiano', 'forno-brace', 'olive-vine'],
   filters: [
     { label: 'Rating 4.5+', icon: 'star', active: true, filled: true },
     { label: 'Price $$' },
