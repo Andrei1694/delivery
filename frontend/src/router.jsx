@@ -63,7 +63,7 @@ const profileRoute = createRoute({
 
 const restaurantMenuRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/restaurant-menu',
+  path: '/restaurant-menu/$restaurantId',
   component: () => (
     <ProtectedRoute>
       <RestaurantMenu />

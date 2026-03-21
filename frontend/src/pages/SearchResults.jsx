@@ -3,63 +3,15 @@ import SymbolIcon from '../components/SymbolIcon';
 import PageHeader from '../components/PageHeader';
 import FilterChip from '../components/FilterChip';
 import HorizontalScroller from '../components/HorizontalScroller';
-
-const FILTERS = [
-  { label: 'Rating 4.5+', icon: 'star', active: true, filled: true },
-  { label: 'Price $$' },
-  { label: 'Fastest Delivery', icon: 'speed' },
-  { label: 'Vegetarian' },
-];
-
-const RESTAURANTS = [
-  {
-    id: 1,
-    name: 'Bella Vita Trattoria',
-    cuisine: 'Traditional Italian',
-    price: '$$$',
-    rating: '4.9',
-    deliveryTime: '15-25 min',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuA4fzsQng7votEQN84BtOYADwQjnIHnc8PcBjG9G6A7sgzd0lJ-bUBRlCbVX8vZrjONDWOWrqZ3E4Wf26ObUq5-aex5y-Bg3HEyO4rb9UNmXum-7Y7WZL6yB9rc-FlJjLjc2d_ju3mtHdqu2TlnTx_AWRqq3BThh7JKcmCzL4JpuhoQX96qG2iQRSPhWtZHANtqZ_hs8l-nY99gOjhEAJg6XtqkDhKBQv0iQfjok7iRvCwyC2w4FJkQr7aQv0YM5laNGMaru23PbKw',
-    imageAlt: 'Signature Margherita Pizza',
-    badge: {
-      label: "Curator's Choice",
-      icon: 'verified',
-      className: 'bg-white/40 text-on-tertiary-container',
-      iconClassName: 'text-tertiary',
-    },
-  },
-  {
-    id: 2,
-    name: "L'Antica Pizzeria",
-    cuisine: 'Neapolitan Style',
-    price: '$$',
-    rating: '4.7',
-    deliveryTime: '20-30 min',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCF8tMsimKProTSfGeCtER7FZw4Dlgs8SbSQE3MX_kkPhUmjymSsDP8sI-7bFOJu-dERR-Zj6ZMy7lShKH0PHwFDWVdPjC8RRS5C4EWL4KABTw-ksQJJUwFbyRIjN7H4UHn7-ElJS927X9GxwGvxaxCYvhe3YoQFTKHjNTFo9yY7Vk29fsPaz7PVszhikr2SZiOtWI17Z6jiczqUsGoYyLk_QtkLC7gml-11qwBxHXV8_TH1rSunlhAwLQyTWL1iycquGZrUun3Qxs',
-    imageAlt: 'Rustic Truffle Pizza',
-    badge: {
-      label: 'New Arrival',
-      icon: 'new_releases',
-      className: 'bg-primary-container/50 text-on-primary-container',
-      iconClassName: 'text-on-primary-container',
-    },
-  },
-  {
-    id: 3,
-    name: 'Forno & Brace',
-    cuisine: 'Artisanal Wood-fired',
-    price: '$$',
-    rating: '4.8',
-    deliveryTime: '10-20 min',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCFEFzzxCf0q9vqj728UczmiLxospQgzSiUpe40bFujO8meHL4JmlzBQMqftSfzj4bk9N37qSHhFK_qOtr0vQSmPgJqI-8ucOi52vK1ioAjyWyMXbYYzBSLJNOt5nvd43tzX6rsTVQ-ntbanxa03PyvPqmtSWunCZztvK4xlUjiSbMQ938iGIv1qZ08AfSOUKAps65LWnATYv22gD28_yCpJtN_NAWvnjWpH57AuMZA6e9TfL5YqI812dBENNz4I9qLoqVAZuS6rPc',
-    imageAlt: 'Wood-fired Pepperoni',
-  },
-];
-
+import { getSearchResultsData } from '../mocks';
 
 function RestaurantCard({ restaurant }) {
   return (
-    <Link to="/restaurant-menu" className="group block cursor-pointer">
+    <Link
+      to="/restaurant-menu/$restaurantId"
+      params={{ restaurantId: restaurant.id }}
+      className="group block cursor-pointer"
+    >
       <div className="relative mb-5 aspect-[16/10] w-full overflow-hidden rounded-[2rem] bg-surface-container shadow-xl shadow-on-surface/5">
         <img
           alt={restaurant.imageAlt}
@@ -114,9 +66,11 @@ function RestaurantCard({ restaurant }) {
   );
 }
 
-
 export default function SearchResults() {
   const navigate = useNavigate();
+  const { filters, queryIcon, queryTitle, querySubtitle, restaurants } =
+    getSearchResultsData();
+
   return (
     <>
       <style>
@@ -149,19 +103,19 @@ export default function SearchResults() {
         <main className="mx-auto max-w-lg px-6 pb-32 pt-24">
           <section className="mb-8">
             <div className="mb-6 flex items-center gap-4 rounded-xl bg-surface-container-lowest p-4 shadow-sm shadow-on-surface/5">
-              <SymbolIcon name="local_pizza" className="text-primary" />
+              <SymbolIcon name={queryIcon} className="text-primary" />
               <div className="flex-1">
                 <p className="text-xs font-medium uppercase tracking-wide text-on-surface-variant">
-                  Searching for
+                  {querySubtitle}
                 </p>
                 <h2 className="font-headline text-xl font-bold text-on-surface">
-                  Artisan Italian Pizza
+                  {queryTitle}
                 </h2>
               </div>
             </div>
 
             <HorizontalScroller className="-mx-6 px-6 py-2" gap="gap-3">
-              {FILTERS.map((filter) => (
+              {filters.map((filter) => (
                 <FilterChip
                   key={filter.label}
                   label={filter.label}
@@ -174,12 +128,11 @@ export default function SearchResults() {
           </section>
 
           <div className="space-y-10">
-            {RESTAURANTS.map((restaurant) => (
+            {restaurants.map((restaurant) => (
               <RestaurantCard key={restaurant.id} restaurant={restaurant} />
             ))}
           </div>
         </main>
-
       </div>
     </>
   );

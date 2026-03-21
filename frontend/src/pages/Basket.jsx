@@ -146,7 +146,7 @@ export default function Basket() {
       >
         <PageHeader
           title="Your Basket"
-          onBack={() => navigate({ to: '/restaurant-menu' })}
+          onBack={() => window.history.back()}
         />
 
         <main className="mx-auto min-h-screen max-w-lg px-6 pb-40 pt-24">
