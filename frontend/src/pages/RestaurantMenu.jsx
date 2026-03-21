@@ -1,7 +1,10 @@
+import { useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import BottomNav from '../components/BottomNav';
 import { NAV_ITEMS } from '../navigation/navItems';
 import PageHeader from '../components/PageHeader';
+import Toast from '../components/Toast';
+import { useToast } from '../components/useToast';
 
 const categoryTabs = [
   { label: 'Appetizers', active: true },
@@ -43,7 +46,7 @@ const secondaryMainCourse = {
 };
 
 
-function MenuCard({ item, alertIcon = false }) {
+function MenuCard({ item, alertIcon = false, onAdd }) {
   return (
     <div className="group relative flex gap-4 rounded-xxl bg-surface-container-lowest p-4 transition-all duration-300 hover:shadow-[0_8px_32px_rgba(172,44,0,0.08)]">
       <div className="flex-1">
@@ -68,6 +71,7 @@ function MenuCard({ item, alertIcon = false }) {
           <button
             className="rounded-full bg-gradient-to-br from-primary to-primary-container px-5 py-2 text-sm font-bold text-on-primary shadow-lg shadow-primary/20 transition-transform active:scale-95"
             type="button"
+            onClick={() => onAdd?.(item)}
           >
             Add
           </button>
@@ -87,6 +91,17 @@ function MenuCard({ item, alertIcon = false }) {
 
 
 export default function RestaurantMenu() {
+  const [cartCount, setCartCount] = useState(0);
+  const [cartTotal, setCartTotal] = useState(0);
+  const { visible, fading, show } = useToast(3000);
+
+  function handleAddToCart(item) {
+    const price = parseFloat(item.price.replace('$', ''));
+    setCartCount((c) => c + 1);
+    setCartTotal((t) => t + price);
+    show();
+  }
+
   return (
     <>
       <style>
@@ -106,6 +121,7 @@ export default function RestaurantMenu() {
             -webkit-box-orient: vertical;
             -webkit-line-clamp: 2;
           }
+
         `}
       </style>
 
@@ -226,7 +242,7 @@ export default function RestaurantMenu() {
             <h2 className="font-headline text-2xl font-bold">Appetizers</h2>
 
             {appetizerItems.map((item) => (
-              <MenuCard key={item.name} item={item} />
+              <MenuCard key={item.name} item={item} onAdd={handleAddToCart} />
             ))}
 
             <h2 className="pt-4 font-headline text-2xl font-bold">Main Course</h2>
@@ -261,32 +277,33 @@ export default function RestaurantMenu() {
                 <button
                   className="w-full rounded-full bg-gradient-to-r from-primary to-primary-container py-3 font-bold text-on-primary shadow-lg shadow-primary/20 transition-all active:scale-[0.98]"
                   type="button"
+                  onClick={() => handleAddToCart({ name: 'Provencal Lamb Rack', price: '$42.00' })}
                 >
                   Add to Order
                 </button>
               </div>
             </div>
 
-            <MenuCard item={secondaryMainCourse} alertIcon />
+            <MenuCard item={secondaryMainCourse} alertIcon onAdd={handleAddToCart} />
           </section>
         </main>
 
         <BottomNav navItems={NAV_ITEMS} />
 
-        <div className="fixed bottom-28 left-0 z-40 flex w-full justify-center px-6">
+        <Toast visible={visible} fading={fading}>
           <Link
-            className="flex w-full max-w-md items-center justify-between rounded-xxl bg-inverse-surface px-8 py-4 text-on-primary shadow-[0_12px_40px_rgba(0,0,0,0.2)] transition-all active:scale-[0.98]"
+            className="flex w-full items-center justify-between rounded-xxl bg-inverse-surface px-8 py-4 text-on-primary shadow-[0_12px_40px_rgba(0,0,0,0.2)] transition-all active:scale-[0.98]"
             to="/basket"
           >
             <div className="flex items-center gap-3">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-bold">
-                2
+                {cartCount}
               </div>
               <span className="font-bold tracking-tight">View Your Order</span>
             </div>
-            <span className="text-lg font-extrabold">$52.50</span>
+            <span className="text-lg font-extrabold">${cartTotal.toFixed(2)}</span>
           </Link>
-        </div>
+        </Toast>
       </div>
     </>
   );
