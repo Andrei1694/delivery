@@ -21,6 +21,7 @@ import HomeFeed from './pages/home/HomeFeed';
 import SearchResults from './pages/SearchResults';
 import Categories from './pages/Categories';
 import OrderTracking from './pages/OrderTracking';
+import OrderConfirmation from './pages/OrderConfirmation';
 
 const rootRoute = createRootRoute({
   component: App,
@@ -168,10 +169,20 @@ const categoriesRoute = createRoute({
 
 const orderTrackingRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/order-tracking',
+  path: '/order/$orderId/track',
   component: () => (
     <ProtectedRoute>
       <OrderTracking />
+    </ProtectedRoute>
+  ),
+});
+
+const orderConfirmationRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/order-confirmation',
+  component: () => (
+    <ProtectedRoute>
+      <OrderConfirmation />
     </ProtectedRoute>
   ),
 });
@@ -192,6 +203,7 @@ const routeTree = rootRoute.addChildren([
   checkoutRoute,
   categoriesRoute,
   orderTrackingRoute,
+  orderConfirmationRoute,
 ]);
 
 export const router = createRouter({

@@ -1,4 +1,4 @@
-import { useRouter } from '@tanstack/react-router';
+import { useRouter, useParams } from '@tanstack/react-router';
 import PageHeader from '../components/PageHeader';
 import SymbolIcon from '../components/SymbolIcon';
 
@@ -6,6 +6,7 @@ const filledStyle = { fontVariationSettings: "'FILL' 1, 'wght' 400, 'GRAD' 0, 'o
 
 export default function OrderTracking() {
   const router = useRouter();
+  const { orderId } = useParams({ from: '/order/$orderId/track' });
 
   return (
     <>
@@ -40,7 +41,7 @@ export default function OrderTracking() {
                   <span className="material-symbols-outlined text-white text-xl" style={filledStyle}>check_circle</span>
                   <h2 className="font-headline font-bold text-lg leading-tight">Your Feast is on its Way!</h2>
                 </div>
-                <p className="text-white/80 text-xs font-medium">Order #8821 • Oct 24, 2023</p>
+                <p className="text-white/80 text-xs font-medium">Order #{orderId} • Oct 24, 2023</p>
               </div>
               <div className="bg-white/20 backdrop-blur-md rounded-xl p-2 px-3 text-center">
                 <p className="text-[10px] uppercase font-bold tracking-wider opacity-80">Arrival</p>

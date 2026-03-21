@@ -104,10 +104,6 @@
 - **Needed UI**: 2–3 step onboarding: allow location → select cuisine preferences → (optional) add first address.
 - **Priority**: 🟢 P3 — personalisation increases retention.
 
-#### `RESTAURANT-INFO` — `/restaurant/:id/info`
-- **Gap**: Only the menu is exposed per restaurant. Users cannot learn about the restaurant itself (opening hours, address, description, reviews).
-- **Needed UI**: About section, operating hours, address, aggregate rating with review list, photos gallery.
-- **Priority**: 🟢 P3 — trust building, especially for new restaurants.
 
 #### `404 / EMPTY STATES`
 - **Gap**: No 404 page. No empty state UI for: empty cart, no search results, no order history, failed API calls.

@@ -151,9 +151,9 @@ function ActionRow({
     <button
       className={`flex w-full items-center justify-between gap-4 rounded-2xl p-4 text-left transition-colors ${
         destructive
-          ? 'bg-error/6 text-error hover:bg-error/10'
-          : 'bg-surface-container-lowest text-on-surface hover:bg-surface-container'
-      } ${disabled ? 'cursor-not-allowed opacity-60' : ''}`}
+          ? 'bg-error/6 text-error hover:bg-error/10 active:bg-error/14'
+          : 'bg-surface-container-lowest text-on-surface hover:bg-surface-container active:bg-surface-container-high'
+      } ${disabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}`}
       disabled={disabled}
       type="button"
       onClick={onClick}
@@ -186,6 +186,9 @@ function ActionRow({
   );
 }
 
+const DEFAULT_PASSWORD_FORM = { currentPassword: '', newPassword: '', confirmPassword: '' };
+const DEFAULT_PASSWORD_VISIBILITY = { currentPassword: false, newPassword: false, confirmPassword: false };
+
 export default function AccountSettings() {
   const navigate = useNavigate();
   const { user, logout, refreshUser } = useAuth();
@@ -197,6 +200,17 @@ export default function AccountSettings() {
   const [profile, setProfile] = useState(() => buildProfileForm(user));
   const [savedPreferences, setSavedPreferences] = useState(() => readStoredPreferences());
   const [preferences, setPreferences] = useState(() => readStoredPreferences());
+
+  const [isPasswordSectionOpen, setIsPasswordSectionOpen] = useState(false);
+  const [passwordForm, setPasswordForm] = useState(DEFAULT_PASSWORD_FORM);
+  const [passwordVisible, setPasswordVisible] = useState(DEFAULT_PASSWORD_VISIBILITY);
+  const [passwordError, setPasswordError] = useState('');
+  const [isSavingPassword, setIsSavingPassword] = useState(false);
+
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
 
   useEffect(() => {
     const nextProfile = buildProfileForm(user);
@@ -256,6 +270,46 @@ export default function AccountSettings() {
       setError('We could not save your settings right now. Try again in a moment.');
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handlePasswordFieldChange = (event) => {
+    const { name, value } = event.target;
+    setPasswordForm((current) => ({ ...current, [name]: value }));
+  };
+
+  const togglePasswordVisibility = (field) => {
+    setPasswordVisible((current) => ({ ...current, [field]: !current[field] }));
+  };
+
+  const handleChangePassword = async () => {
+    setPasswordError('');
+    setIsSavingPassword(true);
+    try {
+      await api.post('/auth/change-password', passwordForm);
+      setIsPasswordSectionOpen(false);
+      setPasswordForm(DEFAULT_PASSWORD_FORM);
+      setToastMessage('Password updated.');
+      toast.show();
+    } catch (err) {
+      const message = err?.response?.data?.message ?? err?.response?.data ?? 'Could not update password. Please try again.';
+      setPasswordError(typeof message === 'string' ? message : 'Could not update password. Please try again.');
+    } finally {
+      setIsSavingPassword(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!user?.id) return;
+    setDeleteError('');
+    setIsDeletingAccount(true);
+    try {
+      await api.delete(`/users/${user.id}`);
+      await logout();
+      navigate({ to: '/login' });
+    } catch {
+      setDeleteError('Could not delete account. Please try again.');
+      setIsDeletingAccount(false);
     }
   };
 
@@ -417,7 +471,7 @@ export default function AccountSettings() {
             <SectionHeading
               eyebrow="Security"
               title="Access & Session"
-              description="The essentials for sign-in security without a detached mock navigation."
+              description="Manage your password and active session for this account."
             />
 
             <div className="ambient-shadow space-y-3 rounded-[2rem] border border-outline/10 bg-surface-container-low p-3">
@@ -438,6 +492,82 @@ export default function AccountSettings() {
               </div>
 
               <ActionRow
+                description="Update your login credentials with a new password."
+                icon="lock"
+                label={isPasswordSectionOpen ? 'Close' : 'Update'}
+                title="Change password"
+                onClick={() => {
+                  setIsPasswordSectionOpen((open) => !open);
+                  setPasswordError('');
+                  setPasswordForm(DEFAULT_PASSWORD_FORM);
+                  setPasswordVisible(DEFAULT_PASSWORD_VISIBILITY);
+                }}
+              />
+
+              <div
+                aria-hidden={!isPasswordSectionOpen}
+                className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                  isPasswordSectionOpen ? 'max-h-[28rem] opacity-100' : 'max-h-0 opacity-0'
+                }`}
+              >
+                <div className="space-y-4 rounded-2xl bg-surface-container-lowest p-5">
+                  {(['currentPassword', 'newPassword', 'confirmPassword']).map((field, i) => {
+                    const labels = ['Current Password', 'New Password', 'Confirm New Password'];
+                    const placeholders = ['Enter current password', 'Enter new password', 'Repeat new password'];
+                    return (
+                      <div key={field}>
+                        <label
+                          className="mb-1.5 ml-1 block text-sm font-medium text-on-surface"
+                          htmlFor={field}
+                        >
+                          {labels[i]}
+                        </label>
+                        <div className="relative">
+                          <input
+                            autoComplete={field === 'currentPassword' ? 'current-password' : 'new-password'}
+                            className="block w-full rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 pr-12 leading-5 text-on-surface placeholder:text-on-surface-variant/70 transition duration-200 ease-in-out focus:border-primary/20 focus:outline-none focus:ring-2 focus:ring-primary/20 sm:text-sm"
+                            id={field}
+                            name={field}
+                            placeholder={placeholders[i]}
+                            type={passwordVisible[field] ? 'text' : 'password'}
+                            value={passwordForm[field]}
+                            onChange={handlePasswordFieldChange}
+                          />
+                          <button
+                            aria-label={passwordVisible[field] ? 'Hide password' : 'Show password'}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 flex h-8 w-8 cursor-pointer items-center justify-center rounded-xl text-on-surface-variant transition-colors hover:bg-surface-container hover:text-on-surface"
+                            tabIndex={-1}
+                            type="button"
+                            onClick={() => togglePasswordVisibility(field)}
+                          >
+                            <SymbolIcon name={passwordVisible[field] ? 'visibility_off' : 'visibility'} />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {passwordError && (
+                    <p className="rounded-xl bg-error-container px-3 py-2 text-sm font-medium text-on-error-container">
+                      {passwordError}
+                    </p>
+                  )}
+                  <button
+                    className={`flex w-full cursor-pointer items-center justify-center gap-2 rounded-full border py-3 font-headline font-bold transition-all ${
+                      isSavingPassword
+                        ? 'cursor-not-allowed border-outline/30 bg-surface-container text-on-surface-variant'
+                        : 'border-primary/30 bg-primary/8 text-primary hover:bg-primary/12 active:bg-primary/16'
+                    }`}
+                    disabled={isSavingPassword}
+                    type="button"
+                    onClick={handleChangePassword}
+                  >
+                    <SymbolIcon name="lock_reset" />
+                    <span>{isSavingPassword ? 'Updating...' : 'Update Password'}</span>
+                  </button>
+                </div>
+              </div>
+
+              <ActionRow
                 description="End the current session and return to the login screen."
                 icon="logout"
                 label="Now"
@@ -451,18 +581,64 @@ export default function AccountSettings() {
             <SectionHeading
               eyebrow="Danger"
               title="Sensitive Actions"
-              description="Deletion is intentionally blocked until the verification flow is designed."
+              description="Permanently remove your account and all associated data. This cannot be undone."
             />
 
-            <div className="ambient-shadow rounded-[2rem] border border-error/15 bg-error/5 p-3">
+            <div className="ambient-shadow space-y-3 rounded-[2rem] border border-error/15 bg-error/5 p-3">
               <ActionRow
-                description="This stays disabled until we add a dedicated verified deletion flow."
+                description="Permanently remove your account and all associated data."
                 destructive
-                disabled
                 icon="delete"
-                label="Soon"
+                label={isDeleteConfirmOpen ? 'Cancel' : 'Delete'}
                 title="Delete account"
+                onClick={() => {
+                  setIsDeleteConfirmOpen((open) => !open);
+                  setDeleteConfirmText('');
+                  setDeleteError('');
+                }}
               />
+
+              {isDeleteConfirmOpen && (
+                <div className="rounded-2xl bg-error/10 border border-error/20 p-4 space-y-4">
+                  <p className="text-sm font-medium text-error/90">
+                    This will permanently delete your account and all associated data. This action cannot be undone.
+                  </p>
+                  <div>
+                    <label
+                      className="mb-1.5 ml-1 block text-sm font-medium text-error"
+                      htmlFor="deleteConfirm"
+                    >
+                      Type <span className="font-bold tracking-widest">DELETE</span> to confirm
+                    </label>
+                    <input
+                      className="block w-full rounded-2xl border border-error/30 bg-surface-container-lowest px-4 py-3 text-on-surface placeholder:text-on-surface-variant/50 focus:border-error/50 focus:outline-none focus:ring-2 focus:ring-error/20 sm:text-sm"
+                      id="deleteConfirm"
+                      placeholder="DELETE"
+                      type="text"
+                      value={deleteConfirmText}
+                      onChange={(e) => setDeleteConfirmText(e.target.value)}
+                    />
+                  </div>
+                  {deleteError && (
+                    <p className="rounded-xl bg-error-container px-3 py-2 text-sm font-medium text-on-error-container">
+                      {deleteError}
+                    </p>
+                  )}
+                  <button
+                    className={`flex w-full items-center justify-center gap-2 rounded-full py-3 font-headline font-bold text-white transition-all ${
+                      deleteConfirmText === 'DELETE' && !isDeletingAccount
+                        ? 'bg-error active:scale-95'
+                        : 'cursor-not-allowed bg-error/30'
+                    }`}
+                    disabled={deleteConfirmText !== 'DELETE' || isDeletingAccount}
+                    type="button"
+                    onClick={handleDeleteAccount}
+                  >
+                    <SymbolIcon name="delete_forever" />
+                    <span>{isDeletingAccount ? 'Deleting...' : 'Delete Account'}</span>
+                  </button>
+                </div>
+              )}
             </div>
           </section>
         </main>
