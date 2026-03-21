@@ -84,10 +84,16 @@ function getSearchResultsData() {
   };
 }
 
+function getAllCategories() {
+  return homeCategories;
+}
+
 export {
   DEFAULT_RESTAURANT_ID,
+  getAllCategories,
   getHomeFeedData,
   getRestaurantById,
   getRestaurantMenuById,
   getSearchResultsData,
 };
+

@@ -19,6 +19,7 @@ import SecureCheckout from './pages/SecureCheckout';
 import SavedAddresses from './pages/SavedAddresses';
 import HomeFeed from './pages/home/HomeFeed';
 import SearchResults from './pages/SearchResults';
+import Categories from './pages/Categories';
 
 const rootRoute = createRootRoute({
   component: App,
@@ -154,6 +155,16 @@ const checkoutRoute = createRoute({
   ),
 });
 
+const categoriesRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/categories',
+  component: () => (
+    <ProtectedRoute>
+      <Categories />
+    </ProtectedRoute>
+  ),
+});
+
 const routeTree = rootRoute.addChildren([
   homeRoute,
   loginRoute,
@@ -168,6 +179,7 @@ const routeTree = rootRoute.addChildren([
   orderHistoryRoute,
   orderDetailsRoute,
   checkoutRoute,
+  categoriesRoute,
 ]);
 
 export const router = createRouter({

@@ -48,7 +48,14 @@ export default function HomeFeed() {
         <section className="mb-6">
           <div className="flex items-center justify-between px-4 mb-3">
             <h2 className="font-headline text-sm font-bold text-on-surface">Quick Categories</h2>
-            <button type="button" className="text-primary text-xs font-bold">View all</button>
+            <Link
+              to="/categories"
+              className="flex items-center gap-0.5 text-primary text-xs font-bold p-2 -mr-2 min-h-[44px] active:scale-95 active:opacity-70 transition-all cursor-pointer select-none"
+              aria-label="View all categories"
+            >
+              View all
+              <SymbolIcon name="chevron_right" className="text-[14px]" />
+            </Link>
           </div>
           <div className="flex gap-4 overflow-x-auto hide-scrollbar px-4">
             {categories.map((category) => (
