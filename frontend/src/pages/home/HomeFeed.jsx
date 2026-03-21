@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router';
 import SymbolIcon from '../../components/SymbolIcon';
+import SearchInput from '../../components/SearchInput';
 import { getHomeFeedData } from '../../mocks';
 
 export default function HomeFeed() {
@@ -24,18 +25,9 @@ export default function HomeFeed() {
             </Link>
           </div>
 
-          <div className="relative">
-            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-on-surface-variant">
-              <SymbolIcon name="search" className="text-[20px]" />
-            </div>
-            <input
-              type="text"
-              placeholder="Search restaurants, dishes..."
-              className="w-full bg-surface-container-lowest border-none rounded-xl py-2.5 pl-11 pr-4 shadow-sm focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-on-surface-variant/50 text-sm font-medium focus:outline-none"
-            />
+            <SearchInput />
           </div>
-        </div>
-      </header>
+        </header>
 
       <main className="pt-32 pb-32 max-w-lg mx-auto">
         <section className="px-4 mb-4">

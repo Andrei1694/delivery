@@ -16,8 +16,10 @@ function App() {
     const prevIdx = PEER_INDEX[prev] ?? -1;
     const nextIdx = PEER_INDEX[pathname] ?? -1;
     if (prevIdx !== -1 && nextIdx !== -1 && prevIdx !== nextIdx) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setAnimClass(nextIdx > prevIdx ? 'page-enter-right' : 'page-enter-left');
     } else {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setAnimClass('');
     }
   }, [pathname]);
