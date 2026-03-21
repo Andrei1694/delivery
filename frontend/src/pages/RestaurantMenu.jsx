@@ -1,6 +1,7 @@
 import { Link } from '@tanstack/react-router';
 import BottomNav from '../components/BottomNav';
 import { NAV_ITEMS } from '../navigation/navItems';
+import PageHeader from '../components/PageHeader';
 
 const categoryTabs = [
   { label: 'Appetizers', active: true },
@@ -112,21 +113,10 @@ export default function RestaurantMenu() {
         className="restaurant-menu-page bg-surface font-body text-on-surface selection:bg-primary-container selection:text-on-primary-container"
         style={{ minHeight: 'max(884px, 100dvh)' }}
       >
-        <nav className="fixed top-0 z-50 w-full bg-surface/70 backdrop-blur-xl transition-all duration-300 dark:bg-inverse-surface/70">
-          <div className="mx-auto flex w-full max-w-lg items-center justify-between px-6 py-4">
-            <button
-              aria-label="Go back"
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-container-lowest text-on-surface-variant transition-opacity duration-200 hover:opacity-80 active:scale-95"
-              type="button"
-              onClick={() => window.history.back()}
-            >
-              <span className="material-symbols-outlined">arrow_back</span>
-            </button>
-
-            <span className="font-headline text-xl font-extrabold tracking-tight text-on-surface dark:text-on-surface">
-              The Culinary Curator
-            </span>
-
+        <PageHeader
+          title="The Culinary Curator"
+          onBack={() => window.history.back()}
+          rightAction={
             <div className="relative">
               <button
                 aria-label="Shopping bag"
@@ -139,8 +129,8 @@ export default function RestaurantMenu() {
                 </span>
               </button>
             </div>
-          </div>
-        </nav>
+          }
+        />
 
         <main className="mx-auto max-w-lg pb-32">
           <header className="relative h-[400px] w-full overflow-hidden">

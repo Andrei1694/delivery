@@ -1,4 +1,5 @@
 import { useRouter } from '@tanstack/react-router';
+import PageHeader from '../components/PageHeader';
 
 export default function SecureCheckout() {
   const router = useRouter();
@@ -51,21 +52,11 @@ export default function SecureCheckout() {
       </style>
 
       <div className="secure-checkout-page bg-surface font-body text-on-surface antialiased min-h-screen flex flex-col overflow-x-hidden">
-        <header className="sticky top-0 z-50 flex items-center justify-between px-4 py-4 bg-surface/70 backdrop-blur-xl border-b border-surface-container">
-          <button
-            aria-label="Go back"
-            className="flex items-center justify-center w-12 h-12 rounded-full bg-surface-container-low text-on-surface hover:bg-surface-container transition-colors"
-            type="button"
-            onClick={() => router.history.back()}
-          >
-            <span className="material-symbols-outlined text-2xl" data-icon="arrow_back">
-              arrow_back
-            </span>
-          </button>
-          <h1 className="font-headline text-lg font-bold tracking-tight flex-1 text-center pr-12">
-            Secure Checkout
-          </h1>
-        </header>
+        <PageHeader
+          sticky
+          title="Secure Checkout"
+          onBack={() => router.history.back()}
+        />
 
         <main className="flex-1 px-4 pb-32">
           <section className="mt-6 p-4 rounded-xl bg-surface-container-low flex items-center justify-between">

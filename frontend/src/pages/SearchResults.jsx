@@ -1,4 +1,8 @@
-import { Link } from '@tanstack/react-router';
+import { Link, useNavigate } from '@tanstack/react-router';
+import SymbolIcon from '../components/SymbolIcon';
+import PageHeader from '../components/PageHeader';
+import FilterChip from '../components/FilterChip';
+import HorizontalScroller from '../components/HorizontalScroller';
 
 const FILTERS = [
   { label: 'Rating 4.5+', icon: 'star', active: true, filled: true },
@@ -52,25 +56,6 @@ const RESTAURANTS = [
   },
 ];
 
-const outlinedIconStyle = {
-  fontVariationSettings: "'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24",
-};
-
-const filledIconStyle = {
-  fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24",
-};
-
-function SymbolIcon({ name, className = '', filled = false }) {
-  return (
-    <span
-      aria-hidden="true"
-      className={`material-symbols-outlined ${className}`.trim()}
-      style={filled ? filledIconStyle : outlinedIconStyle}
-    >
-      {name}
-    </span>
-  );
-}
 
 function RestaurantCard({ restaurant }) {
   return (
@@ -131,6 +116,7 @@ function RestaurantCard({ restaurant }) {
 
 
 export default function SearchResults() {
+  const navigate = useNavigate();
   return (
     <>
       <style>
@@ -151,34 +137,14 @@ export default function SearchResults() {
           .search-results-page .search-results-tonal-bg {
             background: linear-gradient(180deg, rgba(255, 244, 243, 0.8) 0%, rgba(255, 244, 243, 0) 100%);
           }
-
-          .search-results-page .no-scrollbar::-webkit-scrollbar {
-            display: none;
-          }
-
-          .search-results-page .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-          }
         `}
       </style>
 
       <div className="search-results-page bg-background font-body text-on-surface selection:bg-primary-container selection:text-on-primary-container">
-        <header className="fixed top-0 z-50 w-full bg-surface/70 backdrop-blur-xl border-b border-surface-container">
-          <div className="mx-auto flex w-full max-w-lg items-center gap-3 px-6 py-4">
-            <Link
-              to="/"
-              aria-label="Go back"
-              className="rounded-full p-2 text-primary transition-colors duration-200 hover:bg-surface-container-low active:scale-95"
-            >
-              <SymbolIcon name="arrow_back" />
-            </Link>
-
-            <h1 className="font-headline text-xl font-extrabold tracking-tight text-on-surface">
-              The Culinary Curator
-            </h1>
-          </div>
-        </header>
+        <PageHeader
+          title="The Culinary Curator"
+          onBack={() => navigate({ to: '/' })}
+        />
 
         <main className="mx-auto max-w-lg px-6 pb-32 pt-24">
           <section className="mb-8">
@@ -194,28 +160,17 @@ export default function SearchResults() {
               </div>
             </div>
 
-            <div className="no-scrollbar -mx-6 flex gap-3 overflow-x-auto px-6 py-2">
+            <HorizontalScroller className="-mx-6 px-6 py-2" gap="gap-3">
               {FILTERS.map((filter) => (
-                <button
+                <FilterChip
                   key={filter.label}
-                  type="button"
-                  className={
-                    filter.active
-                      ? 'flex shrink-0 items-center gap-2 rounded-full bg-primary px-5 py-2.5 font-label text-sm font-semibold text-white shadow-md shadow-primary/20 transition-transform active:scale-95'
-                      : 'flex shrink-0 items-center gap-2 rounded-full bg-surface-container-high px-5 py-2.5 font-label text-sm font-semibold text-on-surface transition-colors hover:bg-surface-variant'
-                  }
-                >
-                  {filter.icon ? (
-                    <SymbolIcon
-                      name={filter.icon}
-                      className="text-[18px]"
-                      filled={filter.filled}
-                    />
-                  ) : null}
-                  {filter.label}
-                </button>
+                  label={filter.label}
+                  icon={filter.icon}
+                  iconFilled={filter.filled}
+                  active={filter.active}
+                />
               ))}
-            </div>
+            </HorizontalScroller>
           </section>
 
           <div className="space-y-10">

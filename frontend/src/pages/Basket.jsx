@@ -1,4 +1,6 @@
 import { useNavigate } from '@tanstack/react-router';
+import PageHeader from '../components/PageHeader';
+import OrderSummary from '../components/OrderSummary';
 
 const cartItems = [
   {
@@ -34,7 +36,6 @@ const cartItems = [
 
 const serviceFee = 4.2;
 const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-const total = subtotal + serviceFee;
 
 function formatCurrency(value) {
   return new Intl.NumberFormat('en-US', {
@@ -143,22 +144,10 @@ export default function Basket() {
         className="basket-page bg-surface font-body text-on-surface antialiased"
         style={{ minHeight: 'max(884px, 100dvh)' }}
       >
-        <header className="fixed top-0 z-50 w-full bg-surface/70 backdrop-blur-xl border-b border-surface-container">
-          <div className="mx-auto flex w-full max-w-lg items-center justify-between px-6 py-4">
-            <button
-              aria-label="Go back"
-              className="text-primary transition-opacity duration-200 hover:opacity-80 active:scale-95"
-              type="button"
-              onClick={() => navigate({ to: '/restaurant-menu' })}
-            >
-              <span className="material-symbols-outlined">arrow_back</span>
-            </button>
-            <h1 className="font-headline text-xl font-extrabold tracking-tight text-on-surface">
-              Your Basket
-            </h1>
-            <div className="w-10" />
-          </div>
-        </header>
+        <PageHeader
+          title="Your Basket"
+          onBack={() => navigate({ to: '/restaurant-menu' })}
+        />
 
         <main className="mx-auto min-h-screen max-w-lg px-6 pb-40 pt-24">
           <div className="mb-8">
@@ -178,28 +167,7 @@ export default function Basket() {
 
           <div className="mt-12 space-y-4">
             <h4 className="font-headline text-lg font-bold text-on-surface">Order Summary</h4>
-            <div className="space-y-3 rounded-2xl bg-surface-container-low p-6">
-              <div className="flex items-center justify-between text-on-surface-variant">
-                <span className="font-medium">Subtotal</span>
-                <span className="font-headline font-semibold">{formatCurrency(subtotal)}</span>
-              </div>
-              <div className="flex items-center justify-between text-on-surface-variant">
-                <span className="font-medium">Service Fee</span>
-                <span className="font-headline font-semibold">
-                  {formatCurrency(serviceFee)}
-                </span>
-              </div>
-              <div className="flex items-center justify-between text-on-surface-variant">
-                <span className="font-medium">Delivery</span>
-                <span className="font-headline font-semibold text-tertiary">FREE</span>
-              </div>
-              <div className="mt-3 flex items-center justify-between border-t border-outline-variant/20 pt-3">
-                <span className="font-headline text-xl font-bold text-on-surface">Total</span>
-                <span className="font-headline text-2xl font-extrabold text-on-surface">
-                  {formatCurrency(total)}
-                </span>
-              </div>
-            </div>
+            <OrderSummary subtotal={subtotal} serviceFee={serviceFee} />
           </div>
         </main>
 

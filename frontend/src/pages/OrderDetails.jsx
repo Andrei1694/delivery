@@ -1,3 +1,7 @@
+import PageHeader from '../components/PageHeader';
+import OrderSummary from '../components/OrderSummary';
+import SymbolIcon from '../components/SymbolIcon';
+
 const ORDER_ITEMS = [
   {
     name: 'Truffle Risotto',
@@ -53,30 +57,19 @@ export default function OrderDetails() {
       </style>
 
       <div className="order-details-page min-h-screen bg-background font-body text-on-surface selection:bg-primary-container selection:text-on-primary-container">
-        <header className="fixed top-0 z-50 w-full bg-surface/70 backdrop-blur-xl border-b border-surface-container">
-          <div className="mx-auto flex h-16 w-full max-w-lg items-center justify-between px-6">
-            <button
-              aria-label="Go back"
-              className="-ml-2 rounded-full p-2 text-primary duration-200 hover:bg-surface-container-low active:scale-95"
-              type="button"
-              onClick={() => window.history.back()}
-            >
-              <span className="material-symbols-outlined">arrow_back</span>
-            </button>
-
-            <h1 className="font-headline text-lg font-bold tracking-tight text-on-surface">
-              Order Details
-            </h1>
-
+        <PageHeader
+          title="Order Details"
+          onBack={() => window.history.back()}
+          rightAction={
             <button
               aria-label="More options"
-              className="-mr-2 rounded-full p-2 text-primary duration-200 hover:bg-surface-container-low active:scale-95"
+              className="flex h-10 w-10 items-center justify-center rounded-full text-primary duration-200 hover:bg-surface-container-low active:scale-95"
               type="button"
             >
-              <span className="material-symbols-outlined">more_vert</span>
+              <SymbolIcon name="more_vert" />
             </button>
-          </div>
-        </header>
+          }
+        />
 
         <main className="mx-auto max-w-lg space-y-4 px-6 pb-40 pt-20">
           <section className="rounded-3xl border border-outline-variant/10 bg-surface-container-low p-5">
@@ -180,36 +173,8 @@ export default function OrderDetails() {
             </div>
           </section>
 
-          <section className="editorial-shadow rounded-[2rem] border border-outline-variant/10 bg-surface-container-lowest p-6">
-            <div className="space-y-3">
-              <div className="flex justify-between text-sm text-on-surface-variant">
-                <span className="font-medium">Subtotal</span>
-                <span className="font-semibold text-on-surface">$64.00</span>
-              </div>
-
-              <div className="flex justify-between text-sm text-on-surface-variant">
-                <span className="font-medium">Service Fee</span>
-                <span className="font-semibold text-on-surface">$4.20</span>
-              </div>
-
-              <div className="flex items-center justify-between text-sm">
-                <span className="font-medium text-on-surface-variant">
-                  Delivery
-                </span>
-                <span className="text-[10px] font-bold uppercase tracking-tighter text-primary">
-                  FREE
-                </span>
-              </div>
-
-              <div className="mt-3 flex items-center justify-between border-t border-outline-variant/20 pt-3">
-                <p className="font-label text-[10px] uppercase tracking-[0.2em] text-on-surface-variant">
-                  Total Amount
-                </p>
-                <p className="font-headline text-2xl font-extrabold tracking-tight text-on-surface">
-                  $68.20
-                </p>
-              </div>
-            </div>
+          <section>
+            <OrderSummary subtotal={64} serviceFee={4.20} className="rounded-[2rem] border border-outline-variant/10 bg-surface-container-lowest" />
           </section>
         </main>
 

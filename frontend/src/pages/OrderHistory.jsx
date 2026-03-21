@@ -1,3 +1,8 @@
+import SymbolIcon from '../components/SymbolIcon';
+import PageHeader from '../components/PageHeader';
+import FilterChip from '../components/FilterChip';
+import HorizontalScroller from '../components/HorizontalScroller';
+import StatusBadge from '../components/StatusBadge';
 
 const FILTERS = ['All Orders', 'Delivered', 'Processing', 'Cancelled'];
 
@@ -70,22 +75,6 @@ const ORDERS = [
 ];
 
 
-const iconStyle = {
-  fontVariationSettings: "'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24",
-};
-
-
-function SymbolIcon({ name, className = '' }) {
-  return (
-    <span
-      aria-hidden="true"
-      className={`material-symbols-outlined ${className}`.trim()}
-      style={iconStyle}
-    >
-      {name}
-    </span>
-  );
-}
 
 function OrderCard({ order }) {
   return (
@@ -117,11 +106,7 @@ function OrderCard({ order }) {
               <h3 className="font-headline font-bold tracking-tight text-lg text-on-surface leading-tight">
                 {order.restaurant}
               </h3>
-              <span
-                className={`px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-full ${order.statusClassName}`}
-              >
-                {order.status}
-              </span>
+              <StatusBadge label={order.status} className={order.statusClassName} />
             </div>
             <p className="text-xs text-on-surface-variant mt-1 font-medium">
               {order.dateTime}
@@ -196,23 +181,18 @@ export default function OrderHistory() {
       `}</style>
 
       <div className="order-history-page bg-surface font-body text-on-surface selection:bg-primary-container selection:text-on-primary-container">
-        <header className="fixed top-0 w-full z-50 bg-surface/70 backdrop-blur-xl border-b border-surface-container">
-          <div className="flex items-center justify-between px-6 h-16 w-full max-w-lg mx-auto">
-            <h1 className="font-headline font-bold tracking-tight text-on-surface text-xl">
-              Order History
-            </h1>
-
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                className="p-2 text-primary active:scale-95 duration-200 transition-colors hover:bg-surface-container-low"
-                aria-label="Search orders"
-              >
-                <SymbolIcon name="search" />
-              </button>
-            </div>
-          </div>
-        </header>
+        <PageHeader
+          title="Order History"
+          rightAction={
+            <button
+              type="button"
+              className="flex h-10 w-10 items-center justify-center rounded-full text-primary active:scale-95 duration-200 hover:bg-surface-container-low"
+              aria-label="Search orders"
+            >
+              <SymbolIcon name="search" />
+            </button>
+          }
+        />
 
         <main className="pt-20 pb-32 px-6 max-w-lg mx-auto space-y-8">
           <section className="space-y-4">
@@ -230,21 +210,11 @@ export default function OrderHistory() {
               />
             </div>
 
-            <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+            <HorizontalScroller gap="gap-2" className="pb-2">
               {FILTERS.map((filter, index) => (
-                <button
-                  key={filter}
-                  type="button"
-                  className={
-                    index === 0
-                      ? 'px-6 py-2 bg-primary text-on-primary rounded-full text-sm font-bold whitespace-nowrap'
-                      : 'px-6 py-2 bg-surface-container-low text-on-surface-variant rounded-full text-sm font-semibold whitespace-nowrap hover:bg-surface-container-high transition-colors'
-                  }
-                >
-                  {filter}
-                </button>
+                <FilterChip key={filter} label={filter} active={index === 0} />
               ))}
-            </div>
+            </HorizontalScroller>
           </section>
 
           <div className="space-y-10">
