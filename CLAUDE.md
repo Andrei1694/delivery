@@ -48,14 +48,16 @@ Stateless REST API with JWT auth. Packages by concern:
 
 ### Frontend (`frontend/src/`)
 
-- `pages/` — 9 pages (Login, Register, Home, News, NewsArticle, Events, Users, Profile, Chat); lazy-loaded via `React.lazy + Suspense`
-- `auth/` — `AuthContext.jsx` (global auth state), `useAuth.js` hook, `ProtectedRoute`/`PublicOnlyRoute` guards
-- `service/` — axios API client; `requests.js` has all API calls
-- `queries/` — TanStack Query hooks wrapping `requests.js`
-- `components/` — Shared UI: `MobileLayout` (bottom nav), `NormalLayout` (sidebar + top navbar); responsive via `useIsPhone()` hook
-- `router.jsx` — TanStack Router; root route renders layout shell, nested routes are protected/public
-- `forms/` — TanStack Form components
-- `navigation/` — Nav config
+- `pages/` — 9 pages: `HomeFeed` (discovery), `Login`, `Register`, `Profile`, `SearchResults`, `RestaurantMenu`, `Cart`, `OrderHistory`, `OrderDetails`, `SecureCheckout`; routes defined in `router.jsx`
+- `auth/` — `AuthContext.jsx` (global auth state), `ProtectedRoute`/`PublicOnlyRoute` guards
+- `requests.js` — all API calls (axios); no separate service directory
+- `queries/` — TanStack Query hooks: `discovery.js`, `menus.js`
+- `mocks/` — mock data for discovery and menus (`discovery.js`, `menus.js`, `index.js`)
+- `components/` — Shared UI: `BottomNav` (peer-route nav), `Button`, `InputField`, `FilterChip`, `HorizontalScroller`, `PageHeader`, `OrderSummary`, `StatusBadge`, `Toast`/`useToast`
+- `App.jsx` — root shell; renders `<Outlet>` + `BottomNav` on peer routes (`/`, `/search`, `/order-history`, `/profile`); handles slide animation between peer routes
+- `router.jsx` — TanStack Router; flat route tree, all routes protected except `/login` and `/register`
+- `forms/` — `useFormSubmitHandler.js` form utility
+- `navigation/` — `navItems.js` nav config
 
 **Dev proxy**: Vite proxies `/api` → `http://localhost:8080`, so frontend calls `/api/*` which hits the Spring Boot server.
 

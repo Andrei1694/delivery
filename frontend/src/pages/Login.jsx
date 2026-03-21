@@ -128,13 +128,12 @@ const VerveKitchenLogin = () => {
                     >
                       Password
                     </label>
-                    <a
+                    <Link
                       className="text-xs font-bold text-primary transition-colors hover:text-primary-dim"
-                      href="#"
-                      onClick={(e) => e.preventDefault()}
+                      to="/forgot-password"
                     >
                       Forgot Password?
-                    </a>
+                    </Link>
                   </div>
                   <div className="group relative">
                     <input

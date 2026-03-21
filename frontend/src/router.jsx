@@ -6,6 +6,7 @@ import {
 import App from './App';
 import ProtectedRoute from './auth/ProtectedRoute';
 import PublicOnlyRoute from './auth/PublicOnlyRoute';
+import ForgotPassword from './pages/ForgotPassword';
 import Login from './pages/Login';
 import Profile from './pages/Profile';
 import Register from './pages/Register';
@@ -47,6 +48,16 @@ const registerRoute = createRoute({
   component: () => (
     <PublicOnlyRoute>
       <Register />
+    </PublicOnlyRoute>
+  ),
+});
+
+const forgotPasswordRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/forgot-password',
+  component: () => (
+    <PublicOnlyRoute>
+      <ForgotPassword />
     </PublicOnlyRoute>
   ),
 });
@@ -125,6 +136,7 @@ const routeTree = rootRoute.addChildren([
   homeRoute,
   loginRoute,
   registerRoute,
+  forgotPasswordRoute,
   profileRoute,
   restaurantMenuRoute,
   cartRoute,
