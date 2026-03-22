@@ -2,7 +2,10 @@
   "permissions": {
     "allow": [
       "Bash(git mv:*)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(/usr/libexec/java_home:*)",
+      "Bash(export JAVA_HOME=/Users/andreistanciu/Library/Java/JavaVirtualMachines/openjdk-24.0.1/Contents/Home)",
+      "Bash(./mvnw spring-boot:run:*)"
     ]
   }
 }
