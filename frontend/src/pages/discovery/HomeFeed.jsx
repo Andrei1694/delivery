@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router';
+import DismissiblePromoBanner from '../../components/DismissiblePromoBanner';
 import SymbolIcon from '../../components/SymbolIcon';
 import SearchInput from '../../components/SearchInput';
 import { getHomeFeedData } from '../../mocks';
@@ -30,19 +31,14 @@ export default function HomeFeed() {
         </header>
 
       <main className="pt-32 pb-32 max-w-lg mx-auto">
-        <section className="px-4 mb-4">
-          <div className="bg-tertiary rounded-xl p-3 text-on-tertiary flex items-center justify-between relative overflow-hidden">
-            <div className="flex items-center gap-3 relative z-10">
-              <SymbolIcon name={promo.icon} className="text-xl" />
-              <div>
-                <h2 className="font-headline text-sm font-bold leading-none">{promo.title}</h2>
-                <p className="text-[10px] text-on-tertiary/90 mt-0.5">{promo.subtitle}</p>
-              </div>
-            </div>
-            <button type="button" className="relative z-10 p-1" aria-label="Close">
-              <SymbolIcon name="close" className="text-sm" />
-            </button>
-          </div>
+        <section className="px-4">
+          <DismissiblePromoBanner
+            key={promo.title}
+            icon={promo.icon}
+            title={promo.title}
+            subtitle={promo.subtitle}
+            className="mb-4"
+          />
         </section>
 
         <section className="mb-6">
