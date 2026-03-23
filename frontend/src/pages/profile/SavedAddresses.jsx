@@ -1,8 +1,9 @@
+import { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import SymbolIcon from '../../components/SymbolIcon';
 import { getSavedAddressesData } from '../../mocks';
 
-function AddressCard({ label, address, icon, iconClassName }) {
+function AddressCard({ label, address, icon, iconClassName, onEdit, onDelete }) {
   return (
     <article className="ambient-shadow flex flex-col justify-between rounded-[2rem] bg-surface-container-lowest p-6 transition-colors duration-300 hover:bg-surface-container-high">
       <div className="mb-10 flex items-start justify-between">
@@ -15,6 +16,7 @@ function AddressCard({ label, address, icon, iconClassName }) {
             aria-label={`Edit ${label} address`}
             className="p-2 text-on-surface-variant transition-colors hover:text-primary"
             type="button"
+            onClick={onEdit}
           >
             <SymbolIcon className="text-sm" name="edit" />
           </button>
@@ -22,6 +24,7 @@ function AddressCard({ label, address, icon, iconClassName }) {
             aria-label={`Delete ${label} address`}
             className="p-2 text-on-surface-variant transition-colors hover:text-error"
             type="button"
+            onClick={onDelete}
           >
             <SymbolIcon className="text-sm" name="delete" />
           </button>
@@ -36,9 +39,22 @@ function AddressCard({ label, address, icon, iconClassName }) {
   );
 }
 
+const getStoredAddresses = () => {
+  const stored = sessionStorage.getItem('savedAddresses');
+  if (stored) {
+    return JSON.parse(stored);
+  }
+  return getSavedAddressesData().addresses;
+};
+
+const saveAddressesToStorage = (addresses) => {
+  sessionStorage.setItem('savedAddresses', JSON.stringify(addresses));
+};
+
 export default function SavedAddresses() {
   const navigate = useNavigate();
-  const { hero, addresses, addAddressLabel, spotlight } = getSavedAddressesData();
+  const { hero, addAddressLabel, spotlight } = getSavedAddressesData();
+  const [addresses, setAddresses] = useState(getStoredAddresses);
 
   const handleBack = () => {
     if (window.history.length > 1) {
@@ -47,6 +63,21 @@ export default function SavedAddresses() {
     }
 
     navigate({ to: '/profile' });
+  };
+
+  const handleDeleteAddress = (label) => {
+    setAddresses((prev) => {
+      const updated = prev.filter((addr) => addr.label !== label);
+      saveAddressesToStorage(updated);
+      return updated;
+    });
+  };
+
+  const handleEditAddress = (address) => {
+    console.log('Storing address for edit:', address);
+    sessionStorage.setItem('editAddress', JSON.stringify(address));
+    console.log('Navigating to delivery-address form');
+    navigate({ to: '/delivery-address' });
   };
 
   return (
@@ -112,9 +143,26 @@ export default function SavedAddresses() {
           </section>
 
           <section className="grid grid-cols-1 gap-5 md:grid-cols-2">
-            {addresses.map((item) => (
-              <AddressCard key={item.label} {...item} />
-            ))}
+            {addresses.length === 0 ? (
+              <div className="col-span-full flex flex-col items-center justify-center py-16 text-center">
+                <SymbolIcon className="mb-4 text-6xl text-on-surface-variant/30" name="location_off" />
+                <p className="font-headline text-lg font-bold text-on-surface-variant">
+                  No saved addresses yet
+                </p>
+                <p className="mt-2 text-sm text-on-surface-variant">
+                  Add your first address to get started
+                </p>
+              </div>
+            ) : (
+              addresses.map((item) => (
+                <AddressCard
+                  key={item.label}
+                  {...item}
+                  onEdit={() => handleEditAddress(item)}
+                  onDelete={() => handleDeleteAddress(item.label)}
+                />
+              ))
+            )}
 
             <button
               className="group flex min-h-[180px] flex-col items-center justify-center gap-4 rounded-[2rem] border-2 border-dashed border-outline-variant/30 p-6 transition-all duration-300 hover:border-primary-container hover:bg-white"

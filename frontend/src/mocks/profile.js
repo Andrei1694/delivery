@@ -37,4 +37,49 @@ const savedAddressesPageData = {
   },
 };
 
-export { savedAddressesPageData };
+const profilePageData = {
+  user: {
+    name: 'Elena Verve',
+    image:
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuDXCGPZ-p_ywY-CEvY7i-zFx20O4Oht79heJpqGpN6zVAWGp7A_Cvx3JEFHJtccTxBUZyB0F1IZ8tnb9X-ORFmEQ0JJo7Svj5koILhB1_rYBdTq1kdAzJcMSSKOPviI5lBywO6Po2_FgUguPWO-iWSGf9LDMJrqjdZrd9f-fEVxzQxI8d4XZTRgx5SGyFdISRx0fO5-shAYhNLINEbSbtKeKEuMG_luhm_f4Z8F__gWSuVZLSIwKbliiqQxIu2k8d2TNUllI3Wuy-w',
+    imageAlt: 'User profile',
+    memberSince: 'Oct 2023',
+  },
+  loyalty: {
+    tier: 'Gold Gourmet',
+    icon: 'stars',
+  },
+  credits: {
+    amount: '$42.50',
+  },
+  recentOrders: [
+    {
+      name: 'Artisan Pizzeria',
+      image:
+        'https://lh3.googleusercontent.com/aida-public/AB6AXuAUcN_PLhQHknRpbxZt9QR3fJOy4-59_rufK4kWq-gbKxVZHrOK2fUJSB4OaBxj5hF1_LufzCWSyIHeAlpogOXqogbdeho_XFCztlchLx_HZv_F8zoYSPME5l-NIUOfZCc3FpUGJ3ZbB_KGWv8HNWspv2XymXP1QydiGcF5sS1_5hlWqUqcWq9vH2di1W1HWTaEDlbxF_tydlBMknrTybSD4r1AKyI3G5wnOyOPJBNIve4osWHwtIjgW-yPfUlXvfpieLXtuTVdgn4',
+      summary: '2 items • $34.00',
+      status: 'Delivered',
+    },
+    {
+      name: 'The Green Bowl',
+      image:
+        'https://lh3.googleusercontent.com/aida-public/AB6AXuA5zsPXrJ3-yR4grc-Y76sKgywdO0O0IOx_JbvHJiRqD9KmsY4zp3l0jQqGWqkIf0bGQn-VozLY9ZIuKl-bJoUh7ZrRFF1gBtNIMYchbGEKQDdFl_9uVk7ZymG1E_30d9x18i4k4Mttt2GsNcBQZl9HpR8Fi000KrOkfPKuuMrHYPwp5HgZOJtjFp7kYGgbouJjHwi7Dilwp7tiHm2AkIU6wLoHTMmUu2gC-5xsVesn-ft8nnvdqLZlTuZ3hNYoHSyFpNhHlMNyf5c',
+      summary: '1 item • $18.50',
+      status: 'Delivered',
+    },
+  ],
+  contactInfo: {
+    phone: '+1 (555) 012-3456',
+    email: 'elena@kitchen.com',
+  },
+  savedAddressesPreview: [
+    { label: 'Home', address: '123 Culinary Way' },
+    { label: 'Work', address: '456 Gourmet Plaza' },
+  ],
+  paymentMethodsPreview: [
+    { type: 'VISA', last4: '4242', active: true },
+    { type: 'MC', last4: '8812', active: false },
+  ],
+};
+
+export { savedAddressesPageData, profilePageData };

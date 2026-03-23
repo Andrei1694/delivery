@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import SymbolIcon from './SymbolIcon';
+import { getSavedAddressesData } from '../mocks';
 
 const ADDRESS_LABELS = [
   { id: 'home', label: 'Home', icon: 'home', filled: true },
@@ -24,9 +25,39 @@ const INITIAL_VALUES = {
 
 export default function DeliveryAddress() {
   const navigate = useNavigate();
-  const [values, setValues] = useState(INITIAL_VALUES);
-  const [selectedLabel, setSelectedLabel] = useState('home');
+
+  // Get edit data from sessionStorage
+  const stored = sessionStorage.getItem('editAddress');
+  const editData = stored ? JSON.parse(stored) : null;
+  const isEditMode = !!editData;
+
+  // Clear the edit data from sessionStorage after reading
+  if (stored) {
+    sessionStorage.removeItem('editAddress');
+  }
+
+  // Set initial values based on edit mode
+  const initialValues = editData
+    ? {
+        search: editData.address || '',
+        apartment: '',
+        floor: '',
+        notes: '',
+      }
+    : INITIAL_VALUES;
+
+  const initialLabel = editData?.label ? editData.label.toLowerCase() : 'home';
+
+  const [values, setValues] = useState(initialValues);
+  const [selectedLabel, setSelectedLabel] = useState(initialLabel);
   const [isDefault, setIsDefault] = useState(true);
+
+  // Debug: log what we're loading
+  if (editData) {
+    console.log('Edit mode - loading address:', editData);
+    console.log('Initial values:', initialValues);
+    console.log('Initial label:', initialLabel);
+  }
 
   const updateField = (field) => (event) => {
     const { value } = event.target;
@@ -48,7 +79,57 @@ export default function DeliveryAddress() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+
+    // Get current addresses from storage
+    const stored = sessionStorage.getItem('savedAddresses');
+    let addresses = stored ? JSON.parse(stored) : [];
+
+    // If no addresses in storage, get from mock data
+    if (addresses.length === 0) {
+      addresses = getSavedAddressesData().addresses;
+    }
+
+    // Create the address object
+    const labelConfig = ADDRESS_LABELS.find((l) => l.id === selectedLabel);
+    const newAddress = {
+      label: labelConfig?.label || 'Home',
+      address: values.search,
+      icon: labelConfig?.icon || 'home',
+      iconClassName: getIconClassName(selectedLabel),
+    };
+
+    if (isEditMode && editData) {
+      // Update existing address
+      addresses = addresses.map((addr) =>
+        addr.label === editData.label ? newAddress : addr
+      );
+    } else {
+      // Check if address with this label already exists
+      const existingIndex = addresses.findIndex((addr) => addr.label === newAddress.label);
+      if (existingIndex >= 0) {
+        // Replace existing address with same label
+        addresses[existingIndex] = newAddress;
+      } else {
+        // Add new address
+        addresses.push(newAddress);
+      }
+    }
+
+    // Save to storage
+    sessionStorage.setItem('savedAddresses', JSON.stringify(addresses));
+
     navigate({ to: '/saved-addresses' });
+  };
+
+  const getIconClassName = (label) => {
+    switch (label) {
+      case 'home':
+        return 'bg-primary-container/20 text-primary';
+      case 'work':
+        return 'bg-tertiary-container/20 text-tertiary';
+      default:
+        return 'bg-secondary-container/20 text-secondary';
+    }
   };
 
   return (
@@ -80,7 +161,7 @@ export default function DeliveryAddress() {
               </button>
 
               <h1 className="font-headline text-lg font-bold tracking-tight text-primary">
-                Add Address
+                {isEditMode ? 'Edit Address' : 'Add Address'}
               </h1>
             </div>
 
