@@ -1,10 +1,88 @@
 import { Link } from '@tanstack/react-router';
 import DismissiblePromoBanner from '../../components/DismissiblePromoBanner';
+import HomeFeedFoodCard from '../../components/HomeFeedFoodCard';
 import HomeFeedRestaurantCard from '../../components/HomeFeedRestaurantCard';
 import MobileCardSlider from '../../components/MobileCardSlider';
 import SymbolIcon from '../../components/SymbolIcon';
 import SearchInput from '../../components/SearchInput';
-import { getHomeFeedData } from '../../mocks';
+import {
+  getHomeFeedData,
+  getRestaurantById,
+  getRestaurantMenuById,
+} from '../../mocks';
+
+const SIGNATURE_PLATE_IDS = [
+  'heritage-kitchen',
+  'sakura-bloom',
+  'burger-haven',
+  'vero-italiano',
+  'spice-route',
+  'olive-vine',
+];
+
+const SMALL_BITES_IDS = [
+  'heritage-kitchen',
+  'sakura-bloom',
+  'vero-italiano',
+  'forno-brace',
+  'spice-route',
+  'seoul-bowl',
+];
+
+function buildFoodSectionItem(restaurantId, item) {
+  const restaurant = getRestaurantById(restaurantId);
+
+  if (!restaurant || !item) {
+    return null;
+  }
+
+  return {
+    id: `${restaurantId}-${item.name}`,
+    restaurantId,
+    name: item.name,
+    meta: `${restaurant.name} • ${item.price}`,
+    price: item.price,
+    image: item.image,
+    imageAlt: item.imageAlt,
+  };
+}
+
+function buildFeaturedFoodItem(restaurantId) {
+  const menu = getRestaurantMenuById(restaurantId);
+  const section = menu?.sections.find((candidate) => candidate.featuredItem);
+
+  if (!section?.featuredItem) {
+    return null;
+  }
+
+  return buildFoodSectionItem(
+    restaurantId,
+    section.featuredItem,
+  );
+}
+
+function buildSmallBiteItem(restaurantId) {
+  const menu = getRestaurantMenuById(restaurantId);
+  const section = menu?.sections[0];
+  const item = section?.items?.[0];
+
+  if (!item) {
+    return null;
+  }
+
+  return buildFoodSectionItem(restaurantId, item, section.label);
+}
+
+const foodSections = [
+  {
+    title: 'Signature Plates',
+    items: SIGNATURE_PLATE_IDS.map(buildFeaturedFoodItem).filter(Boolean),
+  },
+  {
+    title: 'Small Bites',
+    items: SMALL_BITES_IDS.map(buildSmallBiteItem).filter(Boolean),
+  },
+];
 
 export default function HomeFeed() {
   const { addressLabel, promo, categories, restaurants } = getHomeFeedData();
@@ -92,6 +170,20 @@ export default function HomeFeed() {
             ))}
           </MobileCardSlider>
         </section>
+
+        {foodSections.map((section) => (
+          <section key={section.title} className="mt-8 px-4">
+            <h2 className="mb-4 font-headline text-sm font-bold text-on-surface">{section.title}</h2>
+            <MobileCardSlider
+              ariaLabel={section.title}
+              slideWidthClassName="w-[calc((100%-1rem)/2)]"
+            >
+              {section.items.map((item) => (
+                <HomeFeedFoodCard key={item.id} item={item} />
+              ))}
+            </MobileCardSlider>
+          </section>
+        ))}
       </main>
     </div>
   );
