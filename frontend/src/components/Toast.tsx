@@ -1,4 +1,11 @@
-export default function Toast({ visible, fading, children }) {
+import type { PropsWithChildren } from 'react';
+
+type ToastProps = PropsWithChildren<{
+  visible: boolean;
+  fading: boolean;
+}>;
+
+export default function Toast({ visible, fading, children }: ToastProps) {
   if (!visible) return null;
 
   return (

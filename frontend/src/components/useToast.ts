@@ -3,7 +3,7 @@ import { useState, useRef } from 'react';
 export function useToast(duration = 3000) {
   const [visible, setVisible] = useState(false);
   const [fading, setFading] = useState(false);
-  const timerRef = useRef(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   function show() {
     setVisible(true);

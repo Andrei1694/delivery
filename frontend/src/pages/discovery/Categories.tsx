@@ -35,7 +35,7 @@ export default function Categories() {
                     className="w-14 h-14 object-contain"
                   />
                 ) : (
-                  <SymbolIcon name={category.icon} className="text-3xl text-on-surface-variant" />
+                  <SymbolIcon name={category.icon ?? 'restaurant'} className="text-3xl text-on-surface-variant" />
                 )}
               </div>
               <span className="font-bold text-sm text-center text-on-surface tracking-tight">{category.name}</span>

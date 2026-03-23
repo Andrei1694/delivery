@@ -1,6 +1,21 @@
+import type { ReactNode } from 'react';
 import SymbolIcon from './SymbolIcon';
 
-export default function FilterChip({ label, icon, iconFilled = false, active = false, onClick }) {
+type FilterChipProps = {
+  label: ReactNode;
+  icon?: string;
+  iconFilled?: boolean;
+  active?: boolean;
+  onClick?: () => void;
+};
+
+export default function FilterChip({
+  label,
+  icon,
+  iconFilled = false,
+  active = false,
+  onClick,
+}: FilterChipProps) {
   return (
     <button
       type="button"

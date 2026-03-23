@@ -11,6 +11,10 @@ import {
   getRestaurantMenuById,
 } from '../../mocks';
 
+function isPresent<T>(value: T | null | undefined): value is T {
+  return value != null;
+}
+
 const SIGNATURE_PLATE_IDS = [
   'heritage-kitchen',
   'sakura-bloom',
@@ -70,17 +74,17 @@ function buildSmallBiteItem(restaurantId) {
     return null;
   }
 
-  return buildFoodSectionItem(restaurantId, item, section.label);
+  return buildFoodSectionItem(restaurantId, item);
 }
 
 const foodSections = [
   {
     title: 'Signature Plates',
-    items: SIGNATURE_PLATE_IDS.map(buildFeaturedFoodItem).filter(Boolean),
+    items: SIGNATURE_PLATE_IDS.map(buildFeaturedFoodItem).filter(isPresent),
   },
   {
     title: 'Small Bites',
-    items: SMALL_BITES_IDS.map(buildSmallBiteItem).filter(Boolean),
+    items: SMALL_BITES_IDS.map(buildSmallBiteItem).filter(isPresent),
   },
 ];
 
@@ -150,7 +154,7 @@ export default function HomeFeed() {
                       className="w-10 h-10 object-contain"
                     />
                   ) : (
-                    <SymbolIcon name={category.icon} className="text-on-surface-variant" />
+                    <SymbolIcon name={category.icon ?? 'restaurant'} className="text-on-surface-variant" />
                   )}
                 </div>
                 <span className="text-[10px] font-bold text-on-surface">{category.name}</span>

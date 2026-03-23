@@ -265,7 +265,7 @@ export default function DeliveryAddress() {
               className="w-full resize-none rounded-xl border-none bg-surface-container-low px-4 py-3 text-on-surface transition-all focus:ring-2 focus:ring-primary-container"
               id="delivery-address-notes"
               placeholder="e.g. Please leave at the gate or call upon arrival"
-              rows="3"
+              rows={3}
               value={values.notes}
               onChange={updateField('notes')}
             />

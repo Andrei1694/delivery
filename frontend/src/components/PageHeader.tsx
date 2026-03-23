@@ -1,6 +1,14 @@
+import type { ReactNode } from 'react';
 import SymbolIcon from './SymbolIcon';
 
-export default function PageHeader({ title, onBack, rightAction, sticky = false }) {
+type PageHeaderProps = {
+  title: ReactNode;
+  onBack?: () => void;
+  rightAction?: ReactNode;
+  sticky?: boolean;
+};
+
+export default function PageHeader({ title, onBack, rightAction, sticky = false }: PageHeaderProps) {
   return (
     <header
       className={`${sticky ? 'sticky' : 'fixed'} top-0 z-50 w-full bg-surface/70 backdrop-blur-xl border-b border-surface-container`}

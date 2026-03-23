@@ -1,12 +1,70 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type PropsWithChildren,
+} from 'react';
 import api, { endpoints } from '../requests';
 
-const AuthContext = createContext(null);
+export type AuthUser = {
+  id: number | string;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  phone?: string;
+  roles?: string[];
+  [key: string]: any;
+};
+
+export type AuthCredentials = {
+  phone: string;
+  password: string;
+};
+
+export type RegisterPayload = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  password: string;
+  [key: string]: any;
+};
+
+export type AuthPayload = {
+  token?: string | null;
+  accessToken?: string | null;
+  jwt?: string | null;
+  user?: AuthUser | null;
+  account?: AuthUser | null;
+  [key: string]: any;
+};
+
+export type AuthResult = {
+  token: string | null;
+  user: AuthUser;
+};
+
+export type AuthContextValue = {
+  user: AuthUser | null;
+  isLoading: boolean;
+  isAuthenticated: boolean;
+  isOnboardingPending: boolean;
+  login: (credentials: AuthCredentials) => Promise<AuthResult>;
+  register: (payload: RegisterPayload) => Promise<AuthResult>;
+  logout: () => Promise<void>;
+  refreshUser: () => Promise<AuthUser | null>;
+  completeOnboarding: () => void;
+};
+
+const AuthContext = createContext<AuthContextValue | null>(null);
 const TOKEN_KEY = 'auth_token';
 const ONBOARDING_PENDING_KEY = 'onboarding_pending';
 
-const readStoredToken = () => {
+const readStoredToken = (): string | null => {
   if (typeof window === 'undefined') {
     return null;
   }
@@ -18,7 +76,7 @@ const readStoredToken = () => {
   }
 };
 
-const writeStoredToken = (token) => {
+const writeStoredToken = (token: string | null | undefined) => {
   if (typeof window === 'undefined') {
     return;
   }
@@ -35,7 +93,7 @@ const writeStoredToken = (token) => {
   }
 };
 
-const readStoredOnboardingPending = () => {
+const readStoredOnboardingPending = (): boolean => {
   if (typeof window === 'undefined') {
     return false;
   }
@@ -47,7 +105,7 @@ const readStoredOnboardingPending = () => {
   }
 };
 
-const writeStoredOnboardingPending = (isPending) => {
+const writeStoredOnboardingPending = (isPending: boolean) => {
   if (typeof window === 'undefined') {
     return;
   }
@@ -64,7 +122,7 @@ const writeStoredOnboardingPending = (isPending) => {
   }
 };
 
-const setAuthToken = (token) => {
+const setAuthToken = (token: string | null | undefined) => {
   if (token) {
     api.defaults.headers.common.Authorization = `Bearer ${token}`;
     return;
@@ -73,21 +131,22 @@ const setAuthToken = (token) => {
   delete api.defaults.headers.common.Authorization;
 };
 
-const readTokenFromResponse = (data) =>
+const readTokenFromResponse = (data?: AuthPayload | null): string | null =>
   data?.token ?? data?.accessToken ?? data?.jwt ?? null;
 
-const readUserFromResponse = (data) => data?.user ?? data?.account ?? null;
+const readUserFromResponse = (data?: AuthPayload | null): AuthUser | null =>
+  data?.user ?? data?.account ?? null;
 
 const initialToken = readStoredToken();
 setAuthToken(initialToken);
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+export const AuthProvider = ({ children }: PropsWithChildren) => {
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isOnboardingPending, setIsOnboardingPending] = useState(readStoredOnboardingPending);
 
-  const persistOnboardingPending = useCallback((isPending) => {
+  const persistOnboardingPending = useCallback((isPending: boolean) => {
     setIsOnboardingPending(isPending);
     writeStoredOnboardingPending(isPending);
   }, []);
@@ -101,8 +160,8 @@ export const AuthProvider = ({ children }) => {
   }, [persistOnboardingPending]);
 
   const loadCurrentUser = useCallback(async () => {
-    const { data } = await api.get(endpoints.auth.me);
-    return data;
+    const { data } = await api.get<AuthUser | null>(endpoints.auth.me);
+    return data ?? null;
   }, []);
 
   const refreshUser = useCallback(async () => {
@@ -119,7 +178,7 @@ export const AuthProvider = ({ children }) => {
     return refreshedUser;
   }, [loadCurrentUser, setUnauthenticatedState]);
 
-  const completeAuthentication = useCallback(async (authPayload) => {
+  const completeAuthentication = useCallback(async (authPayload: AuthPayload) => {
     const token = readTokenFromResponse(authPayload);
     const userFromPayload = readUserFromResponse(authPayload);
 
@@ -165,10 +224,17 @@ export const AuthProvider = ({ children }) => {
     restoreSession();
   }, [loadCurrentUser, setUnauthenticatedState]);
 
-  const login = useCallback(async (credentials) => {
+  const login = useCallback(async (credentials: AuthCredentials) => {
     if (credentials.phone === 'admin' && credentials.password === 'admin') {
       const mockToken = 'mock-admin-token';
-      const mockUser = { id: 0, firstName: 'Admin', lastName: 'User', email: 'admin@admin.com', phone: 'admin', roles: ['ADMIN'] };
+      const mockUser: AuthUser = {
+        id: 0,
+        firstName: 'Admin',
+        lastName: 'User',
+        email: 'admin@admin.com',
+        phone: 'admin',
+        roles: ['ADMIN'],
+      };
       writeStoredToken(mockToken);
       setAuthToken(mockToken);
       setUser(mockUser);
@@ -182,7 +248,7 @@ export const AuthProvider = ({ children }) => {
     return authState;
   }, [completeAuthentication, persistOnboardingPending]);
 
-  const register = useCallback(async (payload) => {
+  const register = useCallback(async (payload: RegisterPayload) => {
     const { data } = await api.post(endpoints.auth.register, payload);
     const authState = await completeAuthentication(data);
     persistOnboardingPending(true);
@@ -197,7 +263,7 @@ export const AuthProvider = ({ children }) => {
     persistOnboardingPending(false);
   }, [persistOnboardingPending]);
 
-  const value = useMemo(
+  const value = useMemo<AuthContextValue>(
     () => ({
       user,
       isLoading,

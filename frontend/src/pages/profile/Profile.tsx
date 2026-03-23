@@ -294,7 +294,7 @@ export default function Profile() {
                               </label>
                               <input
                                 className="w-full rounded-lg border-none bg-surface-container px-3 py-2 text-sm"
-                                maxLength="4"
+                                maxLength={4}
                                 type="text"
                                 value={editForm.last4}
                                 onChange={(e) => setEditForm({ ...editForm, last4: e.target.value })}

@@ -1,7 +1,18 @@
-import { Children, useEffect, useId, useRef, useState } from 'react';
+import { Children, useEffect, useId, useRef, useState, type ReactNode } from 'react';
 
 const DEFAULT_DESKTOP_GRID_CLASSNAME = 'md:grid md:grid-cols-2 md:gap-4';
 const DEFAULT_SLIDE_WIDTH_CLASSNAME = 'w-[calc(100%-3rem)]';
+
+type MobileCardSliderProps = {
+  children: ReactNode;
+  ariaLabel: string;
+  className?: string;
+  trackClassName?: string;
+  slideClassName?: string;
+  slideWidthClassName?: string;
+  showDots?: boolean;
+  desktopGridClassName?: string;
+};
 
 export default function MobileCardSlider({
   children,
@@ -12,11 +23,11 @@ export default function MobileCardSlider({
   slideWidthClassName = DEFAULT_SLIDE_WIDTH_CLASSNAME,
   showDots = true,
   desktopGridClassName = DEFAULT_DESKTOP_GRID_CLASSNAME,
-}) {
+}: MobileCardSliderProps) {
   const slides = Children.toArray(children);
   const sliderId = useId();
-  const trackRef = useRef(null);
-  const slideRefs = useRef([]);
+  const trackRef = useRef<HTMLDivElement | null>(null);
+  const slideRefs = useRef<Array<HTMLDivElement | null>>([]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
@@ -82,7 +93,7 @@ export default function MobileCardSlider({
     return () => observer.disconnect();
   }, [slides.length]);
 
-  const scrollToSlide = (index) => {
+  const scrollToSlide = (index: number) => {
     const slideNode = slideRefs.current[index];
 
     if (!slideNode) {
@@ -113,7 +124,7 @@ export default function MobileCardSlider({
       >
         {slides.map((slide, index) => (
           <div
-            key={slide.key ?? `mobile-card-slide-${index}`}
+            key={`${sliderId}-slide-${index}`}
             id={`${sliderId}-slide-${index}`}
             ref={(node) => {
               slideRefs.current[index] = node;

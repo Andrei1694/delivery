@@ -1,3 +1,10 @@
+import type { InputHTMLAttributes } from 'react';
+
+type InputFieldProps = {
+  label: string;
+  error?: string | null;
+} & InputHTMLAttributes<HTMLInputElement>;
+
 const InputField = ({
   label,
   id,
@@ -9,7 +16,7 @@ const InputField = ({
   onBlur,
   error,
   ...inputProps
-}) => {
+}: InputFieldProps) => {
   return (
     <div className="group">
       <label className="mb-1.5 ml-1 block text-sm font-medium text-on-surface" htmlFor={id}>

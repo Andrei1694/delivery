@@ -1,12 +1,20 @@
 import { Link } from '@tanstack/react-router';
+import type { CSSProperties } from 'react';
 
-const iconStyle = { fontVariationSettings: "'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24" };
-const filledIconStyle = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24" };
+const iconStyle: CSSProperties = { fontVariationSettings: "'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24" };
+const filledIconStyle: CSSProperties = { fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24" };
 
-/**
- * @param {{ navItems: Array<{ label: string, icon: string, to?: string }> }} props
- */
-export default function BottomNav({ navItems }) {
+type BottomNavItem = {
+  label: string;
+  icon: string;
+  to?: string;
+};
+
+type BottomNavProps = {
+  navItems: BottomNavItem[];
+};
+
+export default function BottomNav({ navItems }: BottomNavProps) {
   return (
     <nav className="fixed bottom-0 z-50 flex w-full items-center justify-around px-6 pb-8 pointer-events-none">
       <div className="mx-auto flex w-full max-w-md items-center justify-around overflow-hidden rounded-full border border-surface-container bg-surface/80 shadow-[0_8px_32px_color-mix(in_srgb,var(--color-on-surface)_12%,transparent)] backdrop-blur-xl pointer-events-auto dark:bg-on-surface/80">

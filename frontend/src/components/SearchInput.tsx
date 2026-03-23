@@ -1,9 +1,13 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, type KeyboardEvent, type MouseEvent } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import SymbolIcon from './SymbolIcon';
 import { restaurants } from '../mocks/discovery';
 
 const RECENT_SEARCHES = ['Artisan Italian Pizza', 'Burger', 'Sushi'];
+
+type SearchSuggestion =
+  | { type: 'restaurant'; label: string; id: string; meta: string }
+  | { type: 'recent' | 'query'; label: string; id?: never; meta?: never };
 
 export default function SearchInput() {
   const [query, setQuery] = useState('');
@@ -12,8 +16,8 @@ export default function SearchInput() {
   const [isLoading, setIsLoading] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
 
-  const containerRef = useRef(null);
-  const inputRef = useRef(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
   const navigate = useNavigate();
 
   // Debounce logic to wait 300ms before triggering search
@@ -29,8 +33,12 @@ export default function SearchInput() {
 
   // Click away listener to close the dropdown
   useEffect(() => {
-    function handleClickOutside(event) {
-      if (containerRef.current && !containerRef.current.contains(event.target)) {
+    function handleClickOutside(event: MouseEvent | globalThis.MouseEvent) {
+      if (
+        containerRef.current &&
+        event.target instanceof Node &&
+        !containerRef.current.contains(event.target)
+      ) {
         setIsOpen(false);
       }
     }
@@ -42,7 +50,7 @@ export default function SearchInput() {
 
   // Compute suggestions
   const isSearchActive = debouncedQuery.trim().length > 0;
-  let suggestions = [];
+  let suggestions: SearchSuggestion[] = [];
 
   if (isSearchActive && !isLoading) {
     const term = debouncedQuery.toLowerCase();
@@ -62,7 +70,7 @@ export default function SearchInput() {
   }
 
   // Keyboard Navigation
-  const handleKeyDown = (e) => {
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (!isOpen) return;
 
     if (e.key === 'Escape') {
@@ -86,13 +94,12 @@ export default function SearchInput() {
     }
   };
 
-  const handleSelectSuggestion = (suggestion) => {
+  const handleSelectSuggestion = (suggestion: SearchSuggestion) => {
     setIsOpen(false);
     if (suggestion.type === 'restaurant') {
       navigate({ to: '/restaurant-menu/$restaurantId', params: { restaurantId: suggestion.id } });
     } else {
-      // Just an example, let's navigate to search results
-      navigate({ to: '/search-results' }); // Assuming there is a route or logic for this
+      navigate({ to: '/search' });
     }
     inputRef.current?.blur();
   };

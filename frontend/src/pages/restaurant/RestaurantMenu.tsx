@@ -8,6 +8,11 @@ import { useToast } from '../../components/useToast';
 import { getRestaurantById, getRestaurantMenuById } from '../../mocks';
 import { NAV_ITEMS } from '../../navigation/navItems';
 
+type DrawerSelection = {
+  item: any;
+  sectionLabel: string;
+};
+
 function parsePriceLabel(priceLabel) {
   return Number.parseFloat(priceLabel.replace(/[^0-9.]/g, '')) || 0;
 }
@@ -303,8 +308,8 @@ function MenuItemDrawer({ restaurant, selection, onClose, onConfirm }) {
     sectionLabel,
     restaurant,
   );
-  const [selectedSizeId, setSelectedSizeId] = useState(sizeOptions[0]?.id ?? null);
-  const [selectedExtraIds, setSelectedExtraIds] = useState([]);
+  const [selectedSizeId, setSelectedSizeId] = useState<string | null>(sizeOptions[0]?.id ?? null);
+  const [selectedExtraIds, setSelectedExtraIds] = useState<string[]>([]);
   const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
@@ -346,7 +351,7 @@ function MenuItemDrawer({ restaurant, selection, onClose, onConfirm }) {
   const unitPrice = parsePriceLabel(item.price) + (selectedSize?.priceDelta ?? 0) + extraTotal;
   const orderTotal = unitPrice * quantity;
 
-  function handleToggleExtra(optionId) {
+  function handleToggleExtra(optionId: string) {
     setSelectedExtraIds((current) =>
       current.includes(optionId)
         ? current.filter((id) => id !== optionId)
@@ -562,8 +567,8 @@ export default function RestaurantMenu() {
   const menu = getRestaurantMenuById(restaurantId);
   const [cartCount, setCartCount] = useState(0);
   const [cartTotal, setCartTotal] = useState(0);
-  const [drawerSelection, setDrawerSelection] = useState(null);
-  const [selectedSectionId, setSelectedSectionId] = useState(null);
+  const [drawerSelection, setDrawerSelection] = useState<DrawerSelection | null>(null);
+  const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const { visible, fading, show } = useToast(3000);
 
@@ -575,7 +580,7 @@ export default function RestaurantMenu() {
     ? selectedSectionId
     : menu.sections[0]?.id;
 
-  function handleAddToCart(item, sectionLabel) {
+  function handleAddToCart(item: any, sectionLabel: string) {
     setDrawerSelection({ item, sectionLabel });
   }
 
@@ -586,7 +591,7 @@ export default function RestaurantMenu() {
     show();
   }
 
-  function handleSectionSelect(sectionId) {
+  function handleSectionSelect(sectionId: string) {
     setSelectedSectionId(sectionId);
 
     if (typeof document !== 'undefined') {
