@@ -15,13 +15,18 @@ function App() {
     prevRef.current = pathname;
     const prevIdx = PEER_INDEX[prev] ?? -1;
     const nextIdx = PEER_INDEX[pathname] ?? -1;
-    if (prevIdx !== -1 && nextIdx !== -1 && prevIdx !== nextIdx) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setAnimClass(nextIdx > prevIdx ? 'page-enter-right' : 'page-enter-left');
-    } else {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setAnimClass('');
-    }
+    const nextAnimClass =
+      prevIdx !== -1 && nextIdx !== -1 && prevIdx !== nextIdx
+        ? nextIdx > prevIdx
+          ? 'page-enter-right'
+          : 'page-enter-left'
+        : '';
+
+    const frameId = window.requestAnimationFrame(() => {
+      setAnimClass(nextAnimClass);
+    });
+
+    return () => window.cancelAnimationFrame(frameId);
   }, [pathname]);
 
   const isPeer = pathname in PEER_INDEX;

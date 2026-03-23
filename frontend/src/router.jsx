@@ -22,6 +22,7 @@ import OrderTracking from './pages/orders/OrderTracking';
 import Profile from './pages/profile/Profile';
 import AccountSettings from './pages/profile/AccountSettings';
 import SavedAddresses from './pages/profile/SavedAddresses';
+import DeliveryAddress from './components/DeliveryAddress';
 import OnboardingLocation from './pages/onboarding/OnboardingLocation';
 import OnboardingCuisine from './pages/onboarding/OnboardingCuisine';
 import OnboardingAddress from './pages/onboarding/OnboardingAddress';
@@ -130,6 +131,16 @@ const savedAddressesRoute = createRoute({
   ),
 });
 
+const deliveryAddressRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/delivery-address',
+  component: () => (
+    <ProtectedRoute>
+      <DeliveryAddress />
+    </ProtectedRoute>
+  ),
+});
+
 const restaurantMenuRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/restaurant-menu/$restaurantId',
@@ -231,6 +242,7 @@ const routeTree = rootRoute.addChildren([
   profileRoute,
   accountSettingsRoute,
   savedAddressesRoute,
+  deliveryAddressRoute,
   restaurantMenuRoute,
   cartRoute,
   searchRoute,

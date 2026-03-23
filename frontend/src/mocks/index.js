@@ -5,6 +5,7 @@ import {
   searchResultsConfig,
 } from './discovery';
 import { restaurantMenus } from './menus';
+import { savedAddressesPageData } from './profile';
 
 const DEFAULT_RESTAURANT_ID = 'heritage-kitchen';
 
@@ -88,12 +89,16 @@ function getAllCategories() {
   return homeCategories;
 }
 
+function getSavedAddressesData() {
+  return savedAddressesPageData;
+}
+
 export {
   DEFAULT_RESTAURANT_ID,
   getAllCategories,
   getHomeFeedData,
   getRestaurantById,
   getRestaurantMenuById,
+  getSavedAddressesData,
   getSearchResultsData,
 };
-
