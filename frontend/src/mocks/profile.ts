@@ -1,3 +1,24 @@
+const recentOrders = [
+  {
+    orderId: '8818',
+    restaurantId: 'vero-italiano',
+    name: 'Artisan Pizzeria',
+    image:
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuAUcN_PLhQHknRpbxZt9QR3fJOy4-59_rufK4kWq-gbKxVZHrOK2fUJSB4OaBxj5hF1_LufzCWSyIHeAlpogOXqogbdeho_XFCztlchLx_HZv_F8zoYSPME5l-NIUOfZCc3FpUGJ3ZbB_KGWv8HNWspv2XymXP1QydiGcF5sS1_5hlWqUqcWq9vH2di1W1HWTaEDlbxF_tydlBMknrTybSD4r1AKyI3G5wnOyOPJBNIve4osWHwtIjgW-yPfUlXvfpieLXtuTVdgn4',
+    summary: '3 items • $34.20',
+    status: 'Delivered',
+  },
+  {
+    orderId: '8807',
+    restaurantId: 'seoul-bowl',
+    name: 'Seoul Bowl',
+    image:
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuA5zsPXrJ3-yR4grc-Y76sKgywdO0O0IOx_JbvHJiRqD9KmsY4zp3l0jQqGWqkIf0bGQn-VozLY9ZIuKl-bJoUh7ZrRFF1gBtNIMYchbGEKQDdFl_9uVk7ZymG1E_30d9x18i4k4Mttt2GsNcBQZl9HpR8Fi000KrOkfPKuuMrHYPwp5HgZOJtjFp7kYGgbouJjHwi7Dilwp7tiHm2AkIU6wLoHTMmUu2gC-5xsVesn-ft8nnvdqLZlTuZ3hNYoHSyFpNhHlMNyf5c',
+    summary: '3 items • $47.00',
+    status: 'Delivered',
+  },
+];
+
 const savedAddressesPageData = {
   hero: {
     titleLines: ['Your world,', 'curated for flavor.'],
@@ -53,20 +74,7 @@ const profilePageData = {
     amount: '$42.50',
   },
   recentOrders: [
-    {
-      name: 'Artisan Pizzeria',
-      image:
-        'https://lh3.googleusercontent.com/aida-public/AB6AXuAUcN_PLhQHknRpbxZt9QR3fJOy4-59_rufK4kWq-gbKxVZHrOK2fUJSB4OaBxj5hF1_LufzCWSyIHeAlpogOXqogbdeho_XFCztlchLx_HZv_F8zoYSPME5l-NIUOfZCc3FpUGJ3ZbB_KGWv8HNWspv2XymXP1QydiGcF5sS1_5hlWqUqcWq9vH2di1W1HWTaEDlbxF_tydlBMknrTybSD4r1AKyI3G5wnOyOPJBNIve4osWHwtIjgW-yPfUlXvfpieLXtuTVdgn4',
-      summary: '2 items • $34.00',
-      status: 'Delivered',
-    },
-    {
-      name: 'The Green Bowl',
-      image:
-        'https://lh3.googleusercontent.com/aida-public/AB6AXuA5zsPXrJ3-yR4grc-Y76sKgywdO0O0IOx_JbvHJiRqD9KmsY4zp3l0jQqGWqkIf0bGQn-VozLY9ZIuKl-bJoUh7ZrRFF1gBtNIMYchbGEKQDdFl_9uVk7ZymG1E_30d9x18i4k4Mttt2GsNcBQZl9HpR8Fi000KrOkfPKuuMrHYPwp5HgZOJtjFp7kYGgbouJjHwi7Dilwp7tiHm2AkIU6wLoHTMmUu2gC-5xsVesn-ft8nnvdqLZlTuZ3hNYoHSyFpNhHlMNyf5c',
-      summary: '1 item • $18.50',
-      status: 'Delivered',
-    },
+    ...recentOrders,
   ],
   contactInfo: {
     phone: '+1 (555) 012-3456',
@@ -77,8 +85,8 @@ const profilePageData = {
     { label: 'Work', address: '456 Gourmet Plaza' },
   ],
   paymentMethodsPreview: [
-    { type: 'VISA', last4: '4242', active: true },
-    { type: 'MC', last4: '8812', active: false },
+    { type: 'VISA', last4: '4242', expires: '12/25', active: true },
+    { type: 'MC', last4: '8812', expires: '08/26', active: false },
   ],
 };
 

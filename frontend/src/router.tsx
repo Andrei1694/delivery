@@ -27,6 +27,9 @@ import OnboardingLocation from './pages/onboarding/OnboardingLocation';
 import OnboardingCuisine from './pages/onboarding/OnboardingCuisine';
 import OnboardingAddress from './pages/onboarding/OnboardingAddress';
 
+const readOptionalSearchValue = (value: unknown) =>
+  typeof value === 'string' && value.trim() ? value.trim() : undefined;
+
 const rootRoute = createRootRoute({
   component: App,
 });
@@ -166,6 +169,12 @@ const cartRoute = createRoute({
 const searchRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/search',
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { query?: string; category?: string } => ({
+    query: readOptionalSearchValue(search.query),
+    category: readOptionalSearchValue(search.category),
+  }),
   component: () => (
     <ProtectedRoute>
       <SearchResults />
@@ -186,6 +195,9 @@ const orderHistoryRoute = createRoute({
 const orderDetailsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/order-details',
+  validateSearch: (search: Record<string, unknown>): { orderId?: string } => ({
+    orderId: readOptionalSearchValue(search.orderId),
+  }),
   component: () => (
     <ProtectedRoute>
       <OrderDetails />
@@ -226,6 +238,11 @@ const orderTrackingRoute = createRoute({
 const orderConfirmationRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/order-confirmation',
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { paymentLabel?: string } => ({
+    paymentLabel: readOptionalSearchValue(search.paymentLabel),
+  }),
   component: () => (
     <ProtectedRoute>
       <OrderConfirmation />

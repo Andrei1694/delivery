@@ -46,6 +46,7 @@ function OnboardingLocation() {
             <button
               className="text-[#ac2c00] duration-200 active:scale-95 dark:text-[#ffb4a1]"
               type="button"
+              onClick={() => window.history.back()}
             >
               <span className="material-symbols-outlined">arrow_back</span>
             </button>

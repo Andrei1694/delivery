@@ -21,6 +21,7 @@ export default function Categories() {
             <Link
               key={category.id}
               to="/search"
+              search={{ category: category.id }}
               aria-label={`Explore ${category.name} category`}
               className="group flex flex-col items-center gap-3 bg-surface-container-lowest p-4 py-8 rounded-3xl active:scale-95 transition-all shadow-sm active:bg-surface-container-low duration-200"
               style={{ animation: `fadeIn 400ms ease-out ${idx * 40}ms both` }}

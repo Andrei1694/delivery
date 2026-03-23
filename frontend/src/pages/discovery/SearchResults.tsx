@@ -1,4 +1,4 @@
-import { Link, useNavigate } from '@tanstack/react-router';
+import { Link, useNavigate, useSearch } from '@tanstack/react-router';
 import SymbolIcon from '../../components/SymbolIcon';
 import PageHeader from '../../components/PageHeader';
 import FilterChip from '../../components/FilterChip';
@@ -68,8 +68,9 @@ function RestaurantCard({ restaurant }) {
 
 export default function SearchResults() {
   const navigate = useNavigate();
+  const search = useSearch({ from: '/search' });
   const { filters, queryIcon, queryTitle, querySubtitle, restaurants } =
-    getSearchResultsData();
+    getSearchResultsData(search);
 
   return (
     <>
@@ -128,9 +129,23 @@ export default function SearchResults() {
           </section>
 
           <div className="space-y-10">
-            {restaurants.map((restaurant) => (
-              <RestaurantCard key={restaurant.id} restaurant={restaurant} />
-            ))}
+            {restaurants.length > 0 ? (
+              restaurants.map((restaurant) => (
+                <RestaurantCard key={restaurant.id} restaurant={restaurant} />
+              ))
+            ) : (
+              <section className="rounded-[2rem] border border-outline-variant/10 bg-surface-container-lowest p-8 text-center shadow-sm shadow-on-surface/5">
+                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-surface-container text-primary">
+                  <SymbolIcon name="search_off" className="text-[28px]" />
+                </div>
+                <h3 className="font-headline text-2xl font-bold text-on-surface">
+                  No matching restaurants
+                </h3>
+                <p className="mt-2 text-sm font-medium text-on-surface-variant">
+                  Try a broader query or switch categories to explore nearby favorites.
+                </p>
+              </section>
+            )}
           </div>
         </main>
       </div>

@@ -1,8 +1,20 @@
+type OrderSummaryProps = {
+  subtotal: number;
+  serviceFee: number;
+  deliveryFee?: number | null;
+  className?: string;
+};
+
 function formatCurrency(value) {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
 }
 
-export default function OrderSummary({ subtotal, serviceFee, deliveryFee = null, className = '' }) {
+export default function OrderSummary({
+  subtotal,
+  serviceFee,
+  deliveryFee = null,
+  className = '',
+}: OrderSummaryProps) {
   const total = subtotal + serviceFee + (deliveryFee ?? 0);
   return (
     <div className={`space-y-3 rounded-2xl bg-surface-container-low p-6 ${className}`.trim()}>

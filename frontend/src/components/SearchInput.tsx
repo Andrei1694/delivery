@@ -99,7 +99,7 @@ export default function SearchInput() {
     if (suggestion.type === 'restaurant') {
       navigate({ to: '/restaurant-menu/$restaurantId', params: { restaurantId: suggestion.id } });
     } else {
-      navigate({ to: '/search' });
+      navigate({ to: '/search', search: { query: suggestion.label } });
     }
     inputRef.current?.blur();
   };

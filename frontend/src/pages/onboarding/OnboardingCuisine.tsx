@@ -115,14 +115,14 @@ function OnboardingCuisine() {
           <div className="mb-10">
             <div className="mb-4 flex items-center justify-between">
               <span className="font-label text-xs font-bold uppercase tracking-widest text-on-surface/60">
-                Step 2 of 4
+                Step 2 of 3
               </span>
               <span className="font-label text-xs font-bold uppercase tracking-widest text-primary">
-                50% Complete
+                67% Complete
               </span>
             </div>
             <div className="h-2 w-full overflow-hidden rounded-full bg-surface-container">
-              <div className="h-full w-1/2 rounded-full bg-gradient-to-r from-primary to-primary-container" />
+              <div className="h-full w-2/3 rounded-full bg-gradient-to-r from-primary to-primary-container" />
             </div>
           </div>
 
@@ -190,7 +190,7 @@ function OnboardingCuisine() {
             type="button"
             onClick={() => navigate({ to: '/onboarding/address' })}
           >
-            Continue to Preferences
+            Continue to Address
           </button>
           <button
             className="w-full py-2 font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant transition-opacity duration-200 active:opacity-60"

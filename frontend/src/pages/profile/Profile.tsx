@@ -1,9 +1,16 @@
 import { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
+import { useAuth } from '../../auth/AuthContext';
+import PaymentMethodForm from '../../components/PaymentMethodForm';
 import { getProfileData } from '../../mocks';
+import {
+  DEFAULT_PAYMENT_METHOD_FORM,
+  useStoredPaymentMethods,
+} from '../../util/paymentMethods';
 
 export default function Profile() {
   const navigate = useNavigate();
+  const { logout } = useAuth();
   const profileData = getProfileData();
   const {
     user,
@@ -14,19 +21,30 @@ export default function Profile() {
     savedAddressesPreview,
   } = profileData;
 
-  const [paymentMethods, setPaymentMethods] = useState(profileData.paymentMethodsPreview);
+  const [paymentMethods, setPaymentMethods] = useStoredPaymentMethods();
   const [editingPayment, setEditingPayment] = useState(null);
-  const [editForm, setEditForm] = useState({ type: '', last4: '', active: false });
+  const [editForm, setEditForm] = useState(DEFAULT_PAYMENT_METHOD_FORM);
 
-  const handleDeletePayment = (last4) => {
-    setPaymentMethods((prev) => prev.filter((p) => p.last4 !== last4));
+  const handleDeletePayment = (paymentId) => {
+    setPaymentMethods((prev) => {
+      const remainingPayments = prev.filter((payment) => payment.id !== paymentId);
+      if (remainingPayments.length > 0 && !remainingPayments.some((payment) => payment.active)) {
+        return remainingPayments.map((payment, index) => ({
+          ...payment,
+          active: index === 0,
+        }));
+      }
+
+      return remainingPayments;
+    });
   };
 
   const handleEditPayment = (payment) => {
-    setEditingPayment(payment.last4);
+    setEditingPayment(payment.id);
     setEditForm({
       type: payment.type,
       last4: payment.last4,
+      expires: payment.expires,
       active: payment.active,
     });
   };
@@ -34,18 +52,38 @@ export default function Profile() {
   const handleSavePayment = () => {
     setPaymentMethods((prev) =>
       prev.map((p) =>
-        p.last4 === editingPayment
-          ? { type: editForm.type, last4: editForm.last4, active: editForm.active }
+        p.id === editingPayment
+          ? {
+              ...p,
+              type: editForm.type,
+              last4: editForm.last4,
+              expires: editForm.expires,
+              active: editForm.active,
+            }
           : p
       )
+        .map((payment, index, payments) => ({
+          ...payment,
+          active:
+            editForm.active && payment.id !== editingPayment
+              ? false
+              : payment.active || (!payments.some((candidate) => candidate.active) && index === 0),
+        }))
     );
     setEditingPayment(null);
+    setEditForm(DEFAULT_PAYMENT_METHOD_FORM);
   };
 
   const handleCancelEdit = () => {
     setEditingPayment(null);
-    setEditForm({ type: '', last4: '', active: false });
+    setEditForm(DEFAULT_PAYMENT_METHOD_FORM);
   };
+
+  const handleSignOut = async () => {
+    await logout();
+    navigate({ to: '/login' });
+  };
+
   return (
     <>
       <style>
@@ -75,7 +113,12 @@ export default function Profile() {
                   src={user.image}
                 />
               </div>
-              <button className="absolute bottom-0 right-0 rounded-full border-2 border-surface bg-primary p-2 text-white shadow-lg transition-transform active:scale-90">
+              <button
+                className="absolute bottom-0 right-0 rounded-full border-2 border-surface bg-primary p-2 text-white shadow-lg transition-transform active:scale-90"
+                type="button"
+                onClick={() => navigate({ to: '/account-settings' })}
+                aria-label="Edit account settings"
+              >
                 <span className="material-symbols-outlined text-sm">edit</span>
               </button>
             </div>
@@ -128,7 +171,11 @@ export default function Profile() {
           <section>
             <div className="mb-6 flex items-center justify-between px-1">
               <h3 className="font-headline text-2xl font-bold text-on-surface">My Orders</h3>
-              <button className="text-sm font-bold text-primary hover:underline">
+              <button
+                className="text-sm font-bold text-primary hover:underline"
+                type="button"
+                onClick={() => navigate({ to: '/order-history' })}
+              >
                 View History
               </button>
             </div>
@@ -159,11 +206,21 @@ export default function Profile() {
                     <div className="flex gap-2">
                       <button
                         className="rounded-full bg-surface-container-high px-4 py-2 text-xs font-bold transition-colors hover:bg-surface-container-highest"
-                        onClick={() => navigate({ to: '/order-details' })}
+                        type="button"
+                        onClick={() => navigate({ to: '/order-details', search: { orderId: order.orderId } })}
                       >
                         Details
                       </button>
-                      <button className="rounded-full bg-primary px-4 py-2 text-xs font-bold text-white transition-opacity hover:opacity-90">
+                      <button
+                        className="rounded-full bg-primary px-4 py-2 text-xs font-bold text-white transition-opacity hover:opacity-90"
+                        type="button"
+                        onClick={() =>
+                          navigate({
+                            to: '/restaurant-menu/$restaurantId',
+                            params: { restaurantId: order.restaurantId },
+                          })
+                        }
+                      >
                         Reorder
                       </button>
                     </div>
@@ -270,70 +327,23 @@ export default function Profile() {
                   </p>
                 ) : (
                   paymentMethods.map((payment) => (
-                    <div key={payment.last4}>
-                      {editingPayment === payment.last4 ? (
-                        <div className="rounded-lg border border-outline/20 bg-surface-container-high p-4 space-y-3">
-                          <div className="flex gap-3">
-                            <div className="flex-1">
-                              <label className="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant mb-1">
-                                Card Type
-                              </label>
-                              <select
-                                className="w-full rounded-lg border-none bg-surface-container px-3 py-2 text-sm"
-                                value={editForm.type}
-                                onChange={(e) => setEditForm({ ...editForm, type: e.target.value })}
-                              >
-                                <option value="VISA">VISA</option>
-                                <option value="MC">Mastercard</option>
-                                <option value="AMEX">American Express</option>
-                              </select>
-                            </div>
-                            <div className="flex-1">
-                              <label className="block text-[10px] font-bold uppercase tracking-wider text-on-surface-variant mb-1">
-                                Last 4 Digits
-                              </label>
-                              <input
-                                className="w-full rounded-lg border-none bg-surface-container px-3 py-2 text-sm"
-                                maxLength={4}
-                                type="text"
-                                value={editForm.last4}
-                                onChange={(e) => setEditForm({ ...editForm, last4: e.target.value })}
-                              />
-                            </div>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <label className="flex items-center gap-2 text-sm">
-                              <input
-                                checked={editForm.active}
-                                type="checkbox"
-                                onChange={(e) => setEditForm({ ...editForm, active: e.target.checked })}
-                              />
-                              <span>Active</span>
-                            </label>
-                            <div className="flex gap-2">
-                              <button
-                                className="rounded-full bg-surface-container px-4 py-1.5 text-xs font-bold transition-colors hover:bg-surface-container-highest"
-                                onClick={handleCancelEdit}
-                              >
-                                Cancel
-                              </button>
-                              <button
-                                className="rounded-full bg-primary px-4 py-1.5 text-xs font-bold text-white transition-opacity hover:opacity-90"
-                                onClick={handleSavePayment}
-                              >
-                                Save
-                              </button>
-                            </div>
-                          </div>
-                        </div>
+                    <div key={payment.id}>
+                      {editingPayment === payment.id ? (
+                        <PaymentMethodForm
+                          value={editForm}
+                          onChange={setEditForm}
+                          onSave={handleSavePayment}
+                          onCancel={handleCancelEdit}
+                        />
                       ) : (
                         <div className="group/card relative flex items-center gap-3 rounded-lg bg-surface-container px-4 py-3 transition-colors hover:bg-surface-container-high">
                           <div className={`flex h-4 w-7 items-center justify-center rounded-sm ${payment.type === 'VISA' ? 'bg-[#1a1a1a]' : 'bg-[#eb001b]'}`}>
                             <span className="text-[6px] font-bold text-white">{payment.type}</span>
                           </div>
-                          <span className={`text-sm font-bold flex-1 ${!payment.active ? 'opacity-50' : ''}`}>
-                            {'\u2022\u2022\u2022\u2022 ' + payment.last4}
-                          </span>
+                          <div className={`flex-1 ${!payment.active ? 'opacity-50' : ''}`}>
+                            <span className="text-sm font-bold">{'\u2022\u2022\u2022\u2022 ' + payment.last4}</span>
+                            <p className="text-[11px] text-on-surface-variant">Expires {payment.expires}</p>
+                          </div>
                           {payment.active && (
                             <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
                               Active
@@ -352,7 +362,7 @@ export default function Profile() {
                               aria-label="Delete payment method"
                               className="p-1.5 text-on-surface-variant transition-colors hover:text-error"
                               type="button"
-                              onClick={() => handleDeletePayment(payment.last4)}
+                              onClick={() => handleDeletePayment(payment.id)}
                             >
                               <span className="material-symbols-outlined text-sm">delete</span>
                             </button>
@@ -367,7 +377,11 @@ export default function Profile() {
           </section>
 
           <div className="pt-4">
-            <button className="w-full rounded-3xl bg-surface-container-high py-5 font-headline font-bold text-error transition-all hover:bg-error-container hover:text-white active:scale-95">
+            <button
+              className="w-full rounded-3xl bg-surface-container-high py-5 font-headline font-bold text-error transition-all hover:bg-error-container hover:text-white active:scale-95"
+              type="button"
+              onClick={handleSignOut}
+            >
               Sign Out
             </button>
           </div>

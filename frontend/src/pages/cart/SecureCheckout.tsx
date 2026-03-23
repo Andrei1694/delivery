@@ -1,12 +1,72 @@
 import { useState } from 'react';
 import { useRouter } from '@tanstack/react-router';
+import PaymentMethodForm from '../../components/PaymentMethodForm';
 import PageHeader from '../../components/PageHeader';
+import {
+  createPaymentMethodId,
+  DEFAULT_PAYMENT_METHOD_FORM,
+  getPaymentMethodDisplayLabel,
+  useStoredPaymentMethods,
+} from '../../util/paymentMethods';
 
 const ORDER_TOTAL = '$82.70';
 
+function buildDefaultForm(hasSavedMethods) {
+  return {
+    ...DEFAULT_PAYMENT_METHOD_FORM,
+    active: !hasSavedMethods,
+  };
+}
+
 export default function SecureCheckout() {
   const router = useRouter();
-  const [selectedMethod, setSelectedMethod] = useState('card_4242');
+  const [paymentMethods, setPaymentMethods] = useStoredPaymentMethods();
+  const [selectedMethod, setSelectedMethod] = useState(
+    () => paymentMethods.find((method) => method.active)?.id ?? paymentMethods[0]?.id ?? 'apple_pay',
+  );
+  const [isAddingNewMethod, setIsAddingNewMethod] = useState(false);
+  const [newMethodForm, setNewMethodForm] = useState(() => buildDefaultForm(paymentMethods.length > 0));
+
+  const resolvedSelectedMethod =
+    selectedMethod === 'apple_pay' || paymentMethods.some((method) => method.id === selectedMethod)
+      ? selectedMethod
+      : paymentMethods.find((method) => method.active)?.id ?? paymentMethods[0]?.id ?? 'apple_pay';
+  const selectedPaymentMethod = paymentMethods.find((method) => method.id === resolvedSelectedMethod);
+  const paymentLabel =
+    resolvedSelectedMethod === 'apple_pay'
+      ? 'Apple Pay'
+      : getPaymentMethodDisplayLabel(selectedPaymentMethod);
+
+  const handleAddNewMethod = () => {
+    setIsAddingNewMethod(true);
+    setNewMethodForm(buildDefaultForm(paymentMethods.length > 0));
+  };
+
+  const handleSaveNewMethod = () => {
+    const nextMethod = {
+      id: createPaymentMethodId(),
+      ...newMethodForm,
+      active: newMethodForm.active || paymentMethods.length === 0,
+    };
+
+    setPaymentMethods((currentMethods) => {
+      const nextMethods = [
+        ...currentMethods.map((method) => ({
+          ...method,
+          active: nextMethod.active ? false : method.active,
+        })),
+        nextMethod,
+      ];
+
+      if (!nextMethods.some((method) => method.active) && nextMethods[0]) {
+        nextMethods[0] = { ...nextMethods[0], active: true };
+      }
+
+      return nextMethods;
+    });
+    setSelectedMethod(nextMethod.id);
+    setIsAddingNewMethod(false);
+  };
 
   return (
     <>
@@ -30,12 +90,6 @@ export default function SecureCheckout() {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
           }
 
-          .secure-checkout-page .text-gradient {
-            background: linear-gradient(135deg, #ac2c00, #ff7852);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-          }
-
           .secure-checkout-page .btn-gradient {
             background: linear-gradient(135deg, #ac2c00, #972500);
           }
@@ -44,19 +98,13 @@ export default function SecureCheckout() {
             box-shadow: 0 8px 24px rgba(78, 33, 33, 0.06);
           }
 
-          .secure-checkout-page .glass-nav {
-            background-color: rgba(255, 210, 208, 0.7);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-          }
-
           .secure-checkout-page .ghost-border {
             border: 1px solid rgba(224, 156, 153, 0.15);
           }
         `}
       </style>
 
-      <div className="secure-checkout-page bg-surface font-body text-on-surface antialiased min-h-screen flex flex-col overflow-x-hidden">
+      <div className="secure-checkout-page flex min-h-screen flex-col overflow-x-hidden bg-surface font-body text-on-surface antialiased">
         <PageHeader
           sticky
           title="Secure Checkout"
@@ -64,9 +112,9 @@ export default function SecureCheckout() {
         />
 
         <main className="flex-1 px-4 pb-32">
-          <section className="mt-6 p-4 rounded-xl bg-surface-container-low flex items-center justify-between">
+          <section className="mt-6 flex items-center justify-between rounded-xl bg-surface-container-low p-4">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-surface-container text-primary">
                 <span className="material-symbols-outlined" data-icon="receipt">
                   receipt
                 </span>
@@ -80,77 +128,76 @@ export default function SecureCheckout() {
           </section>
 
           <section className="mt-8">
-            <h3 className="font-headline text-xl font-bold mb-5 tracking-tight">Saved Cards</h3>
+            <h3 className="mb-5 font-headline text-xl font-bold tracking-tight">Saved Cards</h3>
             <div className="space-y-4">
-              <label className="block cursor-pointer">
-                <div className={`flex items-center p-4 rounded-xl bg-surface-container-lowest ambient-shadow relative overflow-hidden transition-all ${selectedMethod === 'card_4242' ? 'border-2 border-primary' : 'ghost-border hover:bg-surface-container'}`}>
-                  {selectedMethod === 'card_4242' && <div className="absolute inset-0 bg-primary/5" />}
-                  <div
-                    className="w-12 h-8 bg-surface-container rounded flex items-center justify-center shrink-0 mr-4"
-                    data-alt="Visa Card Logo abstract"
-                  >
-                    <span className="material-symbols-outlined text-tertiary-fixed-dim" data-icon="credit_card">
-                      credit_card
-                    </span>
-                  </div>
-                  <div className="flex-1 relative z-10">
-                    <p className="font-headline text-base font-semibold text-on-surface">
-                      •••• 4242
-                    </p>
-                    <p className="text-xs text-on-surface-variant">Expires 12/25</p>
-                  </div>
-                  <div className="relative z-10">
-                    <input
-                      className="w-5 h-5 text-primary border-outline-variant focus:ring-primary focus:ring-offset-surface bg-surface-container-lowest"
-                      checked={selectedMethod === 'card_4242'}
-                      onChange={() => setSelectedMethod('card_4242')}
-                      name="payment_method"
-                      type="radio"
-                    />
-                  </div>
+              {paymentMethods.length > 0 ? (
+                paymentMethods.map((paymentMethod) => (
+                  <label key={paymentMethod.id} className="block cursor-pointer">
+                    <div className={`relative flex items-center overflow-hidden rounded-xl p-4 transition-all ${
+                      resolvedSelectedMethod === paymentMethod.id
+                        ? 'border-2 border-primary bg-surface-container-lowest ambient-shadow'
+                        : 'ghost-border bg-surface-container-low hover:bg-surface-container-lowest'
+                    }`}>
+                      {resolvedSelectedMethod === paymentMethod.id ? <div className="absolute inset-0 bg-primary/5" /> : null}
+                      <div className="relative z-10 mr-4 flex h-8 w-12 shrink-0 items-center justify-center rounded bg-surface-container">
+                        <span className="text-[11px] font-bold text-on-surface">
+                          {paymentMethod.type}
+                        </span>
+                      </div>
+                      <div className="relative z-10 flex-1">
+                        <p className="font-headline text-base font-semibold text-on-surface">
+                          {getPaymentMethodDisplayLabel(paymentMethod)}
+                        </p>
+                        <p className="text-xs text-on-surface-variant">
+                          Expires {paymentMethod.expires}
+                        </p>
+                      </div>
+                      <div className="relative z-10">
+                        <input
+                          className="h-5 w-5 border-outline-variant bg-surface-container-lowest text-primary focus:ring-primary focus:ring-offset-surface"
+                          checked={resolvedSelectedMethod === paymentMethod.id}
+                          name="payment_method"
+                          type="radio"
+                          onChange={() => setSelectedMethod(paymentMethod.id)}
+                        />
+                      </div>
+                    </div>
+                  </label>
+                ))
+              ) : (
+                <div className="rounded-xl border border-dashed border-outline-variant/30 bg-surface-container-lowest px-4 py-6 text-center text-sm text-on-surface-variant">
+                  Add a saved card to speed through future orders.
                 </div>
-              </label>
+              )}
 
-              <label className="block cursor-pointer">
-                <div className={`flex items-center p-4 rounded-xl bg-surface-container-low relative overflow-hidden transition-all ${selectedMethod === 'card_5555' ? 'border-2 border-primary' : 'ghost-border hover:bg-surface-container-lowest'}`}>
-                  {selectedMethod === 'card_5555' && <div className="absolute inset-0 bg-primary/5" />}
-                  <div
-                    className="w-12 h-8 bg-surface-container rounded flex items-center justify-center shrink-0 mr-4"
-                    data-alt="Mastercard Logo abstract"
-                  >
-                    <span className="material-symbols-outlined text-secondary" data-icon="credit_card">
-                      credit_card
-                    </span>
-                  </div>
-                  <div className="flex-1 relative z-10">
-                    <p className="font-headline text-base font-semibold text-on-surface">
-                      •••• 5555
-                    </p>
-                    <p className="text-xs text-on-surface-variant">Expires 08/26</p>
-                  </div>
-                  <div className="relative z-10">
-                    <input
-                      className="w-5 h-5 text-primary border-outline-variant focus:ring-primary focus:ring-offset-surface bg-surface-container-lowest"
-                      checked={selectedMethod === 'card_5555'}
-                      onChange={() => setSelectedMethod('card_5555')}
-                      name="payment_method"
-                      type="radio"
-                    />
-                  </div>
-                </div>
-              </label>
+              {isAddingNewMethod ? (
+                <PaymentMethodForm
+                  value={newMethodForm}
+                  onChange={setNewMethodForm}
+                  onSave={handleSaveNewMethod}
+                  onCancel={() => {
+                    setIsAddingNewMethod(false);
+                    setNewMethodForm(buildDefaultForm(paymentMethods.length > 0));
+                  }}
+                  saveLabel="Add Method"
+                />
+              ) : null}
             </div>
           </section>
 
           <section className="mt-8">
-            <h3 className="font-headline text-xl font-bold mb-5 tracking-tight">
+            <h3 className="mb-5 font-headline text-xl font-bold tracking-tight">
               Digital Wallets
             </h3>
             <div className="space-y-4">
               <label className="block cursor-pointer">
-                <div className={`flex items-center p-4 rounded-xl bg-surface-container-low relative overflow-hidden transition-all ${selectedMethod === 'apple_pay' ? 'border-2 border-primary' : 'ghost-border hover:bg-surface-container-lowest'}`}>
-                  {selectedMethod === 'apple_pay' && <div className="absolute inset-0 bg-primary/5" />}
-                  <div className="w-12 h-12 bg-surface-container-lowest rounded-full flex items-center justify-center shrink-0 mr-4 text-on-surface shadow-sm relative z-10">
+                <div className={`relative flex items-center overflow-hidden rounded-xl bg-surface-container-low p-4 transition-all ${
+                  resolvedSelectedMethod === 'apple_pay'
+                    ? 'border-2 border-primary'
+                    : 'ghost-border hover:bg-surface-container-lowest'
+                }`}>
+                  {resolvedSelectedMethod === 'apple_pay' ? <div className="absolute inset-0 bg-primary/5" /> : null}
+                  <div className="relative z-10 mr-4 flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-surface-container-lowest text-on-surface shadow-sm">
                     <span
                       className="material-symbols-outlined text-2xl"
                       data-icon="account_balance_wallet"
@@ -158,16 +205,16 @@ export default function SecureCheckout() {
                       account_balance_wallet
                     </span>
                   </div>
-                  <div className="flex-1 relative z-10">
+                  <div className="relative z-10 flex-1">
                     <p className="font-headline text-base font-semibold">Apple Pay</p>
                   </div>
                   <div className="relative z-10">
                     <input
-                      className="w-5 h-5 text-primary border-outline-variant focus:ring-primary focus:ring-offset-surface bg-surface-container-lowest"
-                      checked={selectedMethod === 'apple_pay'}
-                      onChange={() => setSelectedMethod('apple_pay')}
+                      className="h-5 w-5 border-outline-variant bg-surface-container-lowest text-primary focus:ring-primary focus:ring-offset-surface"
+                      checked={resolvedSelectedMethod === 'apple_pay'}
                       name="payment_method"
                       type="radio"
+                      onChange={() => setSelectedMethod('apple_pay')}
                     />
                   </div>
                 </div>
@@ -176,8 +223,9 @@ export default function SecureCheckout() {
           </section>
 
           <button
-            className="mt-6 w-full py-4 flex items-center justify-center gap-2 rounded-xl bg-surface-container-low text-primary font-headline font-semibold hover:bg-surface-container transition-colors ghost-border"
+            className="ghost-border mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-surface-container-low py-4 font-headline font-semibold text-primary transition-colors hover:bg-surface-container"
             type="button"
+            onClick={handleAddNewMethod}
           >
             <span className="material-symbols-outlined" data-icon="add">
               add
@@ -185,7 +233,7 @@ export default function SecureCheckout() {
             Add New Method
           </button>
 
-          <div className="mt-8 flex items-center justify-center gap-2 text-on-surface-variant text-sm">
+          <div className="mt-8 flex items-center justify-center gap-2 text-sm text-on-surface-variant">
             <span className="material-symbols-outlined text-lg" data-icon="lock">
               lock
             </span>
@@ -193,12 +241,17 @@ export default function SecureCheckout() {
           </div>
         </main>
 
-        <div className="fixed bottom-0 left-0 right-0 p-4 pb-6 z-40 bg-gradient-to-t from-surface to-transparent">
+        <div className="fixed bottom-0 left-0 right-0 z-40 bg-gradient-to-t from-surface to-transparent p-4 pb-6">
           <button
-            className="w-full btn-gradient text-on-primary py-4 px-6 rounded-full font-headline text-lg font-bold flex items-center justify-between ambient-shadow transition-transform active:scale-[0.98]"
+            className="ambient-shadow btn-gradient flex w-full items-center justify-between rounded-full px-6 py-4 font-headline text-lg font-bold text-on-primary transition-transform active:scale-[0.98]"
             type="button"
-            onClick={() => selectedMethod && router.navigate({ to: '/order-confirmation' })}
-            disabled={!selectedMethod}
+            onClick={() =>
+              router.navigate({
+                to: '/order-confirmation',
+                search: { paymentLabel },
+              })
+            }
+            disabled={!resolvedSelectedMethod}
           >
             <span>Place Order</span>
             <span>{ORDER_TOTAL}</span>

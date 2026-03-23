@@ -139,9 +139,10 @@ export default function HomeFeed() {
           </div>
           <div className="flex gap-4 overflow-x-auto hide-scrollbar px-4">
             {categories.map((category) => (
-              <button
+              <Link
                 key={category.id}
-                type="button"
+                to="/search"
+                search={{ category: category.id }}
                 className="flex-shrink-0 flex flex-col items-center gap-2"
               >
                 <div
@@ -158,7 +159,7 @@ export default function HomeFeed() {
                   )}
                 </div>
                 <span className="text-[10px] font-bold text-on-surface">{category.name}</span>
-              </button>
+              </Link>
             ))}
           </div>
         </section>

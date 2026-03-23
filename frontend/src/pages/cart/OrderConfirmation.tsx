@@ -1,8 +1,9 @@
-import { useRouter } from '@tanstack/react-router';
+import { useRouter, useSearch } from '@tanstack/react-router';
 import PageHeader from '../../components/PageHeader';
 
 export default function OrderConfirmation() {
   const router = useRouter();
+  const { paymentLabel } = useSearch({ from: '/order-confirmation' });
 
   return (
     <>
@@ -341,7 +342,7 @@ export default function OrderConfirmation() {
 
             <div className="px-4 py-3 flex items-center gap-2 text-on-surface-variant text-sm">
               <span className="material-symbols-outlined text-base">credit_card</span>
-              <span>Paid via <span className="font-semibold text-on-surface">Visa •••• 4242</span></span>
+              <span>Paid via <span className="font-semibold text-on-surface">{paymentLabel ?? 'Visa •••• 4242'}</span></span>
             </div>
           </section>
         </main>

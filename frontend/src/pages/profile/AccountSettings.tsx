@@ -81,7 +81,7 @@ function SectionHeading({ eyebrow, title, description }) {
       <h2 className="mt-2 font-headline text-2xl font-bold tracking-tight text-on-surface">
         {title}
       </h2>
-      <p className="mt-1 text-sm font-medium text-on-surface-variant">
+      <p className="mt-1 max-w-md text-sm font-medium leading-relaxed text-on-surface-variant">
         {description}
       </p>
     </div>
@@ -90,38 +90,40 @@ function SectionHeading({ eyebrow, title, description }) {
 
 function OverviewMetric({ icon, label, value }) {
   return (
-    <div className="rounded-2xl bg-surface-container-lowest p-4">
-      <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+    <div className="flex items-center gap-3 rounded-2xl bg-surface-container-lowest p-4 min-[360px]:block">
+      <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary min-[360px]:mb-3">
         <SymbolIcon name={icon} />
       </div>
-      <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-on-surface-variant">
-        {label}
-      </p>
-      <p className="mt-1 font-headline text-lg font-bold text-on-surface">
-        {value}
-      </p>
+      <div className="min-w-0 flex-1">
+        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-on-surface-variant">
+          {label}
+        </p>
+        <p className="mt-1 font-headline text-base font-bold leading-tight text-on-surface min-[360px]:text-lg">
+          {value}
+        </p>
+      </div>
     </div>
   );
 }
 
 function PreferenceRow({ icon, title, description, enabled, onToggle }) {
   return (
-    <div className="flex items-center justify-between gap-4 rounded-2xl bg-surface-container-lowest p-4">
-      <div className="flex items-start gap-4">
+    <div className="flex flex-col gap-4 rounded-2xl bg-surface-container-lowest p-4 min-[360px]:flex-row min-[360px]:items-center min-[360px]:justify-between">
+      <div className="flex min-w-0 flex-1 items-start gap-4">
         <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-surface-container-high text-primary">
           <SymbolIcon name={icon} />
         </div>
 
-        <div>
+        <div className="min-w-0 flex-1">
           <p className="font-headline font-bold text-on-surface">{title}</p>
-          <p className="mt-1 text-sm text-on-surface-variant">{description}</p>
+          <p className="mt-1 text-sm leading-relaxed text-on-surface-variant">{description}</p>
         </div>
       </div>
 
       <button
         aria-checked={enabled}
         aria-label={title}
-        className={`relative inline-flex h-7 w-12 flex-shrink-0 items-center rounded-full transition-colors ${
+        className={`relative inline-flex h-7 w-12 flex-shrink-0 self-end items-center rounded-full transition-colors min-[360px]:self-center ${
           enabled ? 'bg-primary' : 'bg-outline-variant/40'
         }`}
         role="switch"
@@ -149,7 +151,7 @@ function ActionRow({
 }) {
   return (
     <button
-      className={`flex w-full items-center justify-between gap-4 rounded-2xl p-4 text-left transition-colors ${
+      className={`flex w-full flex-col items-start gap-4 rounded-2xl p-4 text-left transition-colors min-[360px]:flex-row min-[360px]:items-center min-[360px]:justify-between ${
         destructive
           ? 'bg-error/6 text-error hover:bg-error/10 active:bg-error/14'
           : 'bg-surface-container-lowest text-on-surface hover:bg-surface-container active:bg-surface-container-high'
@@ -158,7 +160,7 @@ function ActionRow({
       type="button"
       onClick={onClick}
     >
-      <div className="flex items-start gap-4">
+      <div className="flex min-w-0 flex-1 items-start gap-4">
         <div
           className={`flex h-11 w-11 items-center justify-center rounded-2xl ${
             destructive
@@ -169,17 +171,17 @@ function ActionRow({
           <SymbolIcon name={icon} />
         </div>
 
-        <div>
+        <div className="min-w-0 flex-1">
           <p className={`font-headline font-bold ${destructive ? 'text-error' : 'text-on-surface'}`}>
             {title}
           </p>
-          <p className={`mt-1 text-sm ${destructive ? 'text-error/80' : 'text-on-surface-variant'}`}>
+          <p className={`mt-1 text-sm leading-relaxed ${destructive ? 'text-error/80' : 'text-on-surface-variant'}`}>
             {description}
           </p>
         </div>
       </div>
 
-      <span className="text-xs font-bold uppercase tracking-[0.18em] text-current/70">
+      <span className="inline-flex flex-shrink-0 self-end rounded-full bg-current/8 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-current/70 min-[360px]:self-center">
         {label}
       </span>
     </button>
@@ -322,33 +324,49 @@ export default function AccountSettings() {
     <>
       <style>
         {`
-          .ambient-shadow {
-            box-shadow: 0 8px 24px rgba(78, 33, 33, 0.06);
+          .account-settings-page {
+            min-height: max(884px, 100dvh);
+            font-family: 'Manrope', sans-serif;
+            background-image:
+              radial-gradient(circle at top center, rgba(255, 220, 210, 0.45), transparent 34rem),
+              linear-gradient(180deg, rgba(255, 248, 247, 0.96) 0%, rgba(255, 244, 243, 0.74) 24%, rgba(255, 249, 248, 0) 52%);
+          }
+
+          .account-settings-page .font-headline {
+            font-family: 'Plus Jakarta Sans', 'Manrope', sans-serif;
+          }
+
+          .account-settings-page .ambient-shadow {
+            box-shadow: 0 12px 32px rgba(78, 33, 33, 0.06);
+          }
+
+          .account-settings-page .frosted-footer {
+            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(20px);
           }
         `}
       </style>
 
       <div
-        className="bg-surface font-body text-on-surface selection:bg-primary-container selection:text-on-primary-container"
-        style={{ minHeight: 'max(884px, 100dvh)' }}
+        className="account-settings-page bg-surface font-body text-on-surface selection:bg-primary-container selection:text-on-primary-container"
       >
         <PageHeader
           title="Account Settings"
           onBack={() => window.history.back()}
         />
 
-        <main className="mx-auto max-w-lg space-y-8 px-6 pb-40 pt-24">
-          <section className="ambient-shadow overflow-hidden rounded-[2rem] border border-outline/10 bg-gradient-to-br from-surface-container-low to-surface-container p-6">
-            <div className="flex items-start gap-4">
+        <main className="mx-auto max-w-lg space-y-8 px-5 pb-56 pt-24 min-[390px]:px-6">
+          <section className="ambient-shadow overflow-hidden rounded-[2rem] border border-outline/10 bg-gradient-to-br from-surface-container-low via-surface-container to-surface-container-high/80 p-5 min-[390px]:p-6">
+            <div className="flex flex-col gap-4 text-center min-[360px]:flex-row min-[360px]:items-start min-[360px]:text-left">
               <div className="flex h-16 w-16 items-center justify-center rounded-[1.75rem] bg-primary text-xl font-headline font-extrabold text-white shadow-[0_8px_24px_rgba(172,44,0,0.24)]">
                 {initials || 'VK'}
               </div>
 
-              <div className="flex-1">
+              <div className="min-w-0 flex-1">
                 <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-on-surface-variant">
                   Profile Summary
                 </p>
-                <h1 className="mt-2 font-headline text-3xl font-extrabold tracking-tight text-on-surface">
+                <h1 className="mt-2 font-headline text-[1.75rem] font-extrabold leading-none tracking-tight text-on-surface min-[360px]:text-3xl">
                   {fullName}
                 </h1>
                 <p className="mt-1 text-sm font-medium text-on-surface-variant">
@@ -357,7 +375,7 @@ export default function AccountSettings() {
               </div>
             </div>
 
-            <div className="mt-6 grid grid-cols-2 gap-3">
+            <div className="mt-6 grid gap-3 min-[360px]:grid-cols-2">
               <OverviewMetric icon="stars" label="Loyalty" value={loyaltyLabel} />
               <OverviewMetric icon="redeem" label="Referral" value={referralCode} />
             </div>
@@ -370,7 +388,7 @@ export default function AccountSettings() {
               description="Keep your delivery identity and contact information up to date."
             />
 
-            <div className="ambient-shadow space-y-5 rounded-[2rem] border border-outline/10 bg-surface-container-low p-6">
+            <div className="ambient-shadow space-y-5 rounded-[2rem] border border-outline/10 bg-surface-container-low p-5 min-[390px]:p-6">
               <div className="grid gap-4 sm:grid-cols-2">
                 <InputField
                   id="firstName"
@@ -476,12 +494,12 @@ export default function AccountSettings() {
 
             <div className="ambient-shadow space-y-3 rounded-[2rem] border border-outline/10 bg-surface-container-low p-3">
               <div className="rounded-2xl bg-surface-container-lowest p-4">
-                <div className="flex items-start gap-4">
+                <div className="flex min-w-0 items-start gap-4">
                   <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-surface-container-high text-primary">
                     <SymbolIcon name="mail" />
                   </div>
 
-                  <div>
+                  <div className="min-w-0 flex-1">
                     <p className="font-headline font-bold text-on-surface">Sign-in Email</p>
                     <p className="mt-1 text-sm text-on-surface-variant">{profile.email}</p>
                     <p className="mt-2 text-xs font-medium uppercase tracking-[0.16em] text-on-surface-variant/70">
@@ -599,7 +617,7 @@ export default function AccountSettings() {
               />
 
               {isDeleteConfirmOpen && (
-                <div className="rounded-2xl bg-error/10 border border-error/20 p-4 space-y-4">
+                <div className="space-y-4 rounded-2xl border border-error/20 bg-error/10 p-4">
                   <p className="text-sm font-medium text-error/90">
                     This will permanently delete your account and all associated data. This action cannot be undone.
                   </p>
@@ -649,16 +667,16 @@ export default function AccountSettings() {
           </div>
         </Toast>
 
-        <div className="fixed bottom-0 left-0 right-0 z-40 bg-gradient-to-t from-surface via-surface/95 to-transparent p-6">
+        <div className="pointer-events-none fixed bottom-0 left-0 right-0 z-40 bg-gradient-to-t from-surface via-surface/95 to-transparent px-5 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-4 min-[390px]:px-6">
           <div className="mx-auto max-w-lg">
             {error ? (
-              <p className="mb-3 rounded-2xl bg-error-container px-4 py-3 text-sm font-medium text-on-error-container">
+              <p className="mb-3 rounded-2xl bg-error-container px-4 py-3 text-sm font-medium text-on-error-container shadow-[0_10px_24px_rgba(78,33,33,0.08)]">
                 {error}
               </p>
             ) : null}
 
             <button
-              className={`flex w-full items-center justify-center gap-3 rounded-full py-4 font-headline text-lg font-bold text-white shadow-[0_8px_24px_rgba(172,44,0,0.22)] transition-all ${
+              className={`pointer-events-auto frosted-footer flex w-full items-center justify-center gap-3 rounded-full py-4 font-headline text-lg font-bold text-white shadow-[0_12px_28px_rgba(172,44,0,0.22)] transition-all ${
                 hasChanges && !isSaving
                   ? 'bg-gradient-to-br from-primary to-primary-container active:scale-95'
                   : 'cursor-not-allowed bg-outline/40 shadow-none'

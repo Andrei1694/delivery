@@ -1,43 +1,30 @@
-import PageHeader from '../../components/PageHeader';
+import { useNavigate, useSearch } from '@tanstack/react-router';
 import OrderSummary from '../../components/OrderSummary';
+import PageHeader from '../../components/PageHeader';
 import SymbolIcon from '../../components/SymbolIcon';
-
-const ORDER_ITEMS = [
-  {
-    name: 'Truffle Risotto',
-    quantity: '1x Unit',
-    price: '$24.00',
-    image:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuDqgN-t4arMSnVQ27_d0Resezuqwvv8HjOJ701ZIWMCIOigKHkFDqoocOFTMeShumsM-2wJ9_3uk19Mwt8EeB0Rw5Fe-NSbzt0j-D3gLLnpHlBx17Oavy3tfgS3emzYHQJ-Kkttz2pCNO2FB5t_ND0rLNmUqj-RkiPml6GHuPRf4qnhRzgKlAaBXOFz4Qrs3n95L731RMks9BAbQUL7QHkxRNWgqIB_8CMxQCR9gvw27ySJ7T7Jp34JSZCrfdooUeqxWexvz2xz-ns',
-    alt: 'Gourmet Truffle Risotto',
-  },
-  {
-    name: 'Coq au Vin',
-    quantity: '1x Unit',
-    price: '$28.00',
-    image:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuBbjh_zWAEtqzRl1d0FF-LHX0gBx4rMunbPdZUC9-dHdBC3VPlGWQuIwpWZADFGZ0LNWDLJHBFr2A7fEt5ZOIUdi4Dte-QpaO6LVZ3WbNKN2xM0-2JnBQG_oMT2YJI7RtI5thzKYjxHVlOjKY0Mss67AFNnnZVxR2in0qXGNnw5noWWaxoul-jV5j3g-HZzVCGRV8cBNS5APCg5CDlTqqB-5UVE8TjqanMOuzgDBngK7BXATbL9Y9N7EzM_P2njMWK2DrxR2F8ngXo',
-    alt: 'Traditional Coq au Vin',
-  },
-  {
-    name: 'Crème Brûlée',
-    quantity: '1x Unit',
-    price: '$12.00',
-    image:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuC8HDhxs3RhQ_vGaVRo3X2vXKJp7_NM8ZAatyIuk1DivRidc2RD8XGr_llBc8aBIGFENs2ZgqkvHC_YMBKx2OT8Gqx_yU4yCSX3-FPXWkqEqxnxcr0jd3kjNyj1nBuBnImTuDleUKl7Aye3uRhnt6cq03_9HIdwLQRiBdbXTMuxpsF4LMgvblJUZTg3lnADzx_BSbFHMOsdK2cT9l19drsMfO72Dpp5M8u4FauL9qBaoeAXqc9ykRqfo1zCApIUGKVtpL5UccQIKd0',
-    alt: 'Classic Crème Brûlée',
-  },
-];
+import { getOrderById } from '../../mocks';
 
 const filledIconStyle = {
   fontVariationSettings: "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24",
 };
 
-const deliveredIconStyle = {
+const statusIconStyle = {
   fontVariationSettings: "'FILL' 0, 'wght' 700, 'GRAD' 0, 'opsz' 24",
 };
 
+function formatCurrency(value) {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+  }).format(value);
+}
+
 export default function OrderDetails() {
+  const navigate = useNavigate();
+  const { orderId } = useSearch({ from: '/order-details' });
+  const order = getOrderById(orderId);
+  const subtotal = order.summaryItems.reduce((sum, item) => sum + item.price, 0);
+
   return (
     <>
       <style>
@@ -62,11 +49,17 @@ export default function OrderDetails() {
           onBack={() => window.history.back()}
           rightAction={
             <button
-              aria-label="More options"
+              aria-label="Track this order"
               className="flex h-10 w-10 items-center justify-center rounded-full text-primary duration-200 hover:bg-surface-container-low active:scale-95"
               type="button"
+              onClick={() =>
+                navigate({
+                  to: '/order/$orderId/track',
+                  params: { orderId: order.id },
+                })
+              }
             >
-              <SymbolIcon name="more_vert" />
+              <SymbolIcon name="local_shipping" />
             </button>
           }
         />
@@ -75,24 +68,24 @@ export default function OrderDetails() {
           <section className="rounded-3xl border border-outline-variant/10 bg-surface-container-low p-5">
             <div className="mb-2 flex items-center justify-between gap-4">
               <h2 className="font-headline text-2xl font-extrabold tracking-tight text-on-surface">
-                L&apos;Artiste Bistro
+                {order.restaurant}
               </h2>
 
-              <div className="flex items-center gap-1.5 rounded-full border border-primary/10 bg-primary-container/20 px-3 py-1 text-primary">
+              <div className={`flex items-center gap-1.5 rounded-full px-3 py-1 ${order.statusClassName}`}>
                 <span
                   className="material-symbols-outlined text-sm"
-                  style={deliveredIconStyle}
+                  style={statusIconStyle}
                 >
-                  check_circle
+                  {order.status === 'Cancelled' ? 'cancel' : order.status === 'Processing' ? 'schedule' : 'check_circle'}
                 </span>
                 <span className="font-label text-[10px] font-bold uppercase tracking-wider">
-                  Delivered
+                  {order.status}
                 </span>
               </div>
             </div>
 
             <p className="text-sm font-medium text-on-surface-variant">
-              Order #8821 • Oct 24, 2023
+              Order #{order.id} • {order.dateTime}
             </p>
           </section>
 
@@ -112,7 +105,7 @@ export default function OrderDetails() {
                   Delivery Address
                 </p>
                 <p className="font-headline font-bold text-on-surface">
-                  Home • 124 Park Ave
+                  {order.deliveryAddress}
                 </p>
               </div>
             </div>
@@ -132,17 +125,28 @@ export default function OrderDetails() {
                   Payment Method
                 </p>
                 <p className="font-headline font-bold text-on-surface">
-                  Visa •••• 4242
+                  {order.paymentMethod}
                 </p>
               </div>
             </div>
+
+            {order.cancellationReason ? (
+              <div className="rounded-3xl bg-surface-container-low p-5">
+                <p className="mb-1 font-label text-[10px] uppercase tracking-[0.15em] text-on-surface-variant">
+                  Cancellation Reason
+                </p>
+                <p className="text-sm leading-relaxed text-on-surface-variant">
+                  {order.cancellationReason}
+                </p>
+              </div>
+            ) : null}
           </section>
 
           <section className="space-y-4 pt-2">
             <h3 className="px-2 font-headline text-lg font-bold">Your Items</h3>
 
             <div className="space-y-1">
-              {ORDER_ITEMS.map((item) => (
+              {order.summaryItems.map((item) => (
                 <div key={item.name} className="flex items-center gap-4 p-2">
                   <div className="h-14 w-14 flex-shrink-0 overflow-hidden rounded-xl bg-surface-container-high">
                     <img
@@ -153,18 +157,23 @@ export default function OrderDetails() {
                   </div>
 
                   <div className="flex-grow">
-                    <div className="flex items-start justify-between">
+                    <div className="flex items-start justify-between gap-4">
                       <div>
                         <p className="font-headline font-bold text-on-surface">
                           {item.name}
                         </p>
                         <p className="text-xs text-on-surface-variant">
-                          {item.quantity}
+                          {item.quantityLabel}
                         </p>
+                        {item.note ? (
+                          <p className="text-[11px] text-on-surface-variant/80">
+                            {item.note}
+                          </p>
+                        ) : null}
                       </div>
 
                       <p className="font-body font-semibold text-on-surface">
-                        {item.price}
+                        {formatCurrency(item.price)}
                       </p>
                     </div>
                   </div>
@@ -174,7 +183,12 @@ export default function OrderDetails() {
           </section>
 
           <section>
-            <OrderSummary subtotal={64} serviceFee={4.20} className="rounded-[2rem] border border-outline-variant/10 bg-surface-container-lowest" />
+            <OrderSummary
+              subtotal={subtotal}
+              serviceFee={order.serviceFee}
+              deliveryFee={order.deliveryFee}
+              className="rounded-[2rem] border border-outline-variant/10 bg-surface-container-lowest"
+            />
           </section>
         </main>
 
@@ -183,6 +197,12 @@ export default function OrderDetails() {
             <button
               className="flex w-full items-center justify-center gap-3 rounded-full bg-gradient-to-br from-primary to-primary-container py-4 font-headline text-lg font-bold text-on-primary shadow-lg transition-all active:scale-95"
               type="button"
+              onClick={() =>
+                navigate({
+                  to: '/restaurant-menu/$restaurantId',
+                  params: { restaurantId: order.restaurantId },
+                })
+              }
             >
               <span className="material-symbols-outlined">restart_alt</span>
               Reorder Items
