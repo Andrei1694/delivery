@@ -1,5 +1,7 @@
 import { Link } from '@tanstack/react-router';
 import DismissiblePromoBanner from '../../components/DismissiblePromoBanner';
+import HomeFeedRestaurantCard from '../../components/HomeFeedRestaurantCard';
+import MobileCardSlider from '../../components/MobileCardSlider';
 import SymbolIcon from '../../components/SymbolIcon';
 import SearchInput from '../../components/SearchInput';
 import { getHomeFeedData } from '../../mocks';
@@ -81,34 +83,14 @@ export default function HomeFeed() {
 
         <section className="px-4">
           <h2 className="font-headline text-sm font-bold text-on-surface mb-4">Curated For You</h2>
-          <div className="grid grid-cols-2 gap-4">
+          <MobileCardSlider
+            ariaLabel="Curated restaurants"
+            slideWidthClassName="w-[calc((100%-1rem)/2)]"
+          >
             {restaurants.map((restaurant) => (
-              <Link
-                key={restaurant.id}
-                to="/restaurant-menu/$restaurantId"
-                params={{ restaurantId: restaurant.id }}
-                className="flex flex-col gap-2"
-              >
-                <div className="relative aspect-[4/3] rounded-xl overflow-hidden shadow-sm bg-surface-container">
-                  <img
-                    src={restaurant.image}
-                    alt={restaurant.imageAlt}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute top-2 right-2 bg-white/95 backdrop-blur-sm px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
-                    <SymbolIcon name="star" filled className="text-yellow-500 text-[10px]" />
-                    <span className="text-[10px] font-bold text-on-surface">{restaurant.rating}</span>
-                  </div>
-                </div>
-                <div>
-                  <h3 className="font-headline text-xs font-bold text-on-surface truncate">
-                    {restaurant.name}
-                  </h3>
-                  <p className="text-[10px] text-on-surface-variant truncate">{restaurant.meta}</p>
-                </div>
-              </Link>
+              <HomeFeedRestaurantCard key={restaurant.id} restaurant={restaurant} />
             ))}
-          </div>
+          </MobileCardSlider>
         </section>
       </main>
     </div>

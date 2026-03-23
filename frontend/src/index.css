@@ -47,6 +47,30 @@ select {
 .hide-scrollbar::-webkit-scrollbar { display: none; }
 .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
+.mobile-card-slider__track::-webkit-scrollbar { display: none; }
+.mobile-card-slider__track { -ms-overflow-style: none; scrollbar-width: none; }
+
+.mobile-card-slider__dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border: 0;
+  border-radius: 9999px;
+  background: rgba(162, 103, 101, 0.28);
+  transition: transform 180ms ease, background-color 180ms ease, width 180ms ease;
+}
+
+.mobile-card-slider__dot.is-active,
+.mobile-card-slider__dot[aria-current='true'] {
+  width: 1.35rem;
+  background: var(--color-primary);
+  transform: scaleY(1.05);
+}
+
+.mobile-card-slider__dot:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
 @keyframes page-enter-right {
   from { opacity: 0; transform: translateX(16px); }
   to   { opacity: 1; transform: translateX(0); }
