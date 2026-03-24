@@ -1,4 +1,4 @@
-import { Restaurant } from "../models/types";
+import { Restaurant } from "../../../shared/types";
 
 const restaurants: Restaurant[] = [
   {
