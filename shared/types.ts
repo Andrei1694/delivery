@@ -76,6 +76,7 @@ export interface RestaurantRequestDto {
 
 export interface RestaurantResponseDto {
   id: number;
+  slug?: string;
   name: string;
   cuisine: string;
   priceTier?: string;

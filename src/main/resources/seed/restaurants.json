@@ -1,0 +1,227 @@
+[
+  {
+    "slug": "heritage-kitchen",
+    "name": "The Heritage Kitchen",
+    "cuisine": "Mediterranean Comfort",
+    "priceTier": "$$",
+    "rating": 4.9,
+    "ratingCount": 980,
+    "estimatedDeliveryMinutes": 20,
+    "deliveryFee": 0.0,
+    "safetyLabel": "Farm Assured",
+    "cardImage": "/uploads/restaurants-seed/heritage-kitchen-card.png",
+    "cardImageAlt": "Roasted lamb and mezze spread on a rustic wooden table",
+    "heroImage": "/uploads/restaurants-seed/heritage-kitchen-hero.png",
+    "heroImageAlt": "Warm restaurant hero image with plated Mediterranean dishes",
+    "heroImageTitle": "Braised dishes and fresh herbs on a chef tasting table",
+    "about": "Experience the finest Mediterranean culinary traditions crafted with passion and fresh, locally sourced ingredients. Our chefs bring years of expertise to every dish, ensuring an unforgettable dining experience.",
+    "hours": "Mon-Sun: 11:00 AM - 10:00 PM",
+    "address": "124 Culinary Ave, Food District, FD 10001",
+    "heroBadge": {
+      "label": "Weekend Favorite",
+      "icon": "stars"
+    },
+    "gallery": [
+      "/uploads/restaurants-seed/heritage-kitchen-gallery-1.png",
+      "/uploads/restaurants-seed/heritage-kitchen-gallery-2.png"
+    ],
+    "reviews": [
+      {
+        "author": "Alex J.",
+        "rating": 5.0,
+        "text": "Absolutely fantastic! The flavors were perfectly balanced and the service was amazing.",
+        "date": "2 days ago"
+      },
+      {
+        "author": "Sam T.",
+        "rating": 4.0,
+        "text": "Great food and quick delivery. The meats were tender and perfectly seasoned.",
+        "date": "1 week ago"
+      }
+    ]
+  },
+  {
+    "slug": "sakura-bloom",
+    "name": "Sakura Bloom",
+    "cuisine": "Contemporary Japanese",
+    "priceTier": "$$",
+    "rating": 4.7,
+    "ratingCount": 640,
+    "estimatedDeliveryMinutes": 15,
+    "deliveryFee": 3.99,
+    "safetyLabel": "Ocean Traceable",
+    "cardImage": "/uploads/restaurants-seed/sakura-bloom-card.png",
+    "cardImageAlt": "Sushi platter with salmon, tuna, and garnishes",
+    "heroImage": "/uploads/restaurants-seed/sakura-bloom-hero.png",
+    "heroImageAlt": "Fine dining Japanese seafood plate with bright citrus accents",
+    "heroImageTitle": "Minimalist Japanese plating with seared seafood",
+    "heroBadge": {
+      "label": "Omakase Spotlight",
+      "icon": "stars"
+    }
+  },
+  {
+    "slug": "burger-haven",
+    "name": "Burger Haven",
+    "cuisine": "Signature Burgers",
+    "priceTier": "$",
+    "rating": 4.5,
+    "ratingCount": 1400,
+    "estimatedDeliveryMinutes": 10,
+    "deliveryFee": 2.49,
+    "safetyLabel": "Fresh Ground Daily",
+    "cardImage": "/uploads/restaurants-seed/burger-haven-card.png",
+    "cardImageAlt": "Double burger with fries and a toasted brioche bun",
+    "heroImage": "/uploads/restaurants-seed/burger-haven-hero.png",
+    "heroImageAlt": "Burger and fries with dramatic low-key lighting",
+    "heroImageTitle": "Burger stack with fries and house sauce",
+    "heroBadge": {
+      "label": "Fan Favorite",
+      "icon": "stars"
+    }
+  },
+  {
+    "slug": "vero-italiano",
+    "name": "Vero Italiano",
+    "cuisine": "Traditional Italian",
+    "priceTier": "$$$",
+    "rating": 4.8,
+    "ratingCount": 1100,
+    "estimatedDeliveryMinutes": 25,
+    "deliveryFee": 4.99,
+    "safetyLabel": "Handmade Daily",
+    "cardImage": "/uploads/restaurants-seed/vero-italiano-card.png",
+    "cardImageAlt": "Neapolitan pizza with blistered crust and basil leaves",
+    "heroImage": "/uploads/restaurants-seed/vero-italiano-hero.png",
+    "heroImageAlt": "Wood-fired pizza and pasta arranged on a stone counter",
+    "heroImageTitle": "Italian menu spread beside an oven-fired pizza",
+    "heroBadge": {
+      "label": "Pasta Atelier",
+      "icon": "stars"
+    },
+    "searchBadge": {
+      "label": "New Arrival",
+      "icon": "new_releases",
+      "className": "bg-primary-container/50 text-on-primary-container",
+      "iconClassName": "text-on-primary-container"
+    }
+  },
+  {
+    "slug": "bella-vita-trattoria",
+    "name": "Bella Vita Trattoria",
+    "cuisine": "Traditional Italian",
+    "priceTier": "$$$",
+    "rating": 4.9,
+    "ratingCount": 1600,
+    "estimatedDeliveryMinutes": 15,
+    "deliveryFee": 0.0,
+    "safetyLabel": "Slow Fermented Dough",
+    "cardImage": "/uploads/restaurants-seed/bella-vita-trattoria-card.png",
+    "cardImageAlt": "Margherita pizza with fresh mozzarella and basil",
+    "heroImage": "/uploads/restaurants-seed/bella-vita-trattoria-hero.png",
+    "heroImageAlt": "Classic Italian trattoria pizza on a marble counter",
+    "heroImageTitle": "Neapolitan pizza with basil and olive oil",
+    "heroBadge": {
+      "label": "Chef Curated",
+      "icon": "stars"
+    },
+    "searchBadge": {
+      "label": "Curator's Choice",
+      "icon": "verified",
+      "className": "bg-white/40 text-on-tertiary-container",
+      "iconClassName": "text-tertiary"
+    }
+  },
+  {
+    "slug": "forno-brace",
+    "name": "Forno & Brace",
+    "cuisine": "Artisanal Wood-fired",
+    "priceTier": "$$",
+    "rating": 4.8,
+    "ratingCount": 890,
+    "estimatedDeliveryMinutes": 10,
+    "deliveryFee": 2.99,
+    "safetyLabel": "Stone Oven Fresh",
+    "cardImage": "/uploads/restaurants-seed/forno-brace-card.png",
+    "cardImageAlt": "Wood-fired pepperoni pizza fresh from the oven",
+    "heroImage": "/uploads/restaurants-seed/forno-brace-hero.png",
+    "heroImageAlt": "Fresh pizza slices arranged near a stone oven",
+    "heroImageTitle": "Wood-fired pizza cooling on a metal rack",
+    "heroBadge": {
+      "label": "Wood-fired Daily",
+      "icon": "stars"
+    }
+  },
+  {
+    "slug": "spice-route",
+    "name": "Spice Route",
+    "cuisine": "Modern Indian",
+    "priceTier": "$$$",
+    "rating": 4.8,
+    "ratingCount": 720,
+    "estimatedDeliveryMinutes": 25,
+    "deliveryFee": 4.49,
+    "safetyLabel": "Halal Certified",
+    "cardImage": "/uploads/restaurants-seed/spice-route-card.png",
+    "cardImageAlt": "Aromatic lamb curry in a copper bowl with naan",
+    "heroImage": "/uploads/restaurants-seed/spice-route-hero.png",
+    "heroImageAlt": "Indian feast spread with curries and breads",
+    "heroImageTitle": "Spiced lamb and fresh naan on a saffron-draped table",
+    "heroBadge": {
+      "label": "Tandoor Fresh",
+      "icon": "stars"
+    },
+    "searchBadge": {
+      "label": "New Arrival",
+      "icon": "new_releases",
+      "className": "bg-primary-container/50 text-on-primary-container",
+      "iconClassName": "text-on-primary-container"
+    }
+  },
+  {
+    "slug": "seoul-bowl",
+    "name": "Seoul Bowl",
+    "cuisine": "Contemporary Korean",
+    "priceTier": "$$",
+    "rating": 4.6,
+    "ratingCount": 510,
+    "estimatedDeliveryMinutes": 15,
+    "deliveryFee": 2.99,
+    "safetyLabel": "House-Fermented",
+    "cardImage": "/uploads/restaurants-seed/seoul-bowl-card.png",
+    "cardImageAlt": "Korean bibimbap bowl with colourful vegetables and beef",
+    "heroImage": "/uploads/restaurants-seed/seoul-bowl-hero.png",
+    "heroImageAlt": "Korean rice bowls and banchan on a wooden table",
+    "heroImageTitle": "Wagyu bulgogi and pickled banchan arranged on slate",
+    "heroBadge": {
+      "label": "K-Food Rising",
+      "icon": "stars"
+    }
+  },
+  {
+    "slug": "olive-vine",
+    "name": "Olive & Vine",
+    "cuisine": "Greek Mediterranean",
+    "priceTier": "$$",
+    "rating": 4.7,
+    "ratingCount": 430,
+    "estimatedDeliveryMinutes": 20,
+    "deliveryFee": 0.0,
+    "safetyLabel": "Import Certified",
+    "cardImage": "/uploads/restaurants-seed/olive-vine-card.png",
+    "cardImageAlt": "Greek mezedes spread with olives and grilled octopus",
+    "heroImage": "/uploads/restaurants-seed/olive-vine-hero.png",
+    "heroImageAlt": "Mediterranean table with lamb kleftiko and mezedes",
+    "heroImageTitle": "Slow-roasted lamb and vine leaves on a stone terrace",
+    "heroBadge": {
+      "label": "Aegean Inspired",
+      "icon": "stars"
+    },
+    "searchBadge": {
+      "label": "Curator's Choice",
+      "icon": "verified",
+      "className": "bg-white/40 text-on-tertiary-container",
+      "iconClassName": "text-tertiary"
+    }
+  }
+]

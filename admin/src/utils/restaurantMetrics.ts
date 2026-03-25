@@ -1,3 +1,4 @@
+import { resolveApiAssetUrl } from '../api';
 import type { RestaurantResponseDto } from '../types';
 
 export const currencyFormatter = new Intl.NumberFormat('en-US', {
@@ -11,7 +12,7 @@ export function getRatingNumber(restaurant: RestaurantResponseDto) {
 }
 
 export function getRestaurantImage(restaurant: RestaurantResponseDto) {
-  return restaurant.cardImage || restaurant.heroImage || '';
+  return resolveApiAssetUrl(restaurant.cardImage || restaurant.heroImage || '');
 }
 
 export function getImageAlt(restaurant: RestaurantResponseDto) {

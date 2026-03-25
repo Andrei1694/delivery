@@ -1,8 +1,12 @@
 import axios from 'axios';
 import type { PageResponse, RestaurantRequestDto, RestaurantResponseDto } from './types';
 
+const ABSOLUTE_URL_PATTERN = /^[a-z][a-z\d+\-.]*:/i;
+
+export const apiBaseUrl = 'http://localhost:8080/api';
+
 const api = axios.create({
-  baseURL: 'http://localhost:8080/api',
+  baseURL: apiBaseUrl,
   headers: { 'Content-Type': 'application/json' },
 });
 
@@ -26,6 +30,26 @@ api.interceptors.response.use(
     return Promise.reject(err);
   },
 );
+
+export function resolveApiAssetUrl(value?: string | null) {
+  if (!value?.trim()) {
+    return '';
+  }
+
+  const normalizedValue = value.trim();
+  if (
+    ABSOLUTE_URL_PATTERN.test(normalizedValue) ||
+    normalizedValue.startsWith('//')
+  ) {
+    return normalizedValue;
+  }
+
+  const apiOrigin = new URL(apiBaseUrl, window.location.origin).origin;
+  return new URL(
+    normalizedValue.startsWith('/') ? normalizedValue : `/${normalizedValue}`,
+    apiOrigin,
+  ).toString();
+}
 
 export const restaurantApi = {
   getAll: (page = 0, size = 50) =>

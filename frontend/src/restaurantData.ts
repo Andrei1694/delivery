@@ -1,4 +1,5 @@
 import { searchResultsConfig } from './mocks/discovery';
+import { resolveApiAssetUrl } from './requests';
 import type { RestaurantBadgeDto, RestaurantResponseDto } from './types';
 
 const FALLBACK_RESTAURANT_IMAGE =
@@ -180,14 +181,13 @@ function isBrowserSupportedImageUrl(imageUrl?: string | null) {
 }
 
 function getRestaurantImage(restaurant: RestaurantResponseDto) {
-  return (
-    [
-      restaurant.cardImage,
-      restaurant.heroImage,
-      ...(restaurant.gallery ?? []),
-    ].find(isBrowserSupportedImageUrl) ||
-    FALLBACK_RESTAURANT_IMAGE
-  );
+  const imageUrl = [
+    restaurant.cardImage,
+    restaurant.heroImage,
+    ...(restaurant.gallery ?? []),
+  ].find(isBrowserSupportedImageUrl);
+
+  return imageUrl ? resolveApiAssetUrl(imageUrl) : FALLBACK_RESTAURANT_IMAGE;
 }
 
 function getRestaurantImageAlt(restaurant: RestaurantResponseDto) {
@@ -416,7 +416,7 @@ export function mapApiRestaurantToMenuRestaurant(
     safetyLabel: getSafetyLabel(restaurant),
     cardImage: image,
     cardImageAlt: imageAlt,
-    heroImage: restaurant.heroImage || image,
+    heroImage: resolveApiAssetUrl(restaurant.heroImage) || image,
     heroImageAlt: restaurant.heroImageAlt || imageAlt,
     heroImageTitle: restaurant.heroImageTitle || restaurant.name,
     about:
@@ -426,7 +426,9 @@ export function mapApiRestaurantToMenuRestaurant(
     address: restaurant.address?.trim() || 'Address coming soon',
     heroBadge: normalizeBadge(restaurant.heroBadge),
     searchBadge: normalizeBadge(restaurant.searchBadge),
-    gallery: (restaurant.gallery ?? []).filter(isBrowserSupportedImageUrl),
+    gallery: (restaurant.gallery ?? [])
+      .filter(isBrowserSupportedImageUrl)
+      .map((imageUrl) => resolveApiAssetUrl(imageUrl)),
     reviews: (restaurant.reviews ?? []).map((review, index) => ({
       id: `${restaurant.id}-${index}`,
       author: review.author,

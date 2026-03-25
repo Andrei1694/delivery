@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from '@tanstack/react-form';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useNavigate, useParams } from '@tanstack/react-router';
-import { restaurantApi } from '../../api';
+import { resolveApiAssetUrl, restaurantApi } from '../../api';
 import AdminShell from '../../components/AdminShell';
 import {
   AlertCircleIcon,
@@ -192,9 +192,9 @@ function getPreviewImage(
 ) {
   return (
     heroImagePreviewUrl ||
-    values.heroImage?.trim() ||
+    resolveApiAssetUrl(values.heroImage) ||
     cardImagePreviewUrl ||
-    values.cardImage?.trim() ||
+    resolveApiAssetUrl(values.cardImage) ||
     ''
   );
 }
@@ -918,7 +918,7 @@ export default function RestaurantForm() {
                       <div className="asset-preview">
                         <img
                           className="asset-preview__image"
-                          src={cardImagePreviewUrl || field.state.value}
+                          src={cardImagePreviewUrl || resolveApiAssetUrl(field.state.value)}
                           alt={field.state.value ? 'Card preview' : 'Selected card preview'}
                         />
                         <div className="asset-preview__meta">
@@ -1012,7 +1012,7 @@ export default function RestaurantForm() {
                       <div className="asset-preview">
                         <img
                           className="asset-preview__image"
-                          src={heroImagePreviewUrl || field.state.value}
+                          src={heroImagePreviewUrl || resolveApiAssetUrl(field.state.value)}
                           alt={field.state.value ? 'Hero preview' : 'Selected hero preview'}
                         />
                         <div className="asset-preview__meta">
@@ -1194,7 +1194,7 @@ export default function RestaurantForm() {
                       <article className="gallery-card" key={`${imageUrl}-${index}`}>
                         <img
                           className="gallery-card__image"
-                          src={imageUrl}
+                          src={resolveApiAssetUrl(imageUrl)}
                           alt={`Saved gallery image ${index + 1}`}
                         />
                         <div className="gallery-card__content">

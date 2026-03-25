@@ -19,6 +19,9 @@ public class Restaurant {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true)
+    private String slug;
+
     private String name;
     private String cuisine;
     private String priceTier;

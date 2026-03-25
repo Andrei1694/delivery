@@ -11,12 +11,16 @@ import java.util.List;
 @AllArgsConstructor
 public class RestaurantResponseDto {
     private Long id;
+    private String slug;
     private String name;
     private String cuisine;
     private String priceTier;
     private String rating;
+    private Integer ratingCount;
     private String ratingCountLabel;
+    private Integer estimatedDeliveryMinutes;
     private String deliveryTime;
+    private Double deliveryFee;
     private String deliveryFeeLabel;
     private String safetyLabel;
 

@@ -816,8 +816,12 @@ export default function RestaurantMenu() {
       ? mapApiRestaurantToMenuRestaurant(restaurantData)
       : null
     : getRestaurantById(mockRestaurantId ?? undefined);
+  const menuSlug =
+    apiRestaurantId !== null
+      ? restaurantData?.slug?.trim() || null
+      : mockRestaurantId;
   const menu =
-    mockRestaurantId === null ? null : getRestaurantMenuById(mockRestaurantId);
+    menuSlug === null ? null : getRestaurantMenuById(menuSlug);
   const [cartCount, setCartCount] = useState(0);
   const [cartTotal, setCartTotal] = useState(0);
   const [drawerSelection, setDrawerSelection] = useState<DrawerSelection | null>(null);

@@ -18,6 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,7 +44,7 @@ public class RestaurantService {
 
             mapper.using(ctx -> {
                 Integer v = (Integer) ctx.getSource();
-                return v != null ? v + "+ ratings" : null;
+                return v != null ? v + "+" : null;
             }).map(Restaurant::getRatingCount, RestaurantResponseDto::setRatingCountLabel);
 
             mapper.using(ctx -> {
@@ -53,7 +54,15 @@ public class RestaurantService {
 
             mapper.using(ctx -> {
                 Double v = (Double) ctx.getSource();
-                return v != null ? "$" + v + " delivery" : null;
+                if (v == null) {
+                    return null;
+                }
+
+                if (Math.abs(v) < 0.001d) {
+                    return "Free Delivery";
+                }
+
+                return String.format(Locale.US, "$%.2f delivery", v);
             }).map(Restaurant::getDeliveryFee, RestaurantResponseDto::setDeliveryFeeLabel);
 
             mapper.skip(RestaurantResponseDto::setReviews);
