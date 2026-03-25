@@ -5,7 +5,18 @@
       "Bash(npm run:*)",
       "Bash(/usr/libexec/java_home:*)",
       "Bash(export JAVA_HOME=/Users/andreistanciu/Library/Java/JavaVirtualMachines/openjdk-24.0.1/Contents/Home)",
-      "Bash(./mvnw spring-boot:run:*)"
+      "Bash(./mvnw spring-boot:run:*)",
+      "Bash(npm install:*)",
+      "Bash(node -e \":*)",
+      "Bash(python3 -c \":*)",
+      "Bash(docker exec:*)",
+      "Bash(curl -s -X POST http://localhost:8080/api/auth/register -H \"Content-Type: application/json\" -d '{\"\"email\"\":\"\"admin@admin.com\"\",\"\"password\"\":\"\"admin\"\",\"\"firstName\"\":\"\"Admin\"\",\"\"lastName\"\":\"\"Admin\"\",\"\"phone\"\":\"\"0000000000\"\"}')",
+      "Bash(./mvnw compile:*)",
+      "Bash(java -version)",
+      "Bash(echo \"JAVA_HOME: $JAVA_HOME\")",
+      "Bash(./mvnw -version)",
+      "Bash(JAVA_HOME=/Users/andreistanciu/Library/Java/JavaVirtualMachines/openjdk-24.0.1/Contents/Home ./mvnw compile -q)",
+      "Bash(curl -s -X POST http://localhost:8080/api/auth/login -H \"Content-Type: application/json\" -d '{\"\"email\"\":\"\"admin@admin.com\"\",\"\"password\"\":\"\"admin\"\"}')"
     ]
   }
 }

@@ -1,0 +1,118 @@
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Fira+Sans:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+:root {
+  --font-display: 'Fira Sans', 'Segoe UI', sans-serif;
+  --font-body: 'Fira Sans', 'Segoe UI', sans-serif;
+  --font-mono: 'Fira Code', 'SFMono-Regular', monospace;
+  --page: #070d18;
+  --page-soft: #0d1424;
+  --page-deep: #040812;
+  --panel: rgba(13, 20, 36, 0.92);
+  --surface-raised: #101b31;
+  --ink: #d7e1f2;
+  --ink-strong: #f7fbff;
+  --ink-soft: #b8c5dc;
+  --ink-muted: #8b9bb8;
+  --border: rgba(148, 163, 184, 0.16);
+  --border-strong: rgba(99, 165, 255, 0.32);
+  --accent: #63a5ff;
+  --accent-strong: #9bc9ff;
+  --success-soft: rgba(74, 222, 128, 0.16);
+  --shadow: 0 24px 80px rgba(0, 0, 0, 0.42);
+  color: var(--ink);
+  background:
+    radial-gradient(circle at top left, rgba(99, 165, 255, 0.2), transparent 28%),
+    radial-gradient(circle at 85% 10%, rgba(34, 211, 238, 0.08), transparent 22%),
+    linear-gradient(160deg, var(--page-deep) 0%, var(--page-soft) 48%, var(--page) 100%);
+  font-family: var(--font-body);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color-scheme: dark;
+}
+
+html {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, rgba(99, 165, 255, 0.1), transparent 24%),
+    linear-gradient(180deg, #050b14 0%, #09101d 100%);
+  color: var(--ink);
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 20%),
+    repeating-linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.015) 0 1px,
+      transparent 1px 28px
+    );
+  opacity: 0.34;
+  pointer-events: none;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.92), transparent 92%);
+}
+
+#root {
+  min-height: 100vh;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+::selection {
+  background: rgba(99, 165, 255, 0.32);
+  color: #f7fbff;
+}
+
+:focus-visible {
+  outline: 3px solid var(--accent-strong);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  body::before {
+    opacity: 0.12;
+  }
+}

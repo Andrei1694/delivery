@@ -42,9 +42,16 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
         try {
-            String email = userRepository.findByPhone(request.getPhone())
-                .map(u -> u.getEmail())
-                .orElseThrow(() -> new org.springframework.security.authentication.BadCredentialsException("Invalid phone or password"));
+            String email;
+            if (request.getEmail() != null && !request.getEmail().isBlank()) {
+                email = userRepository.findByEmail(request.getEmail())
+                    .map(u -> u.getEmail())
+                    .orElseThrow(() -> new org.springframework.security.authentication.BadCredentialsException("Invalid credentials"));
+            } else {
+                email = userRepository.findByPhone(request.getPhone())
+                    .map(u -> u.getEmail())
+                    .orElseThrow(() -> new org.springframework.security.authentication.BadCredentialsException("Invalid phone or password"));
+            }
 
             Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(email, request.getPassword())
