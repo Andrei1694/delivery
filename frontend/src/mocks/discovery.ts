@@ -1,4 +1,4 @@
-import { Restaurant } from "../../../shared/types";
+import type { Restaurant } from '../types';
 
 const restaurants: Restaurant[] = [
   {

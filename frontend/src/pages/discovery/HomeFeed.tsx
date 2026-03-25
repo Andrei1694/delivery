@@ -10,6 +10,9 @@ import {
   getRestaurantById,
   getRestaurantMenuById,
 } from '../../mocks';
+import { useQuery } from '@tanstack/react-query';
+import { restaurantApi } from '../../requests';
+import { useEffect } from 'react';
 
 function isPresent<T>(value: T | null | undefined): value is T {
   return value != null;
@@ -90,7 +93,16 @@ const foodSections = [
 
 export default function HomeFeed() {
   const { addressLabel, promo, categories, restaurants } = getHomeFeedData();
+  const { data } =useQuery({
+    queryKey: ['restaurants'],
+    queryFn: () => restaurantApi.getAll().then((response) => response.data),
+  });
 
+  useEffect(()=>{
+    console.log(data)
+  },[
+    data
+  ])
   return (
     <div className="bg-surface font-body text-on-surface min-h-screen">
       <header className="fixed top-0 w-full z-50 bg-surface/70 backdrop-blur-xl border-b border-surface-container">
