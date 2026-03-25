@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
 import BottomNav from '../../components/BottomNav';
 import PageHeader from '../../components/PageHeader';
@@ -7,6 +8,12 @@ import Toast from '../../components/Toast';
 import { useToast } from '../../components/useToast';
 import { getRestaurantById, getRestaurantMenuById } from '../../mocks';
 import { NAV_ITEMS } from '../../navigation/navItems';
+import { restaurantApi } from '../../requests';
+import {
+  mapApiRestaurantToMenuRestaurant,
+  parseRestaurantRouteId,
+  type RestaurantMenuRestaurantModel,
+} from '../../restaurantData';
 
 type DrawerSelection = {
   item: any;
@@ -560,11 +567,257 @@ function RestaurantNotFound({ onBack }) {
   );
 }
 
+function RestaurantMenuLoading({ onBack }: { onBack: () => void }) {
+  return (
+    <>
+      <style>
+        {`
+          .restaurant-menu-page .no-scrollbar::-webkit-scrollbar {
+            display: none;
+          }
+        `}
+      </style>
+
+      <div
+        className="restaurant-menu-page bg-surface font-body text-on-surface selection:bg-primary-container selection:text-on-primary-container"
+        style={{ minHeight: 'max(884px, 100dvh)' }}
+      >
+        <PageHeader title="Restaurant Menu" onBack={onBack} />
+        <main className="mx-auto max-w-lg px-6 pb-16 pt-28">
+          <div className="mb-6 h-[320px] animate-pulse rounded-[2rem] bg-surface-container-low" />
+          <div className="space-y-4 rounded-[2rem] bg-surface-container-lowest p-6 shadow-sm shadow-on-surface/5">
+            <div className="h-8 w-2/3 animate-pulse rounded-full bg-surface-container" />
+            <div className="h-4 w-1/2 animate-pulse rounded-full bg-surface-container" />
+            <div className="h-24 animate-pulse rounded-[1.5rem] bg-surface-container" />
+          </div>
+        </main>
+      </div>
+    </>
+  );
+}
+
+function RestaurantMenuUnavailable({
+  restaurant,
+  onBack,
+}: {
+  restaurant: RestaurantMenuRestaurantModel;
+  onBack: () => void;
+}) {
+  return (
+    <>
+      <style>
+        {`
+          .restaurant-menu-page .no-scrollbar::-webkit-scrollbar {
+            display: none;
+          }
+
+          .restaurant-menu-page .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+          }
+        `}
+      </style>
+
+      <div
+        className="restaurant-menu-page bg-surface font-body text-on-surface selection:bg-primary-container selection:text-on-primary-container"
+        style={{ minHeight: 'max(884px, 100dvh)' }}
+      >
+        <PageHeader title={restaurant.name} onBack={onBack} />
+
+        <main className="mx-auto max-w-lg pb-32">
+          <header className="relative h-[320px] w-full overflow-hidden">
+            <img
+              alt={restaurant.heroImageAlt}
+              className="h-full w-full scale-105 object-cover"
+              src={restaurant.heroImage}
+              title={restaurant.heroImageTitle}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent" />
+            <div className="absolute bottom-0 left-0 w-full p-6">
+              {restaurant.heroBadge ? (
+                <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-tertiary-container/90 px-3 py-1 backdrop-blur-md">
+                  <span
+                    className="material-symbols-outlined text-[16px] text-on-tertiary-container"
+                    style={{ fontVariationSettings: "'FILL' 1" }}
+                  >
+                    {restaurant.heroBadge.icon}
+                  </span>
+                  <span className="text-xs font-bold tracking-wide text-on-tertiary-container">
+                    {restaurant.heroBadge.label.toUpperCase()}
+                  </span>
+                </div>
+              ) : null}
+              <h1 className="mb-2 font-headline text-4xl font-extrabold leading-tight tracking-tight text-on-surface">
+                {restaurant.name}
+              </h1>
+              <div className="flex flex-wrap items-center gap-4 text-sm font-medium text-on-surface-variant">
+                <span className="flex items-center gap-1">
+                  <span className="material-symbols-outlined text-[18px]">schedule</span>
+                  {restaurant.deliveryTime}
+                </span>
+                <span className="flex items-center gap-1">
+                  <span
+                    className="material-symbols-outlined text-[18px] text-primary"
+                    style={{ fontVariationSettings: "'FILL' 1" }}
+                  >
+                    star
+                  </span>
+                  {restaurant.rating} ({restaurant.ratingCountLabel})
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="material-symbols-outlined text-[18px]">payments</span>
+                  {restaurant.deliveryFeeLabel}
+                </span>
+              </div>
+            </div>
+          </header>
+
+          <section className="px-6 py-6">
+            <div className="rounded-xxl bg-surface-container-low p-6 shadow-sm shadow-on-surface/5">
+              <p className="mb-2 text-xs font-bold uppercase tracking-[0.24em] text-primary-dim">
+                Backend Restaurant
+              </p>
+              <h2 className="font-headline text-2xl font-bold text-on-surface">
+                Menu items are not available yet
+              </h2>
+              <p className="mt-3 text-sm font-medium leading-relaxed text-on-surface-variant">
+                The restaurant details are loading from the backend successfully,
+                but menu sections are still mock-only until a menu API is added.
+              </p>
+            </div>
+          </section>
+
+          <section className="space-y-4 px-6">
+            <div className="rounded-xxl bg-surface-container-lowest p-5 shadow-sm shadow-on-surface/5">
+              <div className="mb-4 flex flex-wrap items-center gap-3 text-sm font-semibold text-on-surface-variant">
+                <span>{restaurant.cuisine}</span>
+                <span className="h-1 w-1 rounded-full bg-outline-variant" />
+                <span>{restaurant.safetyLabel}</span>
+              </div>
+              <p className="text-sm font-medium leading-relaxed text-on-surface-variant">
+                {restaurant.about}
+              </p>
+            </div>
+
+            <div className="rounded-xxl bg-surface-container-lowest p-5 shadow-sm shadow-on-surface/5">
+              <h3 className="mb-3 font-headline text-lg font-bold text-on-surface">
+                Details
+              </h3>
+              <div className="space-y-3 text-sm font-medium text-on-surface-variant">
+                <p>{restaurant.address}</p>
+                <p>{restaurant.hours}</p>
+              </div>
+            </div>
+
+            {restaurant.gallery.length > 0 ? (
+              <div className="rounded-xxl bg-surface-container-lowest p-5 shadow-sm shadow-on-surface/5">
+                <h3 className="mb-3 font-headline text-lg font-bold text-on-surface">
+                  Photos
+                </h3>
+                <div className="no-scrollbar -mx-1 flex snap-x snap-mandatory gap-3 overflow-x-auto px-1 pb-1">
+                  {restaurant.gallery.map((image, index) => (
+                    <div
+                      key={image}
+                      className="h-32 w-48 shrink-0 snap-center overflow-hidden rounded-xl"
+                    >
+                      <img
+                        src={image}
+                        alt={`${restaurant.name} photo ${index + 1}`}
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+
+            {restaurant.reviews.length > 0 ? (
+              <div className="rounded-xxl bg-surface-container-lowest p-5 shadow-sm shadow-on-surface/5">
+                <h3 className="mb-3 font-headline text-lg font-bold text-on-surface">
+                  Reviews
+                </h3>
+                <div className="space-y-3">
+                  {restaurant.reviews.slice(0, 3).map((review) => (
+                    <div
+                      key={review.id}
+                      className="rounded-xl border border-outline-variant/20 bg-surface p-4"
+                    >
+                      <div className="mb-2 flex items-center justify-between">
+                        <span className="font-bold text-on-surface">
+                          {review.author}
+                        </span>
+                        <span className="text-xs font-medium text-on-surface-variant">
+                          {review.date}
+                        </span>
+                      </div>
+                      <div className="mb-2 flex items-center gap-0.5">
+                        {[...Array(5)].map((_, index) => (
+                          <span
+                            key={index}
+                            className={`material-symbols-outlined text-[16px] ${index < review.rating ? 'text-primary' : 'text-outline-variant/50'}`}
+                            style={{
+                              fontVariationSettings:
+                                index < review.rating ? "'FILL' 1" : "'FILL' 0",
+                            }}
+                          >
+                            star
+                          </span>
+                        ))}
+                      </div>
+                      <p className="text-sm font-medium text-on-surface-variant">
+                        &quot;{review.text}&quot;
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+
+            <Link
+              to="/"
+              className="flex min-h-[44px] items-center justify-center rounded-full bg-primary px-6 py-3 font-bold text-on-primary shadow-lg shadow-primary/20 transition-transform active:scale-95"
+            >
+              Return to Explore
+            </Link>
+          </section>
+        </main>
+
+        <BottomNav navItems={NAV_ITEMS} />
+      </div>
+    </>
+  );
+}
+
 export default function RestaurantMenu() {
   const navigate = useNavigate();
   const { restaurantId } = useParams({ from: '/restaurant-menu/$restaurantId' });
-  const restaurant = getRestaurantById(restaurantId);
-  const menu = getRestaurantMenuById(restaurantId);
+  const restaurantTarget = parseRestaurantRouteId(restaurantId);
+  const isApiRestaurant = restaurantTarget.source === 'api';
+  const apiRestaurantId =
+    restaurantTarget.source === 'api' ? restaurantTarget.id : null;
+  const mockRestaurantId =
+    restaurantTarget.source === 'mock' ? restaurantTarget.id : null;
+  const { data: restaurantData, isPending, isError } = useQuery({
+    queryKey: ['restaurants', 'detail', restaurantId],
+    queryFn: () => {
+      if (apiRestaurantId === null) {
+        throw new Error('Missing API restaurant id');
+      }
+
+      return restaurantApi
+        .getById(apiRestaurantId)
+        .then((response) => response.data);
+    },
+    enabled: apiRestaurantId !== null,
+    staleTime: 60_000,
+  });
+  const restaurant = apiRestaurantId !== null
+    ? restaurantData
+      ? mapApiRestaurantToMenuRestaurant(restaurantData)
+      : null
+    : getRestaurantById(mockRestaurantId ?? undefined);
+  const menu =
+    mockRestaurantId === null ? null : getRestaurantMenuById(mockRestaurantId);
   const [cartCount, setCartCount] = useState(0);
   const [cartTotal, setCartTotal] = useState(0);
   const [drawerSelection, setDrawerSelection] = useState<DrawerSelection | null>(null);
@@ -572,7 +825,28 @@ export default function RestaurantMenu() {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const { visible, fading, show } = useToast(3000);
 
-  if (!restaurant || !menu) {
+  if (isApiRestaurant && isPending) {
+    return <RestaurantMenuLoading onBack={() => navigate({ to: '/' })} />;
+  }
+
+  if (isApiRestaurant && isError) {
+    return <RestaurantNotFound onBack={() => navigate({ to: '/' })} />;
+  }
+
+  if (!restaurant) {
+    return <RestaurantNotFound onBack={() => navigate({ to: '/' })} />;
+  }
+
+  if (!menu) {
+    if (isApiRestaurant) {
+      return (
+        <RestaurantMenuUnavailable
+          restaurant={restaurant}
+          onBack={() => navigate({ to: '/' })}
+        />
+      );
+    }
+
     return <RestaurantNotFound onBack={() => navigate({ to: '/' })} />;
   }
 

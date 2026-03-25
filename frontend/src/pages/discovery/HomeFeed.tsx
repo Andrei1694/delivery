@@ -12,7 +12,10 @@ import {
 } from '../../mocks';
 import { useQuery } from '@tanstack/react-query';
 import { restaurantApi } from '../../requests';
-import { useEffect } from 'react';
+import {
+  mapApiRestaurantToHomeCard,
+  sortRestaurantsForDiscovery,
+} from '../../restaurantData';
 
 function isPresent<T>(value: T | null | undefined): value is T {
   return value != null;
@@ -92,17 +95,26 @@ const foodSections = [
 ];
 
 export default function HomeFeed() {
-  const { addressLabel, promo, categories, restaurants } = getHomeFeedData();
-  const { data } =useQuery({
-    queryKey: ['restaurants'],
-    queryFn: () => restaurantApi.getAll().then((response) => response.data),
+  const {
+    addressLabel,
+    promo,
+    categories,
+    restaurants: fallbackRestaurants,
+  } = getHomeFeedData();
+  const { data } = useQuery({
+    queryKey: ['restaurants', 'all'],
+    queryFn: () =>
+      restaurantApi.getAll(0, 100).then((response) => response.data.content),
+    staleTime: 60_000,
   });
 
-  useEffect(()=>{
-    console.log(data)
-  },[
-    data
-  ])
+  const restaurants =
+    data && data.length > 0
+      ? sortRestaurantsForDiscovery(data)
+          .slice(0, 6)
+          .map(mapApiRestaurantToHomeCard)
+      : fallbackRestaurants;
+
   return (
     <div className="bg-surface font-body text-on-surface min-h-screen">
       <header className="fixed top-0 w-full z-50 bg-surface/70 backdrop-blur-xl border-b border-surface-container">

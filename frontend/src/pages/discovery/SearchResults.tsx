@@ -1,11 +1,23 @@
+import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate, useSearch } from '@tanstack/react-router';
 import SymbolIcon from '../../components/SymbolIcon';
 import PageHeader from '../../components/PageHeader';
 import FilterChip from '../../components/FilterChip';
 import HorizontalScroller from '../../components/HorizontalScroller';
-import { getSearchResultsData } from '../../mocks';
+import { restaurantApi } from '../../requests';
+import {
+  buildSearchFilters,
+  buildSearchResultsCopy,
+  filterRestaurantsForSearch,
+  mapApiRestaurantToSearchCard,
+  type SearchRestaurantCardModel,
+} from '../../restaurantData';
 
-function RestaurantCard({ restaurant }) {
+function RestaurantCard({
+  restaurant,
+}: {
+  restaurant: SearchRestaurantCardModel;
+}) {
   return (
     <Link
       to="/restaurant-menu/$restaurantId"
@@ -69,8 +81,23 @@ function RestaurantCard({ restaurant }) {
 export default function SearchResults() {
   const navigate = useNavigate();
   const search = useSearch({ from: '/search' });
-  const { filters, queryIcon, queryTitle, querySubtitle, restaurants } =
-    getSearchResultsData(search);
+  const query = typeof search.query === 'string' ? search.query.trim() : '';
+  const category = typeof search.category === 'string' ? search.category : '';
+  const { data, isPending, isError } = useQuery({
+    queryKey: ['restaurants', 'all'],
+    queryFn: () =>
+      restaurantApi.getAll(0, 100).then((response) => response.data.content),
+    staleTime: 60_000,
+  });
+  const filters = buildSearchFilters({ query, category });
+  const { queryIcon, queryTitle, querySubtitle } = buildSearchResultsCopy({
+    query,
+    category,
+  });
+  const restaurants = filterRestaurantsForSearch(data ?? [], {
+    query,
+    category,
+  }).map(mapApiRestaurantToSearchCard);
 
   return (
     <>
@@ -129,7 +156,32 @@ export default function SearchResults() {
           </section>
 
           <div className="space-y-10">
-            {restaurants.length > 0 ? (
+            {isPending ? (
+              Array.from({ length: 3 }, (_, index) => (
+                <section
+                  key={index}
+                  className="overflow-hidden rounded-[2rem] border border-outline-variant/10 bg-surface-container-lowest p-4 shadow-sm shadow-on-surface/5"
+                >
+                  <div className="mb-5 aspect-[16/10] animate-pulse rounded-[1.5rem] bg-surface-container" />
+                  <div className="space-y-3 px-2">
+                    <div className="h-7 w-2/3 animate-pulse rounded-full bg-surface-container" />
+                    <div className="h-4 w-1/2 animate-pulse rounded-full bg-surface-container" />
+                  </div>
+                </section>
+              ))
+            ) : isError ? (
+              <section className="rounded-[2rem] border border-outline-variant/10 bg-surface-container-lowest p-8 text-center shadow-sm shadow-on-surface/5">
+                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-surface-container text-primary">
+                  <SymbolIcon name="cloud_off" className="text-[28px]" />
+                </div>
+                <h3 className="font-headline text-2xl font-bold text-on-surface">
+                  We couldn&apos;t load restaurants
+                </h3>
+                <p className="mt-2 text-sm font-medium text-on-surface-variant">
+                  Check the backend connection and try again.
+                </p>
+              </section>
+            ) : restaurants.length > 0 ? (
               restaurants.map((restaurant) => (
                 <RestaurantCard key={restaurant.id} restaurant={restaurant} />
               ))

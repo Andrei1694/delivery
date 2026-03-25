@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from '@tanstack/react-form';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useNavigate, useParams } from '@tanstack/react-router';
@@ -27,6 +27,8 @@ import type {
 import { getRestaurantInitials } from '../../utils/restaurantMetrics';
 
 const formId = 'restaurant-editor';
+const acceptedRestaurantImageTypes =
+  'image/jpeg,image/png,image/webp,image/gif,image/avif';
 
 const emptyBadge = (): RestaurantBadgeDto => ({
   label: '',
@@ -42,7 +44,13 @@ const emptyReview = (): RestaurantReviewDto => ({
   date: '',
 });
 
-const defaultValues: RestaurantRequestDto = {
+type RestaurantFormValues = RestaurantRequestDto & {
+  cardImageFile: File | null;
+  heroImageFile: File | null;
+  galleryFiles: File[];
+};
+
+const defaultValues: RestaurantFormValues = {
   name: '',
   cuisine: '',
   priceTier: '',
@@ -63,11 +71,14 @@ const defaultValues: RestaurantRequestDto = {
   searchBadge: emptyBadge(),
   gallery: [],
   reviews: [],
+  cardImageFile: null,
+  heroImageFile: null,
+  galleryFiles: [],
 };
 
 function toFormValues(
   restaurant?: RestaurantResponseDto,
-): RestaurantRequestDto {
+): RestaurantFormValues {
   if (!restaurant) {
     return {
       ...defaultValues,
@@ -75,6 +86,9 @@ function toFormValues(
       searchBadge: emptyBadge(),
       gallery: [],
       reviews: [],
+      cardImageFile: null,
+      heroImageFile: null,
+      galleryFiles: [],
     };
   }
 
@@ -93,14 +107,99 @@ function toFormValues(
       : emptyBadge(),
     gallery: [...(restaurant.gallery ?? [])],
     reviews: (restaurant.reviews ?? []).map((review) => ({ ...review })),
+    cardImageFile: null,
+    heroImageFile: null,
+    galleryFiles: [],
   };
 }
 
-function getPreviewImage(values: RestaurantRequestDto) {
-  return values.heroImage?.trim() || values.cardImage?.trim() || '';
+async function readFileAsDataUrl(file: File) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        resolve(reader.result);
+        return;
+      }
+
+      reject(new Error(`Unable to read preview for ${file.name}.`));
+    };
+
+    reader.onerror = () => {
+      reject(reader.error ?? new Error(`Unable to read preview for ${file.name}.`));
+    };
+
+    reader.readAsDataURL(file);
+  });
 }
 
-function getPreviewAlt(values: RestaurantRequestDto) {
+function toRestaurantPayload(values: RestaurantFormValues): RestaurantRequestDto {
+  return {
+    name: values.name.trim(),
+    cuisine: values.cuisine.trim(),
+    priceTier: values.priceTier?.trim() || undefined,
+    rating: values.rating,
+    ratingCount: values.ratingCount,
+    estimatedDeliveryMinutes: values.estimatedDeliveryMinutes,
+    deliveryFee: values.deliveryFee,
+    safetyLabel: values.safetyLabel?.trim() || undefined,
+    cardImage: values.cardImage?.trim() || undefined,
+    cardImageAlt: values.cardImageAlt?.trim() || undefined,
+    heroImage: values.heroImage?.trim() || undefined,
+    heroImageAlt: values.heroImageAlt?.trim() || undefined,
+    heroImageTitle: values.heroImageTitle?.trim() || undefined,
+    about: values.about?.trim() || undefined,
+    hours: values.hours?.trim() || undefined,
+    address: values.address?.trim() || undefined,
+    heroBadge: values.heroBadge,
+    searchBadge: values.searchBadge,
+    gallery: values.gallery
+      .map((imageUrl) => imageUrl.trim())
+      .filter(Boolean),
+    reviews: values.reviews,
+  };
+}
+
+function buildRestaurantFormData(values: RestaurantFormValues) {
+  const formData = new FormData();
+  formData.append(
+    'restaurant',
+    new Blob([JSON.stringify(toRestaurantPayload(values))], {
+      type: 'application/json',
+    }),
+  );
+
+  if (values.cardImageFile) {
+    formData.append('cardImageFile', values.cardImageFile);
+  }
+
+  if (values.heroImageFile) {
+    formData.append('heroImageFile', values.heroImageFile);
+  }
+
+  values.galleryFiles.forEach((file) => {
+    formData.append('galleryFiles', file);
+  });
+
+  return formData;
+}
+
+function getPreviewImage(
+  values: RestaurantFormValues,
+  cardImagePreviewUrl?: string,
+  heroImagePreviewUrl?: string,
+) {
+  return (
+    heroImagePreviewUrl ||
+    values.heroImage?.trim() ||
+    cardImagePreviewUrl ||
+    values.cardImage?.trim() ||
+    ''
+  );
+}
+
+function getPreviewAlt(values: RestaurantFormValues) {
   return (
     values.heroImageAlt?.trim() ||
     values.cardImageAlt?.trim() ||
@@ -108,7 +207,10 @@ function getPreviewAlt(values: RestaurantRequestDto) {
   );
 }
 
-function getValidationItems(values: RestaurantRequestDto) {
+function getValidationItems(
+  values: RestaurantFormValues,
+  hasPrimaryImage: boolean,
+) {
   return [
     {
       label: 'Core identity',
@@ -126,7 +228,7 @@ function getValidationItems(values: RestaurantRequestDto) {
     },
     {
       label: 'Primary images',
-      complete: Boolean(values.cardImage?.trim() || values.heroImage?.trim()),
+      complete: hasPrimaryImage,
     },
     {
       label: 'Accessible alt text',
@@ -144,8 +246,8 @@ function getValidationItems(values: RestaurantRequestDto) {
   ];
 }
 
-function getCompletion(values: RestaurantRequestDto) {
-  const validationItems = getValidationItems(values);
+function getCompletion(values: RestaurantFormValues, hasPrimaryImage: boolean) {
+  const validationItems = getValidationItems(values, hasPrimaryImage);
   return Math.round(
     (validationItems.filter((item) => item.complete).length / validationItems.length) *
       100,
@@ -208,16 +310,30 @@ function SectionCard({
 function ValidationPanel({
   values,
   isEdit,
+  cardImagePreviewUrl,
+  heroImagePreviewUrl,
 }: {
-  values: RestaurantRequestDto;
+  values: RestaurantFormValues;
   isEdit: boolean;
+  cardImagePreviewUrl: string;
+  heroImagePreviewUrl: string;
 }) {
-  const previewImage = getPreviewImage(values);
-  const completion = getCompletion(values);
-  const validationItems = getValidationItems(values);
+  const hasPrimaryImage = Boolean(
+    cardImagePreviewUrl ||
+      heroImagePreviewUrl ||
+      values.cardImage?.trim() ||
+      values.heroImage?.trim(),
+  );
+  const previewImage = getPreviewImage(values, cardImagePreviewUrl, heroImagePreviewUrl);
+  const completion = getCompletion(values, hasPrimaryImage);
+  const validationItems = getValidationItems(values, hasPrimaryImage);
   const imageCount =
-    [values.cardImage, values.heroImage].filter((item) => item?.trim()).length +
-    values.gallery.filter((item) => item.trim()).length;
+    [
+      cardImagePreviewUrl || values.cardImage?.trim(),
+      heroImagePreviewUrl || values.heroImage?.trim(),
+    ].filter(Boolean).length +
+    values.gallery.filter((item) => item.trim()).length +
+    values.galleryFiles.length;
 
   return (
     <>
@@ -360,6 +476,9 @@ export default function RestaurantForm() {
   const params = useParams({ strict: false }) as { restaurantId?: string };
   const restaurantId = params.restaurantId ? Number(params.restaurantId) : undefined;
   const isEdit = restaurantId !== undefined;
+  const [cardImagePreviewUrl, setCardImagePreviewUrl] = useState('');
+  const [heroImagePreviewUrl, setHeroImagePreviewUrl] = useState('');
+  const [galleryPreviewUrls, setGalleryPreviewUrls] = useState<string[]>([]);
 
   const {
     data: existing,
@@ -372,10 +491,10 @@ export default function RestaurantForm() {
   });
 
   const saveMutation = useMutation({
-    mutationFn: (payload: RestaurantRequestDto) =>
+    mutationFn: (payload: FormData) =>
       isEdit
-        ? restaurantApi.update(restaurantId!, payload)
-        : restaurantApi.create(payload),
+        ? restaurantApi.updateMultipart(restaurantId!, payload)
+        : restaurantApi.createMultipart(payload),
     onSuccess: () => {
       void navigate({ to: '/restaurants' });
     },
@@ -383,7 +502,7 @@ export default function RestaurantForm() {
 
   const form = useForm({
     defaultValues,
-    onSubmit: ({ value }) => saveMutation.mutate(value),
+    onSubmit: ({ value }) => saveMutation.mutate(buildRestaurantFormData(value)),
   });
 
   useEffect(() => {
@@ -391,6 +510,45 @@ export default function RestaurantForm() {
       form.reset(toFormValues(existing));
     }
   }, [existing, form]);
+
+  async function handlePrimaryImageSelection(
+    fieldName: 'cardImageFile' | 'heroImageFile',
+    setPreview: (preview: string) => void,
+    files: FileList | null,
+  ) {
+    const nextFile = files?.[0];
+    if (!nextFile) {
+      return;
+    }
+
+    const previewUrl = await readFileAsDataUrl(nextFile);
+    form.setFieldValue(fieldName, nextFile);
+    setPreview(previewUrl);
+  }
+
+  async function handleGalleryFileSelection(files: FileList | null) {
+    const nextFiles = Array.from(files ?? []);
+    if (!nextFiles.length) {
+      return;
+    }
+
+    const nextPreviewUrls = await Promise.all(nextFiles.map(readFileAsDataUrl));
+    form.setFieldValue('galleryFiles', [
+      ...form.state.values.galleryFiles,
+      ...nextFiles,
+    ]);
+    setGalleryPreviewUrls((current) => [...current, ...nextPreviewUrls]);
+  }
+
+  function removePendingGalleryFile(index: number) {
+    form.setFieldValue(
+      'galleryFiles',
+      form.state.values.galleryFiles.filter((_, fileIndex) => fileIndex !== index),
+    );
+    setGalleryPreviewUrls((current) =>
+      current.filter((_, previewIndex) => previewIndex !== index),
+    );
+  }
 
   if (isEdit && isLoading) {
     return (
@@ -483,7 +641,14 @@ export default function RestaurantForm() {
       }
       aside={
         <form.Subscribe selector={(state) => state.values}>
-          {(values) => <ValidationPanel values={values} isEdit={isEdit} />}
+          {(values) => (
+            <ValidationPanel
+              values={values}
+              isEdit={isEdit}
+              cardImagePreviewUrl={cardImagePreviewUrl}
+              heroImagePreviewUrl={heroImagePreviewUrl}
+            />
+          )}
         </form.Subscribe>
       }
       railStats={[
@@ -745,15 +910,77 @@ export default function RestaurantForm() {
             <form.Field name="cardImage">
               {(field) => (
                 <Field
-                  label="Card image URL"
-                  hint="Used in compact search and catalog surfaces."
+                  label="Card image upload"
+                  hint="Upload the image used in compact search and catalog surfaces. Supported formats: JPEG, PNG, WebP, GIF, AVIF."
                 >
-                  <input
-                    className="admin-input"
-                    value={field.state.value ?? ''}
-                    onChange={(event) => field.handleChange(event.target.value)}
-                    placeholder="https://..."
-                  />
+                  <div className="asset-field">
+                    {cardImagePreviewUrl || field.state.value?.trim() ? (
+                      <div className="asset-preview">
+                        <img
+                          className="asset-preview__image"
+                          src={cardImagePreviewUrl || field.state.value}
+                          alt={field.state.value ? 'Card preview' : 'Selected card preview'}
+                        />
+                        <div className="asset-preview__meta">
+                          <strong>
+                            {cardImagePreviewUrl
+                              ? 'Selected replacement'
+                              : 'Current saved image'}
+                          </strong>
+                          <span>
+                            {cardImagePreviewUrl
+                              ? 'This file will replace the current card image when you save.'
+                              : 'This image will be preserved unless you upload a replacement or remove it.'}
+                          </span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="asset-empty">No card image selected yet.</div>
+                    )}
+
+                    <input
+                      className="admin-input admin-input--file"
+                      type="file"
+                      accept={acceptedRestaurantImageTypes}
+                      onChange={(event) => {
+                        void handlePrimaryImageSelection(
+                          'cardImageFile',
+                          setCardImagePreviewUrl,
+                          event.target.files,
+                        );
+                        event.target.value = '';
+                      }}
+                    />
+
+                    <div className="asset-actions">
+                      {cardImagePreviewUrl ? (
+                        <button
+                          type="button"
+                          className="button button--ghost button--compact"
+                          onClick={() => {
+                            form.setFieldValue('cardImageFile', null);
+                            setCardImagePreviewUrl('');
+                          }}
+                        >
+                          Undo replacement
+                        </button>
+                      ) : null}
+
+                      {field.state.value?.trim() ? (
+                        <button
+                          type="button"
+                          className="button button--ghost button--compact"
+                          onClick={() => {
+                            field.handleChange('');
+                            form.setFieldValue('cardImageFile', null);
+                            setCardImagePreviewUrl('');
+                          }}
+                        >
+                          Remove image
+                        </button>
+                      ) : null}
+                    </div>
+                  </div>
                 </Field>
               )}
             </form.Field>
@@ -777,15 +1004,77 @@ export default function RestaurantForm() {
             <form.Field name="heroImage">
               {(field) => (
                 <Field
-                  label="Hero image URL"
-                  hint="Used in the larger customer-facing detail surface."
+                  label="Hero image upload"
+                  hint="Upload the large-format image used on the restaurant detail page. Supported formats: JPEG, PNG, WebP, GIF, AVIF."
                 >
-                  <input
-                    className="admin-input"
-                    value={field.state.value ?? ''}
-                    onChange={(event) => field.handleChange(event.target.value)}
-                    placeholder="https://..."
-                  />
+                  <div className="asset-field">
+                    {heroImagePreviewUrl || field.state.value?.trim() ? (
+                      <div className="asset-preview">
+                        <img
+                          className="asset-preview__image"
+                          src={heroImagePreviewUrl || field.state.value}
+                          alt={field.state.value ? 'Hero preview' : 'Selected hero preview'}
+                        />
+                        <div className="asset-preview__meta">
+                          <strong>
+                            {heroImagePreviewUrl
+                              ? 'Selected replacement'
+                              : 'Current saved image'}
+                          </strong>
+                          <span>
+                            {heroImagePreviewUrl
+                              ? 'This file will replace the current hero image when you save.'
+                              : 'This image will be preserved unless you upload a replacement or remove it.'}
+                          </span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="asset-empty">No hero image selected yet.</div>
+                    )}
+
+                    <input
+                      className="admin-input admin-input--file"
+                      type="file"
+                      accept={acceptedRestaurantImageTypes}
+                      onChange={(event) => {
+                        void handlePrimaryImageSelection(
+                          'heroImageFile',
+                          setHeroImagePreviewUrl,
+                          event.target.files,
+                        );
+                        event.target.value = '';
+                      }}
+                    />
+
+                    <div className="asset-actions">
+                      {heroImagePreviewUrl ? (
+                        <button
+                          type="button"
+                          className="button button--ghost button--compact"
+                          onClick={() => {
+                            form.setFieldValue('heroImageFile', null);
+                            setHeroImagePreviewUrl('');
+                          }}
+                        >
+                          Undo replacement
+                        </button>
+                      ) : null}
+
+                      {field.state.value?.trim() ? (
+                        <button
+                          type="button"
+                          className="button button--ghost button--compact"
+                          onClick={() => {
+                            field.handleChange('');
+                            form.setFieldValue('heroImageFile', null);
+                            setHeroImagePreviewUrl('');
+                          }}
+                        >
+                          Remove image
+                        </button>
+                      ) : null}
+                    </div>
+                  </div>
                 </Field>
               )}
             </form.Field>
@@ -877,49 +1166,82 @@ export default function RestaurantForm() {
 
         <SectionCard
           eyebrow="Gallery"
-          title="Additional asset URLs"
-          description="Add supporting imagery to deepen the record without changing the primary customer flow."
+          title="Additional gallery images"
+          description="Manage saved gallery images and add new uploads that will be appended on save."
         >
           <form.Field name="gallery" mode="array">
             {(field) => (
-              <div className="array-list">
-                {field.state.value.map((_, index) => (
-                  <form.Field key={index} name={`gallery[${index}]`}>
-                    {(itemField) => (
-                      <div className="array-item">
-                        <Field
-                          label={`Gallery image ${index + 1}`}
-                          hint="Paste a direct image URL."
-                        >
-                          <input
-                            className="admin-input"
-                            value={(itemField.state.value as string) ?? ''}
-                            onChange={(event) => itemField.handleChange(event.target.value)}
-                            placeholder="https://..."
-                          />
-                        </Field>
-
-                        <button
-                          type="button"
-                          className="button button--ghost button--compact array-item__remove"
-                          onClick={() => field.removeValue(index)}
-                          aria-label={`Remove gallery image ${index + 1}`}
-                        >
-                          <TrashIcon width={16} height={16} />
-                        </button>
-                      </div>
-                    )}
-                  </form.Field>
-                ))}
-
-                <button
-                  type="button"
-                  className="button button--ghost button--compact"
-                  onClick={() => field.pushValue('')}
+              <div className="asset-stack">
+                <Field
+                  label="Upload gallery images"
+                  hint="Select one or more image files in JPEG, PNG, WebP, GIF, or AVIF format. They will be appended to the kept gallery items when you save."
                 >
-                  <PlusIcon width={16} height={16} />
-                  Add gallery image
-                </button>
+                  <input
+                    className="admin-input admin-input--file"
+                    type="file"
+                    accept={acceptedRestaurantImageTypes}
+                    multiple
+                    onChange={(event) => {
+                      void handleGalleryFileSelection(event.target.files);
+                      event.target.value = '';
+                    }}
+                  />
+                </Field>
+
+                {field.state.value.length > 0 ? (
+                  <div className="gallery-grid">
+                    {field.state.value.map((imageUrl, index) => (
+                      <article className="gallery-card" key={`${imageUrl}-${index}`}>
+                        <img
+                          className="gallery-card__image"
+                          src={imageUrl}
+                          alt={`Saved gallery image ${index + 1}`}
+                        />
+                        <div className="gallery-card__content">
+                          <strong>Saved image {index + 1}</strong>
+                          <button
+                            type="button"
+                            className="button button--ghost button--compact"
+                            onClick={() => field.removeValue(index)}
+                            aria-label={`Remove gallery image ${index + 1}`}
+                          >
+                            <TrashIcon width={16} height={16} />
+                            Remove
+                          </button>
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="asset-empty">No saved gallery images.</div>
+                )}
+
+                {form.state.values.galleryFiles.length > 0 ? (
+                  <div className="gallery-grid">
+                    {form.state.values.galleryFiles.map((file, index) => (
+                      <article className="gallery-card gallery-card--pending" key={`${file.name}-${index}`}>
+                        <img
+                          className="gallery-card__image"
+                          src={galleryPreviewUrls[index]}
+                          alt={`Pending gallery upload ${index + 1}`}
+                        />
+                        <div className="gallery-card__content">
+                          <strong>{file.name}</strong>
+                          <span>Pending upload</span>
+                          <button
+                            type="button"
+                            className="button button--ghost button--compact"
+                            onClick={() => removePendingGalleryFile(index)}
+                            aria-label={`Remove pending gallery upload ${index + 1}`}
+                          >
+                            <TrashIcon width={16} height={16} />
+                            Remove
+                          </button>
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                ) : null}
               </div>
             )}
           </form.Field>

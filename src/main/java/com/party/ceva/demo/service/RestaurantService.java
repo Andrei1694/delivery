@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
@@ -57,6 +58,11 @@ public class RestaurantService {
 
             mapper.skip(RestaurantResponseDto::setReviews);
         });
+
+        modelMapper.typeMap(RestaurantRequestDto.class, Restaurant.class).addMappings(mapper -> {
+            mapper.skip(Restaurant::setGallery);
+            mapper.skip(Restaurant::setReviews);
+        });
     }
 
     @Transactional
@@ -92,13 +98,10 @@ public class RestaurantService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Restaurant not found: " + id));
 
         modelMapper.map(requestDto, existing);
-
-        existing.getReviews().clear();
-        if (requestDto.getReviews() != null) {
-            for (RestaurantRequestDto.RestaurantReviewDto reviewDto : requestDto.getReviews()) {
-                existing.getReviews().add(toReviewEntity(reviewDto, existing));
-            }
-        }
+        existing.setCardImage(normalizeImageUrl(requestDto.getCardImage()));
+        existing.setHeroImage(normalizeImageUrl(requestDto.getHeroImage()));
+        replaceGallery(existing, requestDto.getGallery());
+        replaceReviews(existing, requestDto.getReviews());
 
         Restaurant saved = restaurantRepository.save(existing);
         logger.info("Updated restaurant with id: {}", saved.getId());
@@ -118,13 +121,10 @@ public class RestaurantService {
 
     private Restaurant toEntity(RestaurantRequestDto dto) {
         Restaurant restaurant = modelMapper.map(dto, Restaurant.class);
-        restaurant.setGallery(dto.getGallery() != null ? dto.getGallery() : new ArrayList<>());
-        restaurant.setReviews(new ArrayList<>());
-        if (dto.getReviews() != null) {
-            for (RestaurantRequestDto.RestaurantReviewDto reviewDto : dto.getReviews()) {
-                restaurant.getReviews().add(toReviewEntity(reviewDto, restaurant));
-            }
-        }
+        restaurant.setCardImage(normalizeImageUrl(dto.getCardImage()));
+        restaurant.setHeroImage(normalizeImageUrl(dto.getHeroImage()));
+        replaceGallery(restaurant, dto.getGallery());
+        replaceReviews(restaurant, dto.getReviews());
         return restaurant;
     }
 
@@ -142,5 +142,45 @@ public class RestaurantService {
                         .collect(Collectors.toList())
                 : new ArrayList<>());
         return dto;
+    }
+
+    private String normalizeImageUrl(String imageUrl) {
+        return StringUtils.hasText(imageUrl) ? imageUrl.trim() : null;
+    }
+
+    private List<String> normalizeGallery(List<String> gallery) {
+        if (gallery == null) {
+            return new ArrayList<>();
+        }
+
+        return gallery.stream()
+                .filter(StringUtils::hasText)
+                .map(String::trim)
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    private void replaceGallery(Restaurant restaurant, List<String> gallery) {
+        if (restaurant.getGallery() == null) {
+            restaurant.setGallery(new ArrayList<>());
+        } else {
+            restaurant.getGallery().clear();
+        }
+        restaurant.getGallery().addAll(normalizeGallery(gallery));
+    }
+
+    private void replaceReviews(Restaurant restaurant, List<RestaurantRequestDto.RestaurantReviewDto> reviewDtos) {
+        if (restaurant.getReviews() == null) {
+            restaurant.setReviews(new ArrayList<>());
+        } else {
+            restaurant.getReviews().clear();
+        }
+
+        if (reviewDtos == null) {
+            return;
+        }
+
+        for (RestaurantRequestDto.RestaurantReviewDto reviewDto : reviewDtos) {
+            restaurant.getReviews().add(toReviewEntity(reviewDto, restaurant));
+        }
     }
 }

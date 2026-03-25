@@ -1,7 +1,12 @@
 import { Link } from '@tanstack/react-router';
 import SymbolIcon from './SymbolIcon';
+import type { HomeFeedRestaurantCardModel } from '../restaurantData';
 
-export default function HomeFeedRestaurantCard({ restaurant }) {
+export default function HomeFeedRestaurantCard({
+  restaurant,
+}: {
+  restaurant: HomeFeedRestaurantCardModel;
+}) {
   return (
     <Link
       to="/restaurant-menu/$restaurantId"

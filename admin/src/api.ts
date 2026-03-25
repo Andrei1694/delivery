@@ -7,6 +7,10 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
+  if (config.data instanceof FormData && config.headers) {
+    delete config.headers['Content-Type'];
+  }
+
   const token = localStorage.getItem('admin_token');
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
@@ -33,7 +37,13 @@ export const restaurantApi = {
   create: (data: RestaurantRequestDto) =>
     api.post<RestaurantResponseDto>('/restaurants', data),
 
+  createMultipart: (data: FormData) =>
+    api.post<RestaurantResponseDto>('/restaurants', data),
+
   update: (id: number, data: RestaurantRequestDto) =>
+    api.put<RestaurantResponseDto>(`/restaurants/${id}`, data),
+
+  updateMultipart: (id: number, data: FormData) =>
     api.put<RestaurantResponseDto>(`/restaurants/${id}`, data),
 
   delete: (id: number) =>

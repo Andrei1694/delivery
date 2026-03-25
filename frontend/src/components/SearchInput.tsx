@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef, type KeyboardEvent, type MouseEvent } from 'react';
 import { useNavigate } from '@tanstack/react-router';
+import { useQuery } from '@tanstack/react-query';
 import SymbolIcon from './SymbolIcon';
-import { restaurants } from '../mocks/discovery';
+import { restaurantApi } from '../requests';
+import { buildRestaurantRouteId } from '../restaurantData';
 
 const RECENT_SEARCHES = ['Artisan Italian Pizza', 'Burger', 'Sushi'];
 
@@ -13,18 +15,26 @@ export default function SearchInput() {
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const navigate = useNavigate();
+  const trimmedQuery = query.trim();
+  const trimmedDebouncedQuery = debouncedQuery.trim();
+
+  const { data: matchedRestaurants = [], isFetching } = useQuery({
+    queryKey: ['restaurant-suggestions', trimmedDebouncedQuery],
+    queryFn: () =>
+      restaurantApi.search(trimmedDebouncedQuery).then((response) => response.data),
+    enabled: trimmedDebouncedQuery.length > 0,
+    staleTime: 30_000,
+  });
 
   // Debounce logic to wait 300ms before triggering search
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedQuery(query);
-      setIsLoading(false);
       setActiveIndex(-1); // Reset keyboard focus
     }, 300);
 
@@ -49,19 +59,19 @@ export default function SearchInput() {
   }, []);
 
   // Compute suggestions
-  const isSearchActive = debouncedQuery.trim().length > 0;
+  const isSearchActive = trimmedDebouncedQuery.length > 0;
+  const isLoading =
+    trimmedQuery.length > 0 &&
+    (trimmedQuery !== trimmedDebouncedQuery || isFetching);
   let suggestions: SearchSuggestion[] = [];
 
   if (isSearchActive && !isLoading) {
-    const term = debouncedQuery.toLowerCase();
-    suggestions = restaurants
-      .filter(
-        (r) =>
-          r.name.toLowerCase().includes(term) ||
-          r.cuisine.toLowerCase().includes(term)
-      )
-      .slice(0, 5) // Limit to 5 suggestions
-      .map((r) => ({ type: 'restaurant', label: r.name, id: r.id, meta: r.cuisine }));
+    suggestions = matchedRestaurants.slice(0, 5).map((restaurant) => ({
+      type: 'restaurant',
+      label: restaurant.name,
+      id: buildRestaurantRouteId(restaurant.id),
+      meta: [restaurant.cuisine, restaurant.deliveryTime].filter(Boolean).join(' • '),
+    }));
   } else if (!isSearchActive && !isLoading) {
     suggestions = RECENT_SEARCHES.map((s) => ({
       type: 'recent',
@@ -121,7 +131,6 @@ export default function SearchInput() {
         onChange={(e) => {
           setQuery(e.target.value);
           setIsOpen(true);
-          setIsLoading(e.target.value.trim() !== '');
         }}
         onFocus={handleFocus}
         onKeyDown={handleKeyDown}
@@ -139,7 +148,6 @@ export default function SearchInput() {
           className="absolute inset-y-0 right-3 flex justify-center items-center w-8 h-full rounded-full text-on-surface-variant hover:text-on-surface focus:outline-none"
           onClick={() => {
             setQuery('');
-            setIsLoading(false);
             inputRef.current?.focus();
           }}
           aria-label="Clear search"
