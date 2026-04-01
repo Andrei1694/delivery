@@ -16,13 +16,17 @@ import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Table(name="section")
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+@EqualsAndHashCode(exclude = "restaurants")
+@ToString(exclude = "restaurants")
 public class Section {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -4,11 +4,15 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Table(name = "restaurant_review")
 @Data
+@EqualsAndHashCode(exclude = "restaurant")
+@ToString(exclude = "restaurant")
 @NoArgsConstructor
 @AllArgsConstructor
 public class RestaurantReview {

@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -14,6 +16,8 @@ import java.util.Set;
 @Entity
 @Table(name = "restaurant")
 @Data
+@EqualsAndHashCode(exclude = {"sections", "reviews", "gallery"})
+@ToString(exclude = {"sections", "reviews", "gallery"})
 @NoArgsConstructor
 @AllArgsConstructor
 public class Restaurant {
