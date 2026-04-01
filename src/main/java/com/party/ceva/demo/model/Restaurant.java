@@ -7,7 +7,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "restaurant")
@@ -40,6 +42,9 @@ public class Restaurant {
     private String about;
     private String hours;
     private String address;
+
+    @ManyToMany(mappedBy = "restaurants", fetch = FetchType.LAZY)
+    private Set<Section> sections = new LinkedHashSet<>();
 
     @Embedded
     @AttributeOverrides({

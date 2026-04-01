@@ -1,12 +1,16 @@
 package com.party.ceva.demo.model;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -38,6 +42,14 @@ public class Section {
 
     @Column(nullable = false)
     private LocalDateTime updatedAt;
+
+    @ManyToMany
+    @JoinTable(
+        name = "sections_restaurant",
+        joinColumns = @JoinColumn(name="section_id"),
+        inverseJoinColumns = @JoinColumn(name="restaurant_id")
+    )
+    private Set<Restaurant> restaurants;
 
     @PrePersist
     void onCreate() {
