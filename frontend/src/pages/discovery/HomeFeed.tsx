@@ -11,7 +11,7 @@ import {
   getRestaurantMenuById,
 } from '../../mocks';
 import { useQuery } from '@tanstack/react-query';
-import { restaurantApi } from '../../requests';
+import { restaurantApi, sectionsApi } from '../../requests';
 import {
   mapApiRestaurantToHomeCard,
   sortRestaurantsForDiscovery,
@@ -83,7 +83,7 @@ function buildSmallBiteItem(restaurantId) {
   return buildFoodSectionItem(restaurantId, item);
 }
 
-const foodSections = [
+const _foodSections = [
   {
     title: 'Signature Plates',
     items: SIGNATURE_PLATE_IDS.map(buildFeaturedFoodItem).filter(isPresent),
@@ -101,6 +101,7 @@ export default function HomeFeed() {
     categories,
     restaurants: fallbackRestaurants,
   } = getHomeFeedData();
+  
   const { data } = useQuery({
     queryKey: ['restaurants', 'all'],
     queryFn: () =>
@@ -108,13 +109,26 @@ export default function HomeFeed() {
     staleTime: 60_000,
   });
 
-  const restaurants =
+
+  const { data: sectionsData } = useQuery({
+    queryKey: ['sections'],
+    queryFn: () => sectionsApi.getAll().then((response) => response.data),
+    staleTime: 60_000,
+  });
+
+  console.log(sectionsData)
+  const _restaurants =
     data && data.length > 0
       ? sortRestaurantsForDiscovery(data)
           .slice(0, 6)
           .map(mapApiRestaurantToHomeCard)
       : fallbackRestaurants;
 
+  const fetchRestaurantsByIds = () => {
+    const restaurantIdSet = Array.from(new Set<number>(sectionsData?.flatMap((section) => section.restaurantIds)));
+    console.log(restaurantIdSet)
+  }
+  fetchRestaurantsByIds()
   return (
     <div className="bg-surface font-body text-on-surface min-h-screen">
       <header className="fixed top-0 w-full z-50 bg-surface/70 backdrop-blur-xl border-b border-surface-container">
@@ -188,7 +202,7 @@ export default function HomeFeed() {
           </div>
         </section>
 
-        <section className="px-4">
+        {/* <section className="px-4">
           <h2 className="font-headline text-sm font-bold text-on-surface mb-4">Curated For You</h2>
           <MobileCardSlider
             ariaLabel="Curated restaurants"
@@ -198,18 +212,19 @@ export default function HomeFeed() {
               <HomeFeedRestaurantCard key={restaurant.id} restaurant={restaurant} />
             ))}
           </MobileCardSlider>
-        </section>
+        </section> */}
 
-        {foodSections.map((section) => (
-          <section key={section.title} className="mt-8 px-4">
-            <h2 className="mb-4 font-headline text-sm font-bold text-on-surface">{section.title}</h2>
+        {sectionsData?.map((section) => (
+          <section key={section.name} className="mt-8 px-4">
+            <h2 className="mb-4 font-headline text-sm font-bold text-on-surface">{section.name}</h2>
             <MobileCardSlider
-              ariaLabel={section.title}
+              ariaLabel={section.name}
               slideWidthClassName="w-[calc((100%-1rem)/2)]"
             >
-              {section.items.map((item) => (
+              {/* {section.items.map((item) => (
                 <HomeFeedFoodCard key={item.id} item={item} />
-              ))}
+              ))} */}
+              
             </MobileCardSlider>
           </section>
         ))}

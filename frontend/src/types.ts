@@ -7,4 +7,6 @@ export type {
   RestaurantResponseDto,
   RestaurantReview,
   RestaurantReviewDto,
+  SectionRequestDto,
+  SectionResponseDto,
 } from '../../shared/types';

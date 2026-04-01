@@ -3,6 +3,8 @@ import type {
   PageResponse,
   RestaurantRequestDto,
   RestaurantResponseDto,
+  SectionRequestDto,
+  SectionResponseDto,
 } from './types';
 
 const ABSOLUTE_URL_PATTERN = /^[a-z][a-z\d+\-.]*:/i;
@@ -66,6 +68,23 @@ export const restaurantApi = {
 
   delete: (id: number) =>
     api.delete(`/restaurants/${id}`),
+};
+
+export const sectionsApi = {
+  getAll: () =>
+    api.get<SectionResponseDto[]>('/sections'),
+
+  getById: (id: number) =>
+    api.get<SectionResponseDto>(`/sections/${id}`),
+
+  create: (data: SectionRequestDto) =>
+    api.post<SectionResponseDto>('/sections', data),
+
+  update: (id: number, data: SectionRequestDto) =>
+    api.put<SectionResponseDto>(`/sections/${id}`, data),
+
+  delete: (id: number) =>
+    api.delete(`/sections/${id}`),
 };
 
 export default api;
