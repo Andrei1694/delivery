@@ -1,98 +1,16 @@
 import { Link } from '@tanstack/react-router';
 import DismissiblePromoBanner from '../../components/DismissiblePromoBanner';
-import HomeFeedFoodCard from '../../components/HomeFeedFoodCard';
 import HomeFeedRestaurantCard from '../../components/HomeFeedRestaurantCard';
 import MobileCardSlider from '../../components/MobileCardSlider';
 import SymbolIcon from '../../components/SymbolIcon';
 import SearchInput from '../../components/SearchInput';
-import {
-  getHomeFeedData,
-  getRestaurantById,
-  getRestaurantMenuById,
-} from '../../mocks';
+import { getHomeFeedData } from '../../mocks';
 import { useQuery } from '@tanstack/react-query';
 import { restaurantApi, sectionsApi } from '../../requests';
 import {
   mapApiRestaurantToHomeCard,
   sortRestaurantsForDiscovery,
 } from '../../restaurantData';
-
-function isPresent<T>(value: T | null | undefined): value is T {
-  return value != null;
-}
-
-const SIGNATURE_PLATE_IDS = [
-  'heritage-kitchen',
-  'sakura-bloom',
-  'burger-haven',
-  'vero-italiano',
-  'spice-route',
-  'olive-vine',
-];
-
-const SMALL_BITES_IDS = [
-  'heritage-kitchen',
-  'sakura-bloom',
-  'vero-italiano',
-  'forno-brace',
-  'spice-route',
-  'seoul-bowl',
-];
-
-function buildFoodSectionItem(restaurantId, item) {
-  const restaurant = getRestaurantById(restaurantId);
-
-  if (!restaurant || !item) {
-    return null;
-  }
-
-  return {
-    id: `${restaurantId}-${item.name}`,
-    restaurantId,
-    name: item.name,
-    meta: `${restaurant.name} • ${item.price}`,
-    price: item.price,
-    image: item.image,
-    imageAlt: item.imageAlt,
-  };
-}
-
-function buildFeaturedFoodItem(restaurantId) {
-  const menu = getRestaurantMenuById(restaurantId);
-  const section = menu?.sections.find((candidate) => candidate.featuredItem);
-
-  if (!section?.featuredItem) {
-    return null;
-  }
-
-  return buildFoodSectionItem(
-    restaurantId,
-    section.featuredItem,
-  );
-}
-
-function buildSmallBiteItem(restaurantId) {
-  const menu = getRestaurantMenuById(restaurantId);
-  const section = menu?.sections[0];
-  const item = section?.items?.[0];
-
-  if (!item) {
-    return null;
-  }
-
-  return buildFoodSectionItem(restaurantId, item);
-}
-
-const _foodSections = [
-  {
-    title: 'Signature Plates',
-    items: SIGNATURE_PLATE_IDS.map(buildFeaturedFoodItem).filter(isPresent),
-  },
-  {
-    title: 'Small Bites',
-    items: SMALL_BITES_IDS.map(buildSmallBiteItem).filter(isPresent),
-  },
-];
 
 export default function HomeFeed() {
   const {
@@ -101,7 +19,7 @@ export default function HomeFeed() {
     categories,
     restaurants: fallbackRestaurants,
   } = getHomeFeedData();
-  
+
   const { data } = useQuery({
     queryKey: ['restaurants', 'all'],
     queryFn: () =>
@@ -109,26 +27,34 @@ export default function HomeFeed() {
     staleTime: 60_000,
   });
 
-
   const { data: sectionsData } = useQuery({
     queryKey: ['sections'],
     queryFn: () => sectionsApi.getAll().then((response) => response.data),
     staleTime: 60_000,
   });
 
-  console.log(sectionsData)
-  const _restaurants =
+  const sectionRestaurantIds = [
+    ...new Set((sectionsData ?? []).flatMap((s) => s.restaurantIds)),
+  ];
+
+  const { data: sectionRestaurants } = useQuery({
+    queryKey: ['restaurants', 'byIds', sectionRestaurantIds],
+    queryFn: () =>
+      restaurantApi.findByIds(sectionRestaurantIds).then((r) => r.data),
+    enabled: sectionRestaurantIds.length > 0,
+    staleTime: 60_000,
+  });
+
+  const sectionRestaurantMap = new Map(
+    (sectionRestaurants ?? []).map((r) => [r.id, r]),
+  );
+
+  const restaurants =
     data && data.length > 0
       ? sortRestaurantsForDiscovery(data)
           .slice(0, 6)
           .map(mapApiRestaurantToHomeCard)
       : fallbackRestaurants;
-
-  const fetchRestaurantsByIds = () => {
-    const restaurantIdSet = Array.from(new Set<number>(sectionsData?.flatMap((section) => section.restaurantIds)));
-    console.log(restaurantIdSet)
-  }
-  fetchRestaurantsByIds()
   return (
     <div className="bg-surface font-body text-on-surface min-h-screen">
       <header className="fixed top-0 w-full z-50 bg-surface/70 backdrop-blur-xl border-b border-surface-container">
@@ -202,18 +128,6 @@ export default function HomeFeed() {
           </div>
         </section>
 
-        {/* <section className="px-4">
-          <h2 className="font-headline text-sm font-bold text-on-surface mb-4">Curated For You</h2>
-          <MobileCardSlider
-            ariaLabel="Curated restaurants"
-            slideWidthClassName="w-[calc((100%-1rem)/2)]"
-          >
-            {restaurants.map((restaurant) => (
-              <HomeFeedRestaurantCard key={restaurant.id} restaurant={restaurant} />
-            ))}
-          </MobileCardSlider>
-        </section> */}
-
         {sectionsData?.map((section) => (
           <section key={section.name} className="mt-8 px-4">
             <h2 className="mb-4 font-headline text-sm font-bold text-on-surface">{section.name}</h2>
@@ -221,10 +135,13 @@ export default function HomeFeed() {
               ariaLabel={section.name}
               slideWidthClassName="w-[calc((100%-1rem)/2)]"
             >
-              {/* {section.items.map((item) => (
-                <HomeFeedFoodCard key={item.id} item={item} />
-              ))} */}
-              
+              {section.restaurantIds
+                .map((id) => sectionRestaurantMap.get(id))
+                .filter((r) => r != null)
+                .map(mapApiRestaurantToHomeCard)
+                .map((restaurant) => (
+                  <HomeFeedRestaurantCard key={restaurant.id} restaurant={restaurant} />
+                ))}
             </MobileCardSlider>
           </section>
         ))}

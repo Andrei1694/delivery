@@ -192,4 +192,11 @@ public class RestaurantService {
             restaurant.getReviews().add(toReviewEntity(reviewDto, restaurant));
         }
     }
+
+    public List<RestaurantResponseDto> findRestaurantsByIds(List<Long> ids) {
+        return this.restaurantRepository.findAllById(ids)
+                .stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
 }

@@ -54,6 +54,9 @@ export const restaurantApi = {
   getAll: (page = 0, size = 50) =>
     api.get<PageResponse<RestaurantResponseDto>>('/restaurants', { params: { page, size } }),
 
+  findByIds: (ids: number[]) =>
+    api.post<RestaurantResponseDto[]>('/restaurants/ids', ids),
+
   search: (query: string) =>
     api.get<RestaurantResponseDto[]>('/restaurants/search', { params: { query } }),
 

@@ -38,6 +38,12 @@ public class RestaurantController {
         return ResponseEntity.ok(restaurantService.getRestaurant(id));
     }
 
+    @PostMapping("/ids")
+    public ResponseEntity<List<RestaurantResponseDto>> getRestaurantByIds(@RequestBody List<Long> ids)  {
+        return ResponseEntity.ok(restaurantService.findRestaurantsByIds(ids));
+    }
+
+
     @GetMapping("/search")
     public ResponseEntity<List<RestaurantResponseDto>> searchRestaurants(@RequestParam String query) {
         return ResponseEntity.ok(restaurantService.searchRestaurants(query));
