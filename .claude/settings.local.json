@@ -16,7 +16,8 @@
       "Bash(echo \"JAVA_HOME: $JAVA_HOME\")",
       "Bash(./mvnw -version)",
       "Bash(JAVA_HOME=/Users/andreistanciu/Library/Java/JavaVirtualMachines/openjdk-24.0.1/Contents/Home ./mvnw compile -q)",
-      "Bash(curl -s -X POST http://localhost:8080/api/auth/login -H \"Content-Type: application/json\" -d '{\"\"email\"\":\"\"admin@admin.com\"\",\"\"password\"\":\"\"admin\"\"}')"
+      "Bash(curl -s -X POST http://localhost:8080/api/auth/login -H \"Content-Type: application/json\" -d '{\"\"email\"\":\"\"admin@admin.com\"\",\"\"password\"\":\"\"admin\"\"}')",
+      "Bash(find /Users/andreistanciu/Desktop/Projects/delivery/admin -type f -name *.tsx -o -name *.ts -o -name *.jsx -o -name *.js)"
     ]
   }
 }

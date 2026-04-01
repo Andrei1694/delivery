@@ -102,6 +102,21 @@ export interface RestaurantResponseDto {
   reviews: RestaurantReviewDto[];
 }
 
+export interface SectionRequestDto {
+  key: string;
+  name: string;
+  active: boolean;
+}
+
+export interface SectionResponseDto {
+  id: number;
+  key: string;
+  name: string;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface PageResponse<T> {
   content: T[];
   totalElements: number;

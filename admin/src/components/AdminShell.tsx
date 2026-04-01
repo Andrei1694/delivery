@@ -67,8 +67,9 @@ export default function AdminShell({
             </Link>
 
             <p className="body-copy">
-              Monitor module readiness, manage the restaurant catalog, and stage
-              the next operational surfaces from one dashboard.
+              Monitor module readiness, manage the restaurant catalog and
+              taxonomy, and stage the next operational surfaces from one
+              dashboard.
             </p>
 
             <div className="nav-group">
@@ -140,8 +141,9 @@ export default function AdminShell({
               </div>
 
               <p className="body-copy">
-                Restaurants is live today. Orders, Customers, Analytics, and
-                Settings are visible to establish the full dashboard structure.
+                Dashboard, Restaurants, and Sections are live today. Orders,
+                Customers, Analytics, and Settings remain visible to establish
+                the full dashboard structure.
               </p>
             </section>
 

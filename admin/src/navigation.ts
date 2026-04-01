@@ -3,6 +3,7 @@ import {
   AnalyticsIcon,
   CustomersIcon,
   DashboardIcon,
+  NoteIcon,
   OrdersIcon,
   PlateIcon,
   SettingsIcon,
@@ -11,6 +12,7 @@ import {
 export type AdminModuleKey =
   | 'dashboard'
   | 'restaurants'
+  | 'sections'
   | 'orders'
   | 'customers'
   | 'analytics'
@@ -21,7 +23,7 @@ export interface AdminModule {
   label: string;
   description: string;
   live: boolean;
-  to?: '/' | '/restaurants';
+  to?: '/' | '/restaurants' | '/sections';
   icon: ComponentType<SVGProps<SVGSVGElement>>;
 }
 
@@ -41,6 +43,14 @@ export const adminModules: AdminModule[] = [
     live: true,
     to: '/restaurants',
     icon: PlateIcon,
+  },
+  {
+    key: 'sections',
+    label: 'Sections',
+    description: 'Catalog structure',
+    live: true,
+    to: '/sections',
+    icon: NoteIcon,
   },
   {
     key: 'orders',

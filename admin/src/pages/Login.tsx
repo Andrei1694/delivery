@@ -10,7 +10,7 @@ import {
 
 export default function Login() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -28,7 +28,7 @@ export default function Login() {
 
     try {
       const response = await api.post<{ token: string }>('/auth/login', {
-        email,
+        phone,
         password,
       });
 
@@ -61,9 +61,9 @@ export default function Login() {
               Sign in to the delivery operations dashboard.
             </h1>
             <p className="page-header__description">
-              Dashboard and Restaurants are live today. Orders, Customers,
-              Analytics, and Settings are already staged in the shell for the
-              next rollout.
+              Dashboard, Restaurants, and Sections are live today. Orders,
+              Customers, Analytics, and Settings are already staged in the
+              shell for the next rollout.
             </p>
           </div>
 
@@ -72,7 +72,8 @@ export default function Login() {
               <p className="metric-card__label">Live modules</p>
               <p className="metric-card__value">{liveModuleCount}</p>
               <p className="metric-card__note">
-                Dashboard and Restaurants are ready for daily operations.
+                Dashboard, Restaurants, and Sections are ready for daily
+                operations.
               </p>
             </article>
 
@@ -118,7 +119,7 @@ export default function Login() {
             <h2 className="panel__title">Access your workspace</h2>
             <p className="panel__description">
               Use your admin credentials to enter the protected dashboard and
-              manage live restaurant data.
+              manage live restaurant and section data.
             </p>
           </div>
 
@@ -130,16 +131,16 @@ export default function Login() {
 
           <form onSubmit={handleSubmit} className="stack">
             <label className="field">
-              <span className="field__label">Email</span>
-              <span className="field__hint">Use the account with admin privileges.</span>
+              <span className="field__label">Phone</span>
+              <span className="field__hint">Use the phone number linked to your admin account.</span>
               <input
-                type="email"
-                autoComplete="email"
+                type="tel"
+                autoComplete="tel"
                 required
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
+                value={phone}
+                onChange={(event) => setPhone(event.target.value)}
                 className="admin-input"
-                placeholder="ops@delivery.local"
+                placeholder="+1 555 000 0000"
               />
             </label>
 
