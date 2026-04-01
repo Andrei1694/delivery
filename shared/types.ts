@@ -106,6 +106,7 @@ export interface SectionRequestDto {
   key: string;
   name: string;
   active: boolean;
+  restaurantIds: number[];
 }
 
 export interface SectionResponseDto {
@@ -115,6 +116,7 @@ export interface SectionResponseDto {
   active: boolean;
   createdAt: string;
   updatedAt: string;
+  restaurantIds: number[];
 }
 
 export interface PageResponse<T> {

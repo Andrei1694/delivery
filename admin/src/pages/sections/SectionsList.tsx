@@ -2,7 +2,7 @@ import { useDeferredValue, useState } from 'react';
 import { useForm } from '@tanstack/react-form';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
-import { sectionsApi } from '../../api';
+import { restaurantApi, sectionsApi } from '../../api';
 import AdminShell from '../../components/AdminShell';
 import {
   AlertCircleIcon,
@@ -14,7 +14,11 @@ import {
   SearchIcon,
   TrashIcon,
 } from '../../components/AdminIcons';
-import type { SectionRequestDto, SectionResponseDto } from '../../types';
+import type {
+  RestaurantResponseDto,
+  SectionRequestDto,
+  SectionResponseDto,
+} from '../../types';
 
 const editorFormId = 'section-editor';
 const editorPanelId = 'section-editor-panel';
@@ -23,6 +27,7 @@ const defaultValues: SectionRequestDto = {
   key: '',
   name: '',
   active: true,
+  restaurantIds: [],
 };
 
 const timestampFormatter = new Intl.DateTimeFormat('en-US', {
@@ -34,6 +39,7 @@ const timestampFormatter = new Intl.DateTimeFormat('en-US', {
 });
 
 type StatusFilter = 'all' | 'active' | 'inactive';
+type RestaurantLookupMap = Map<number, RestaurantResponseDto>;
 
 function Field({
   label,
@@ -93,7 +99,19 @@ function toFormValues(section?: SectionResponseDto | null): SectionRequestDto {
     key: section?.key ?? '',
     name: section?.name ?? '',
     active: section?.active ?? true,
+    restaurantIds: normalizeRestaurantIds(section?.restaurantIds),
   };
+}
+
+function normalizeRestaurantIds(restaurantIds?: number[]): number[] {
+  return Array.from(
+    new Set(
+      (restaurantIds ?? []).filter(
+        (restaurantId): restaurantId is number =>
+          Number.isInteger(restaurantId) && restaurantId > 0,
+      ),
+    ),
+  ).sort((left, right) => left - right);
 }
 
 function normalizeSectionPayload(values: SectionRequestDto): SectionRequestDto {
@@ -101,7 +119,54 @@ function normalizeSectionPayload(values: SectionRequestDto): SectionRequestDto {
     key: values.key.trim(),
     name: values.name.trim(),
     active: Boolean(values.active),
+    restaurantIds: normalizeRestaurantIds(values.restaurantIds),
   };
+}
+
+function getRestaurantLabel(
+  restaurantId: number,
+  restaurantsById: RestaurantLookupMap,
+) {
+  return restaurantsById.get(restaurantId)?.name ?? `Restaurant #${restaurantId}`;
+}
+
+function getRestaurantSearchText(
+  restaurantIds: number[],
+  restaurantsById: RestaurantLookupMap,
+) {
+  return restaurantIds
+    .map((restaurantId) => {
+      const restaurant = restaurantsById.get(restaurantId);
+
+      if (!restaurant) {
+        return '';
+      }
+
+      return `${restaurant.name} ${restaurant.cuisine ?? ''} ${restaurant.id}`;
+    })
+    .join(' ');
+}
+
+function getRestaurantPreview(
+  restaurantIds: number[],
+  restaurantsById: RestaurantLookupMap,
+  maxItems = 2,
+) {
+  const normalizedRestaurantIds = normalizeRestaurantIds(restaurantIds);
+
+  if (normalizedRestaurantIds.length === 0) {
+    return 'No restaurants linked';
+  }
+
+  const labels = normalizedRestaurantIds.map((restaurantId) =>
+    getRestaurantLabel(restaurantId, restaurantsById),
+  );
+
+  if (labels.length <= maxItems) {
+    return labels.join(', ');
+  }
+
+  return `${labels.slice(0, maxItems).join(', ')} +${labels.length - maxItems} more`;
 }
 
 function formatTimestamp(value?: string) {
@@ -154,6 +219,12 @@ function SectionStatusPanel({
   const inactiveSections = sections.length - activeSections;
   const visibleActive = filteredSections.filter((section) => section.active).length;
   const visibleInactive = filteredSections.length - visibleActive;
+  const linkedSections = sections.filter(
+    (section) => section.restaurantIds.length > 0,
+  ).length;
+  const visibleLinkedSections = filteredSections.filter(
+    (section) => section.restaurantIds.length > 0,
+  ).length;
 
   return (
     <section className="panel page-section">
@@ -162,7 +233,8 @@ function SectionStatusPanel({
         <h2 className="panel__title">Section coverage</h2>
         <p className="panel__description">
           Track how much of the current taxonomy is active and how much remains
-          disabled in the live module.
+          disabled while monitoring how many sections already have restaurant
+          assignments.
         </p>
       </div>
 
@@ -191,6 +263,14 @@ function SectionStatusPanel({
           <span>Visible inactive</span>
           <strong>{visibleInactive}</strong>
         </div>
+        <div className="audit-row">
+          <span>Linked records</span>
+          <strong>{linkedSections}</strong>
+        </div>
+        <div className="audit-row">
+          <span>Visible linked</span>
+          <strong>{visibleLinkedSections}</strong>
+        </div>
       </div>
     </section>
   );
@@ -200,14 +280,25 @@ function EditorOverview({
   editingSection,
   values,
   isPending,
+  restaurantsById,
 }: {
   editingSection: SectionResponseDto | null;
   values: SectionRequestDto;
   isPending: boolean;
+  restaurantsById: RestaurantLookupMap;
 }) {
   const normalizedKey = values.key.trim();
   const normalizedName = values.name.trim();
-  const completion = [normalizedKey, normalizedName].filter(Boolean).length + 1;
+  const linkedRestaurantCount = values.restaurantIds.length;
+  const completion =
+    [normalizedKey, normalizedName].filter(Boolean).length +
+    1 +
+    (linkedRestaurantCount > 0 ? 1 : 0);
+  const readinessPercentage = Math.round((completion / 4) * 100);
+  const restaurantPreview = getRestaurantPreview(
+    values.restaurantIds,
+    restaurantsById,
+  );
 
   return (
     <section className="panel page-section">
@@ -230,18 +321,22 @@ function EditorOverview({
           <p className="metric-mini__label">Status</p>
           <strong>{values.active ? 'Active' : 'Inactive'}</strong>
         </article>
+        <article className="metric-mini">
+          <p className="metric-mini__label">Linked restaurants</p>
+          <strong>{linkedRestaurantCount}</strong>
+        </article>
       </div>
 
       <div className="readiness-bar" aria-hidden="true">
         <div
           className="readiness-bar__value"
-          style={{ width: `${Math.round((completion / 3) * 100)}%` }}
+          style={{ width: `${readinessPercentage}%` }}
         />
       </div>
       <p className="body-copy">
         {isPending
           ? 'Saving changes to the API.'
-          : `${Math.round((completion / 3) * 100)}% of the editor checks are ready.`}
+          : `${readinessPercentage}% of the editor checks are ready.`}
       </p>
 
       <div className="audit-list">
@@ -258,10 +353,15 @@ function EditorOverview({
           <strong>{values.active ? 'Live' : 'Paused'}</strong>
         </div>
         <div className="audit-row">
+          <span>Linked restaurants</span>
+          <strong>{linkedRestaurantCount || 'None'}</strong>
+        </div>
+        <div className="audit-row">
           <span>Last updated</span>
           <strong>{editingSection ? formatTimestamp(editingSection.updatedAt) : 'Not saved yet'}</strong>
         </div>
       </div>
+      <p className="body-copy">{restaurantPreview}</p>
     </section>
   );
 }
@@ -269,13 +369,27 @@ function EditorOverview({
 export default function SectionsList() {
   const queryClient = useQueryClient();
   const [query, setQuery] = useState('');
+  const [restaurantQuery, setRestaurantQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [editingSection, setEditingSection] = useState<SectionResponseDto | null>(null);
   const deferredQuery = useDeferredValue(query.trim().toLowerCase());
+  const deferredRestaurantQuery = useDeferredValue(
+    restaurantQuery.trim().toLowerCase(),
+  );
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['sections'],
     queryFn: () => sectionsApi.getAll().then((response) => response.data),
+  });
+
+  const {
+    data: restaurantOptionsData,
+    isLoading: isRestaurantOptionsLoading,
+    isError: isRestaurantOptionsError,
+  } = useQuery({
+    queryKey: ['restaurants', 'section-options', 0, 500],
+    queryFn: () =>
+      restaurantApi.getAll(0, 500).then((response) => response.data.content),
   });
 
   const form = useForm({
@@ -307,27 +421,53 @@ export default function SectionsList() {
     },
   });
 
-  const sections = [...(data ?? [])].sort((left, right) => {
-    const leftUpdatedAt = Number.isNaN(Date.parse(left.updatedAt))
+  const restaurantOptions = [...(restaurantOptionsData ?? [])].sort((left, right) =>
+    left.name.localeCompare(right.name),
+  );
+  const restaurantsById = new Map<number, RestaurantResponseDto>();
+
+  for (const restaurant of restaurantOptions) {
+    restaurantsById.set(restaurant.id, restaurant);
+  }
+
+  const filteredRestaurantOptions = restaurantOptions.filter((restaurant) => {
+    if (deferredRestaurantQuery.length === 0) {
+      return true;
+    }
+
+    const searchableText =
+      `${restaurant.name} ${restaurant.cuisine ?? ''} ${restaurant.id}`.toLowerCase();
+
+    return searchableText.includes(deferredRestaurantQuery);
+  });
+
+  const sections = (data ?? [])
+    .map((section) => ({
+      ...section,
+      restaurantIds: normalizeRestaurantIds(section.restaurantIds),
+    }))
+    .sort((left, right) => {
+      const leftUpdatedAt = Number.isNaN(Date.parse(left.updatedAt))
       ? 0
       : Date.parse(left.updatedAt);
-    const rightUpdatedAt = Number.isNaN(Date.parse(right.updatedAt))
+      const rightUpdatedAt = Number.isNaN(Date.parse(right.updatedAt))
       ? 0
       : Date.parse(right.updatedAt);
 
-    if (leftUpdatedAt !== rightUpdatedAt) {
-      return rightUpdatedAt - leftUpdatedAt;
-    }
+      if (leftUpdatedAt !== rightUpdatedAt) {
+        return rightUpdatedAt - leftUpdatedAt;
+      }
 
-    return left.name.localeCompare(right.name);
-  });
+      return left.name.localeCompare(right.name);
+    });
 
   const filteredSections = sections.filter((section) => {
     const matchesStatus =
       statusFilter === 'all' ||
       (statusFilter === 'active' && section.active) ||
       (statusFilter === 'inactive' && !section.active);
-    const searchableText = `${section.name} ${section.key}`.toLowerCase();
+    const searchableText =
+      `${section.name} ${section.key} ${getRestaurantSearchText(section.restaurantIds, restaurantsById)}`.toLowerCase();
 
     return (
       matchesStatus &&
@@ -339,7 +479,9 @@ export default function SectionsList() {
   const activeSections = sections.filter((section) => section.active).length;
   const inactiveSections = totalSections - activeSections;
   const visibleActive = filteredSections.filter((section) => section.active).length;
-  const visibleInactive = filteredSections.length - visibleActive;
+  const visibleLinkedSections = filteredSections.filter(
+    (section) => section.restaurantIds.length > 0,
+  ).length;
   const hasFilters = deferredQuery.length > 0 || statusFilter !== 'all';
 
   const saveErrorMessage = saveMutation.isError
@@ -367,7 +509,9 @@ export default function SectionsList() {
 
   function resetEditor() {
     setEditingSection(null);
+    setRestaurantQuery('');
     form.reset(defaultValues);
+    saveMutation.reset();
   }
 
   function handleStartCreate() {
@@ -377,6 +521,7 @@ export default function SectionsList() {
 
   function handleEdit(section: SectionResponseDto) {
     setEditingSection(section);
+    setRestaurantQuery('');
     form.reset(toFormValues(section));
     focusEditor();
   }
@@ -415,6 +560,7 @@ export default function SectionsList() {
                 editingSection={editingSection}
                 values={values}
                 isPending={saveMutation.isPending}
+                restaurantsById={restaurantsById}
               />
             )}
           </form.Subscribe>
@@ -423,7 +569,7 @@ export default function SectionsList() {
       railStats={[
         { label: 'Visible', value: `${filteredSections.length}` },
         { label: 'Active', value: `${visibleActive}` },
-        { label: 'Inactive', value: `${visibleInactive}` },
+        { label: 'Linked', value: `${visibleLinkedSections}` },
       ]}
     >
       <section className="stats-grid">
@@ -484,7 +630,8 @@ export default function SectionsList() {
           </h2>
           <p className="section-card__description">
             Maintain a clean section key, a clear operator-facing name, and the
-            active state from the same inline editor.
+            active state while linking the restaurants that should appear in the
+            section.
           </p>
         </div>
 
@@ -510,6 +657,8 @@ export default function SectionsList() {
               validators={{
                 onBlur: ({ value }) =>
                   value.trim() ? undefined : 'Section key is required.',
+                onSubmit: ({ value }) =>
+                  value.trim() ? undefined : 'Section key is required.',
               }}
             >
               {(field) => (
@@ -534,6 +683,8 @@ export default function SectionsList() {
               name="name"
               validators={{
                 onBlur: ({ value }) =>
+                  value.trim() ? undefined : 'Section name is required.',
+                onSubmit: ({ value }) =>
                   value.trim() ? undefined : 'Section name is required.',
               }}
             >
@@ -584,6 +735,167 @@ export default function SectionsList() {
             )}
           </form.Field>
 
+          <form.Field name="restaurantIds">
+            {(field) => {
+              const selectedRestaurantIds = normalizeRestaurantIds(field.state.value);
+
+              function toggleRestaurantSelection(restaurantId: number) {
+                const nextRestaurantIds = selectedRestaurantIds.includes(restaurantId)
+                  ? selectedRestaurantIds.filter(
+                      (selectedRestaurantId) => selectedRestaurantId !== restaurantId,
+                    )
+                  : [...selectedRestaurantIds, restaurantId];
+
+                field.handleChange(normalizeRestaurantIds(nextRestaurantIds));
+              }
+
+              return (
+                <div className="field">
+                  <span className="field__label">Linked restaurants</span>
+                  <span className="field__hint">
+                    Choose which restaurants belong to this section. Leave empty
+                    to keep the section available without assignments.
+                  </span>
+                  <div className="section-assignment">
+                    <div className="section-assignment__header">
+                      <p className="body-copy">
+                        {selectedRestaurantIds.length === 0
+                          ? 'No restaurants linked yet.'
+                          : getRestaurantPreview(
+                              selectedRestaurantIds,
+                              restaurantsById,
+                              3,
+                            )}
+                      </p>
+                      <span
+                        className={`pill ${
+                          selectedRestaurantIds.length > 0
+                            ? 'pill--accent'
+                            : 'pill--neutral'
+                        }`}
+                      >
+                        {selectedRestaurantIds.length} linked
+                      </span>
+                    </div>
+
+                    {selectedRestaurantIds.length > 0 ? (
+                      <div className="section-selection-row">
+                        {selectedRestaurantIds.map((restaurantId) => {
+                          const label = getRestaurantLabel(
+                            restaurantId,
+                            restaurantsById,
+                          );
+
+                          return (
+                            <button
+                              key={restaurantId}
+                              type="button"
+                              className="selection-chip selection-chip--selected"
+                              onClick={() => toggleRestaurantSelection(restaurantId)}
+                              aria-label={`Remove ${label} from this section`}
+                              disabled={isRestaurantOptionsError}
+                            >
+                              {label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <div className="asset-empty section-assignment__empty">
+                        Save with no linked restaurants or select records from the
+                        list below.
+                      </div>
+                    )}
+
+                    {isRestaurantOptionsError ? (
+                      <div
+                        className="notification notification--info"
+                        role="status"
+                        aria-live="polite"
+                      >
+                        <AlertCircleIcon width={18} height={18} />
+                        Restaurant options could not be loaded. Existing linked
+                        restaurant IDs will be preserved when you save.
+                      </div>
+                    ) : (
+                      <>
+                        <label
+                          className="search-wrap search-wrap--compact"
+                          aria-label="Search restaurants to link"
+                        >
+                          <SearchIcon width={16} height={16} />
+                          <input
+                            value={restaurantQuery}
+                            onChange={(event) =>
+                              setRestaurantQuery(event.target.value)
+                            }
+                            className="search-input"
+                            placeholder="Search restaurants by name, cuisine, or ID"
+                          />
+                        </label>
+
+                        {isRestaurantOptionsLoading ? (
+                          <div className="asset-empty section-assignment__empty">
+                            Loading restaurant options…
+                          </div>
+                        ) : filteredRestaurantOptions.length === 0 ? (
+                          <div className="asset-empty section-assignment__empty">
+                            {deferredRestaurantQuery.length > 0
+                              ? 'No restaurants match the current search.'
+                              : 'No restaurants are available to link yet.'}
+                          </div>
+                        ) : (
+                          <div className="section-assignment-list">
+                            {filteredRestaurantOptions.map((restaurant) => {
+                              const isSelected = selectedRestaurantIds.includes(
+                                restaurant.id,
+                              );
+
+                              return (
+                                <button
+                                  key={restaurant.id}
+                                  type="button"
+                                  className={`assignment-option ${
+                                    isSelected
+                                      ? 'assignment-option--selected'
+                                      : ''
+                                  }`}
+                                  onClick={() =>
+                                    toggleRestaurantSelection(restaurant.id)
+                                  }
+                                  aria-pressed={isSelected}
+                                >
+                                  <span className="assignment-option__copy">
+                                    <span className="assignment-option__title">
+                                      {restaurant.name}
+                                    </span>
+                                    <span className="assignment-option__meta">
+                                      {restaurant.cuisine || 'Cuisine not set'} • #
+                                      {restaurant.id}
+                                    </span>
+                                  </span>
+                                  <span
+                                    className={`pill ${
+                                      isSelected
+                                        ? 'pill--success'
+                                        : 'pill--neutral'
+                                    }`}
+                                  >
+                                    {isSelected ? 'Linked' : 'Link'}
+                                  </span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </div>
+              );
+            }}
+          </form.Field>
+
           <div className="cluster">
             <button
               type="submit"
@@ -624,7 +936,7 @@ export default function SectionsList() {
       <SectionCard
         eyebrow="Module table"
         title="Search and manage sections"
-        description="Filter by status or keyword, then update or remove section records from the same operational surface."
+        description="Filter by status, section metadata, or linked restaurant names, then update or remove records from the same operational surface."
       >
         <div className="toolbar">
           <label className="search-wrap" aria-label="Search sections">
@@ -633,11 +945,11 @@ export default function SectionsList() {
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               className="search-input"
-              placeholder="Search by name or key"
+              placeholder="Search by name, key, or restaurant"
             />
           </label>
 
-          <div className="filter-row" aria-label="Section status filters">
+          <div className="filter-row" role="group" aria-label="Section status filters">
             <button
               type="button"
               className={`filter-chip ${statusFilter === 'all' ? 'filter-chip--active' : ''}`}
@@ -666,6 +978,15 @@ export default function SectionsList() {
           <div className="notification notification--error" role="alert" aria-live="polite">
             <AlertCircleIcon width={18} height={18} />
             {deleteErrorMessage}
+          </div>
+        ) : null}
+
+        {isRestaurantOptionsError ? (
+          <div className="notification notification--info" role="status" aria-live="polite">
+            <AlertCircleIcon width={18} height={18} />
+            Restaurant lookups are unavailable right now. Section saves still
+            preserve existing linked IDs, but restaurant-name search and labels
+            may fall back to IDs.
           </div>
         ) : null}
 
@@ -711,6 +1032,7 @@ export default function SectionsList() {
                       <tr>
                         <th>Name</th>
                         <th>Key</th>
+                        <th>Restaurants</th>
                         <th>Status</th>
                         <th>Updated</th>
                         <th aria-label="Actions" />
@@ -742,6 +1064,27 @@ export default function SectionsList() {
                             </td>
                             <td>
                               <span className="pill pill--neutral">{section.key}</span>
+                            </td>
+                            <td>
+                              <div className="list-row__copy">
+                                <div className="list-row__title-line">
+                                  <span
+                                    className={`pill ${
+                                      section.restaurantIds.length > 0
+                                        ? 'pill--accent'
+                                        : 'pill--neutral'
+                                    }`}
+                                  >
+                                    {section.restaurantIds.length} linked
+                                  </span>
+                                </div>
+                                <p className="list-row__meta">
+                                  {getRestaurantPreview(
+                                    section.restaurantIds,
+                                    restaurantsById,
+                                  )}
+                                </p>
+                              </div>
                             </td>
                             <td>
                               <span
@@ -811,12 +1154,27 @@ export default function SectionsList() {
                             </span>
                           </div>
                           <p className="list-row__meta">Key: {section.key}</p>
+                          <p className="list-row__meta">
+                            Restaurants:{' '}
+                            {getRestaurantPreview(
+                              section.restaurantIds,
+                              restaurantsById,
+                            )}
+                          </p>
                         </div>
 
                         <div className="mobile-grid">
                           <div>
                             <p className="mobile-card__label field__hint">Identifier</p>
                             <p className="mobile-card__value">#{section.id}</p>
+                          </div>
+                          <div>
+                            <p className="mobile-card__label field__hint">
+                              Linked restaurants
+                            </p>
+                            <p className="mobile-card__value">
+                              {section.restaurantIds.length}
+                            </p>
                           </div>
                           <div>
                             <p className="mobile-card__label field__hint">Updated</p>

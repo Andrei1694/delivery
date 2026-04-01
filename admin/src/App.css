@@ -648,6 +648,12 @@
   flex-shrink: 0;
 }
 
+.search-wrap--compact {
+  min-height: 46px;
+  padding: 0 14px;
+  border-radius: 12px;
+}
+
 .search-input,
 .admin-input,
 .admin-textarea {
@@ -673,6 +679,108 @@
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+}
+
+.section-assignment {
+  display: grid;
+  gap: 12px;
+}
+
+.section-assignment__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.section-assignment__empty {
+  min-height: 0;
+  padding: 14px 16px;
+  text-align: left;
+}
+
+.section-selection-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.selection-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid rgba(99, 165, 255, 0.2);
+  border-radius: 999px;
+  background: rgba(99, 165, 255, 0.12);
+  color: var(--ink-strong);
+  transition:
+    border-color 180ms ease,
+    background-color 180ms ease,
+    color 180ms ease;
+}
+
+.selection-chip:hover:not(:disabled) {
+  border-color: var(--border-strong);
+  background: rgba(99, 165, 255, 0.18);
+}
+
+.selection-chip:disabled {
+  cursor: default;
+  opacity: 0.72;
+}
+
+.section-assignment-list {
+  display: grid;
+  gap: 10px;
+  max-height: 320px;
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.assignment-option {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.02);
+  color: inherit;
+  text-align: left;
+  transition:
+    border-color 180ms ease,
+    background-color 180ms ease,
+    transform 180ms ease;
+}
+
+.assignment-option:hover {
+  border-color: var(--border-strong);
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateY(-1px);
+}
+
+.assignment-option--selected {
+  border-color: rgba(74, 222, 128, 0.24);
+  background: rgba(74, 222, 128, 0.08);
+}
+
+.assignment-option__copy {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.assignment-option__title {
+  color: var(--ink-strong);
+  font-weight: 700;
+}
+
+.assignment-option__meta {
+  color: var(--ink-muted);
+  font-size: 0.9rem;
 }
 
 .filter-chip {
@@ -1266,7 +1374,9 @@
   .restaurant-entry,
   .snapshot-card,
   .section-heading,
-  .list-row {
+  .list-row,
+  .section-assignment__header,
+  .assignment-option {
     flex-direction: column;
     align-items: flex-start;
   }
@@ -1276,7 +1386,8 @@
   }
 
   .button,
-  .filter-chip {
+  .filter-chip,
+  .selection-chip {
     width: 100%;
   }
 

@@ -1,7 +1,9 @@
 package com.party.ceva.demo.service;
 
 import java.time.LocalDateTime;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -11,18 +13,23 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.party.ceva.demo.dto.SectionDto;
+import com.party.ceva.demo.model.Restaurant;
 import com.party.ceva.demo.model.Section;
+import com.party.ceva.demo.repository.RestaurantRepository;
 import com.party.ceva.demo.repository.SectionRepository;
 
 @Service
 public class SectionService {
 
     private final SectionRepository sectionRepository;
+    private final RestaurantRepository restaurantRepository;
     private final ModelMapper modelMapper;
 
-    public SectionService(SectionRepository sectionRepository, ModelMapper modelMapper) {
+    public SectionService(SectionRepository sectionRepository, RestaurantRepository restaurantRepository,
+            ModelMapper modelMapper) {
         this.sectionRepository = sectionRepository;
         this.modelMapper = modelMapper;
+        this.restaurantRepository = restaurantRepository;
     }
 
     @Transactional(readOnly = true)
@@ -52,6 +59,9 @@ public class SectionService {
         section.setCreatedAt(now);
         section.setUpdatedAt(now);
 
+        Set<Restaurant> restaurants = resolveRestaurants(validDto.getRestaurantIds());
+        section.setRestaurants(restaurants);
+
         Section savedSection = this.sectionRepository.save(section);
         return toDto(savedSection);
     }
@@ -75,8 +85,25 @@ public class SectionService {
 
         existingSection.setUpdatedAt(LocalDateTime.now());
 
+        Set<Restaurant> restaurants = resolveRestaurants(validDto.getRestaurantIds());
+        existingSection.setRestaurants(restaurants);
+
         Section savedSection = this.sectionRepository.save(existingSection);
         return toDto(savedSection);
+    }
+
+    private Set<Restaurant> resolveRestaurants(List<Long> restaurantIds) {
+        if (restaurantIds == null || restaurantIds.isEmpty()) {
+            return new LinkedHashSet<>();
+        }
+
+        List<Long> uniqueIds = restaurantIds.stream().distinct().toList();
+        Set<Restaurant> restaurants = new LinkedHashSet<>(this.restaurantRepository.findAllById(uniqueIds));
+
+        if (restaurants.size() != uniqueIds.size()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "One or more restaurants were not found");
+        }
+        return restaurants;
     }
 
     @Transactional
@@ -89,8 +116,15 @@ public class SectionService {
         return modelMapper.map(dto, Section.class);
     }
 
-    private SectionDto toDto(Section s) {
-        return modelMapper.map(s, SectionDto.class);
+    private SectionDto toDto(Section section) {
+        SectionDto dto = modelMapper.map(section, SectionDto.class);
+        List<Long> restaurantIds = section.getRestaurants() == null
+                ? List.of()
+                : section.getRestaurants().stream()
+                        .map(Restaurant::getId)
+                        .toList();
+        dto.setRestaurantIds(restaurantIds);
+        return dto;
     }
 
     private SectionDto requirePayload(SectionDto dto) {
