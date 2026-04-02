@@ -44,6 +44,28 @@ export interface RestaurantBadgeDto {
   iconClassName?: string;
 }
 
+export interface MealSizeDto {
+  name?: string;
+  price?: number;
+}
+
+export interface ExtrasDto {
+  name?: string;
+  price?: number;
+}
+
+export interface MealDto {
+  id?: number;
+  name: string;
+  about?: string;
+  cardImage?: string;
+  available?: boolean;
+  stock?: number;
+  price: number;
+  sizes: MealSizeDto[];
+  extras: ExtrasDto[];
+}
+
 export interface RestaurantReviewDto {
   author: string;
   rating: number;
@@ -100,6 +122,7 @@ export interface RestaurantResponseDto {
   searchBadge?: RestaurantBadgeDto;
   gallery: string[];
   reviews: RestaurantReviewDto[];
+  meals?: MealDto[];
 }
 
 export interface SectionRequestDto {

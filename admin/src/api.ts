@@ -1,5 +1,6 @@
 import axios from 'axios';
 import type {
+  MealDto,
   PageResponse,
   RestaurantRequestDto,
   RestaurantResponseDto,
@@ -78,6 +79,20 @@ export const restaurantApi = {
 
   delete: (id: number) =>
     api.delete(`/restaurants/${id}`),
+};
+
+export const mealApi = {
+  getAllByRestaurant: (restaurantId: number) =>
+    api.get<MealDto[]>(`/meals/${restaurantId}`),
+
+  create: (restaurantId: number, data: MealDto) =>
+    api.post<MealDto[]>(`/meals/${restaurantId}`, [data]),
+
+  update: (restaurantId: number, mealId: number, data: MealDto) =>
+    api.put<MealDto>(`/meals/${restaurantId}/${mealId}`, data),
+
+  delete: (restaurantId: number, mealId: number) =>
+    api.delete(`/meals/${restaurantId}/${mealId}`),
 };
 
 export const sectionsApi = {

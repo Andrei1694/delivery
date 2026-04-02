@@ -66,18 +66,28 @@ public class MealService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public MealDto getMealById(Long mealId) {
+        Meal meal = mealRepository.findById(mealId)
+                .orElseThrow(() -> new EntityNotFoundException("Meal not found: " + mealId));
+        return toDto(meal);
+    }
+
     @Transactional
     public MealDto removeMealFromRestaurant(Long restaurantId, Long mealId) {
-        Restaurant restaurant = restaurantRepository.findById(restaurantId)
+        restaurantRepository.findById(restaurantId)
             .orElseThrow(() -> new EntityNotFoundException("Restaurant not found: " + restaurantId));
 
         Meal meal = mealRepository.findById(mealId)
             .orElseThrow(() -> new EntityNotFoundException("Meal not found: " + mealId));
 
-        boolean belonged = restaurant.getMeals().removeIf(m -> m.getId().equals(mealId));
-        if (!belonged) throw new EntityNotFoundException("Meal " + mealId + " not found in restaurant " + restaurantId);
+        if (!meal.getRestaurant().getId().equals(restaurantId)) {
+            throw new EntityNotFoundException("Meal " + mealId + " not found in restaurant " + restaurantId);
+        }
 
-        return toDto(meal);
+        MealDto dto = toDto(meal);
+        mealRepository.delete(meal);
+        return dto;
     }
     
     @Transactional

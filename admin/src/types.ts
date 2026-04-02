@@ -1,4 +1,7 @@
 export type {
+  ExtrasDto,
+  MealDto,
+  MealSizeDto,
   PageResponse,
   Restaurant,
   RestaurantBadge,
