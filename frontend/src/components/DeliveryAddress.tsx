@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
+import Button from './Button';
 import SymbolIcon from './SymbolIcon';
 import { getSavedAddressesData } from '../mocks';
 
@@ -339,12 +340,9 @@ export default function DeliveryAddress() {
 
           <div className="pointer-events-none fixed bottom-0 left-0 right-0 bg-gradient-to-t from-surface via-surface to-transparent p-6">
             <div className="pointer-events-auto mx-auto max-w-2xl">
-              <button
-                className="w-full rounded-full bg-gradient-to-r from-primary to-primary-container py-4 font-headline text-lg font-bold text-white shadow-[0_8px_24px_rgba(172,44,0,0.3)] transition-all hover:brightness-110 active:scale-[0.98]"
-                type="submit"
-              >
+              <Button className="py-4 text-lg hover:brightness-110 active:scale-[0.98]" type="submit">
                 Save Address
-              </button>
+              </Button>
             </div>
           </div>
         </form>

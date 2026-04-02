@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useAuth } from '../../auth/AuthContext';
+import Button from '../../components/Button';
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -269,12 +270,9 @@ const Register = () => {
                   </label>
                 </div>
 
-                <button
-                  className="w-full rounded-full bg-gradient-to-br from-primary to-primary-container py-5 font-headline text-lg font-bold text-on-primary shadow-lg transition-all duration-200 hover:scale-[1.02] hover:shadow-primary-container/20 active:scale-95"
-                  type="submit"
-                >
+                <Button className="py-5 text-lg" type="submit">
                   Join Verve Kitchen
-                </button>
+                </Button>
               </form>
             </div>
 

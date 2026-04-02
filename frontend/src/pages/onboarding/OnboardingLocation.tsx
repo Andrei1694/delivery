@@ -1,4 +1,5 @@
 import { useNavigate } from '@tanstack/react-router';
+import Button from '../../components/Button';
 
 const featureHighlights = [
   {
@@ -112,14 +113,14 @@ function OnboardingLocation() {
           </div>
 
           <div className="relative z-10 w-full space-y-4">
-            <button
-              className="flex w-full items-center justify-center gap-3 rounded-full bg-gradient-to-br from-[#ac2c00] to-[#ff7852] px-8 py-5 font-headline text-lg font-bold text-white shadow-[0_8px_24px_rgba(172,44,0,0.15)] transition-all duration-200 active:scale-95"
+            <Button
+              className="gap-3 px-8 py-5 text-lg"
               type="button"
               onClick={() => navigate({ to: '/onboarding/cuisine' })}
             >
               Enable Location
               <span className="material-symbols-outlined text-xl">near_me</span>
-            </button>
+            </Button>
             <button
               className="w-full py-4 font-headline text-sm font-semibold text-on-surface-variant transition-colors duration-200 hover:text-on-surface active:scale-95"
               type="button"

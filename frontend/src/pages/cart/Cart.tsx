@@ -1,4 +1,5 @@
 import { useNavigate } from '@tanstack/react-router';
+import Button from '../../components/Button';
 import PageHeader from '../../components/PageHeader';
 import OrderSummary from '../../components/OrderSummary';
 import { useCart, SERVICE_FEE } from '../../cart';
@@ -150,15 +151,15 @@ export default function Cart() {
 
         <div className="pointer-events-none fixed bottom-0 left-0 right-0 z-40 bg-gradient-to-t from-surface via-surface/90 to-transparent p-6">
           <div className="pointer-events-auto mx-auto max-w-lg">
-            <button
-              className="ambient-shadow flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-primary-container px-6 py-4 font-headline text-lg font-bold text-on-primary transition-all duration-300 active:scale-95 disabled:pointer-events-none disabled:opacity-50"
+            <Button
+              className="ambient-shadow gap-2 px-6 py-4 text-lg active:scale-95"
               disabled={cart.items.length === 0}
               type="button"
               onClick={() => navigate({ to: '/checkout' })}
             >
               <span>Proceed to Checkout</span>
               <span className="material-symbols-outlined">arrow_forward</span>
-            </button>
+            </Button>
           </div>
         </div>
       </div>

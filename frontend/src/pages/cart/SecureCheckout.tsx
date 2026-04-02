@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useRouter } from '@tanstack/react-router';
+import Button from '../../components/Button';
 import PaymentMethodForm from '../../components/PaymentMethodForm';
 import PageHeader from '../../components/PageHeader';
 import {
@@ -248,8 +249,8 @@ export default function SecureCheckout() {
         </main>
 
         <div className="fixed bottom-0 left-0 right-0 z-40 bg-gradient-to-t from-surface to-transparent p-4 pb-6">
-          <button
-            className="ambient-shadow btn-gradient flex w-full items-center justify-between rounded-full px-6 py-4 font-headline text-lg font-bold text-on-primary transition-transform active:scale-[0.98]"
+          <Button
+            className="ambient-shadow btn-gradient justify-between px-6 py-4 text-lg active:scale-[0.98]"
             type="button"
             onClick={() =>
               router.navigate({
@@ -261,7 +262,7 @@ export default function SecureCheckout() {
           >
             <span>Place Order</span>
             <span>{orderTotalLabel}</span>
-          </button>
+          </Button>
         </div>
       </div>
     </>

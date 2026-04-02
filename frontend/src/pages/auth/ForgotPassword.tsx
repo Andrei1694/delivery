@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useRouter } from '@tanstack/react-router';
+import Button from '../../components/Button';
 
 const ForgotPassword = () => {
   const [phone, setPhone] = useState('');
@@ -85,12 +86,9 @@ const ForgotPassword = () => {
             </div>
           </div>
 
-          <button
-            className="mt-2 w-full py-4 px-6 rounded-full bg-gradient-to-br from-primary to-primary-dim text-on-primary font-headline font-bold text-base hover:opacity-90 transition-opacity shadow-[0_8px_24px_rgba(78,33,33,0.06)]"
-            type="submit"
-          >
+          <Button className="mt-2 px-6 py-4 text-base" type="submit">
             Send Reset Link
-          </button>
+          </Button>
         </form>
 
         <div className="mt-8 text-center">

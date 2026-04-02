@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { useAuth } from '../../auth/AuthContext';
+import Button from '../../components/Button';
 
 function OnboardingAddress() {
   const navigate = useNavigate();
@@ -169,13 +170,10 @@ function OnboardingAddress() {
             </div>
 
             <footer className="-mx-6 sticky bottom-0 mt-12 bg-surface/80 px-6 py-6 backdrop-blur-md">
-              <button
-                className="flex w-full items-center justify-center gap-3 rounded-full bg-gradient-to-br from-primary to-primary-container py-4 font-headline text-lg font-bold text-on-primary shadow-[0_8px_24px_rgba(172,44,0,0.25)] transition-transform duration-200 active:scale-95"
-                type="submit"
-              >
+              <Button className="gap-3 py-4 text-lg" type="submit">
                 Start Exploring
                 <span className="material-symbols-outlined">arrow_forward</span>
-              </button>
+              </Button>
               <p className="mt-4 text-center font-label text-[11px] font-bold uppercase tracking-[0.2em] text-on-surface-variant opacity-60">
                 Secured by Curator Cloud
               </p>

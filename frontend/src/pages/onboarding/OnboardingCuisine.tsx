@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
+import Button from '../../components/Button';
 
 const cuisines = [
   {
@@ -185,13 +186,13 @@ function OnboardingCuisine() {
         </main>
 
         <div className="fixed bottom-0 left-0 right-0 z-40 flex flex-col gap-4 bg-surface/80 px-6 pb-10 pt-4 backdrop-blur-xl">
-          <button
-            className="w-full rounded-full bg-gradient-to-br from-primary to-primary-container py-4 font-headline font-bold text-white shadow-[0_8px_24px_rgba(172,44,0,0.2)] duration-200 active:scale-95"
+          <Button
+            className="py-4 text-base"
             type="button"
             onClick={() => navigate({ to: '/onboarding/address' })}
           >
             Continue to Address
-          </button>
+          </Button>
           <button
             className="w-full py-2 font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant transition-opacity duration-200 active:opacity-60"
             type="button"

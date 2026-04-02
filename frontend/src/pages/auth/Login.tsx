@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useAuth } from '../../auth/AuthContext';
+import Button from '../../components/Button';
 
 const VerveKitchenLogin = () => {
   const [phone, setPhone] = useState('');
@@ -150,12 +151,12 @@ const VerveKitchenLogin = () => {
                   </div>
                 </div>
 
-                <button
-                  className="mt-4 w-full rounded-full bg-gradient-to-br from-primary to-primary-container py-4 font-headline text-lg font-bold text-white shadow-[0_8px_24px_rgba(172,44,0,0.2)] transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_12px_32px_rgba(172,44,0,0.3)] active:scale-95"
+                <Button
+                  className="mt-4 py-4 text-lg"
                   type="submit"
                 >
                   Sign In
-                </button>
+                </Button>
               </form>
 
               <div className="relative mt-10">

@@ -1,4 +1,5 @@
 import { useNavigate, useSearch } from '@tanstack/react-router';
+import Button from '../../components/Button';
 import OrderSummary from '../../components/OrderSummary';
 import PageHeader from '../../components/PageHeader';
 import SymbolIcon from '../../components/SymbolIcon';
@@ -194,8 +195,8 @@ export default function OrderDetails() {
 
         <div className="fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-t from-background via-background to-transparent p-6">
           <div className="mx-auto max-w-lg">
-            <button
-              className="flex w-full items-center justify-center gap-3 rounded-full bg-gradient-to-br from-primary to-primary-container py-4 font-headline text-lg font-bold text-on-primary shadow-lg transition-all active:scale-95"
+            <Button
+              className="gap-3 py-4 text-lg active:scale-95"
               type="button"
               onClick={() =>
                 navigate({
@@ -206,7 +207,7 @@ export default function OrderDetails() {
             >
               <span className="material-symbols-outlined">restart_alt</span>
               Reorder Items
-            </button>
+            </Button>
           </div>
         </div>
       </div>
