@@ -1,5 +1,6 @@
 import axios, { type AxiosInstance } from 'axios';
 import type {
+  MealDto,
   PageResponse,
   RestaurantRequestDto,
   RestaurantResponseDto,
@@ -88,6 +89,11 @@ export const sectionsApi = {
 
   delete: (id: number) =>
     api.delete(`/sections/${id}`),
+};
+
+export const mealApi = {
+  getByRestaurant: (restaurantId: number) =>
+    api.get<MealDto[]>(`/meals/${restaurantId}`),
 };
 
 export default api;

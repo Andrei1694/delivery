@@ -88,8 +88,22 @@ export const mealApi = {
   create: (restaurantId: number, data: MealDto) =>
     api.post<MealDto[]>(`/meals/${restaurantId}`, [data]),
 
+  createMultipart: (restaurantId: number, data: MealDto, cardImageFile: File) => {
+    const formData = new FormData();
+    formData.append('meal', new Blob([JSON.stringify(data)], { type: 'application/json' }));
+    formData.append('cardImageFile', cardImageFile);
+    return api.post<MealDto[]>(`/meals/${restaurantId}`, formData);
+  },
+
   update: (restaurantId: number, mealId: number, data: MealDto) =>
     api.put<MealDto>(`/meals/${restaurantId}/${mealId}`, data),
+
+  updateMultipart: (restaurantId: number, mealId: number, data: MealDto, cardImageFile: File) => {
+    const formData = new FormData();
+    formData.append('meal', new Blob([JSON.stringify(data)], { type: 'application/json' }));
+    formData.append('cardImageFile', cardImageFile);
+    return api.put<MealDto>(`/meals/${restaurantId}/${mealId}`, formData);
+  },
 
   delete: (restaurantId: number, mealId: number) =>
     api.delete(`/meals/${restaurantId}/${mealId}`),

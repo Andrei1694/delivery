@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useCart } from '../../cart';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
 import BottomNav from '../../components/BottomNav';
@@ -8,7 +9,7 @@ import Toast from '../../components/Toast';
 import { useToast } from '../../components/useToast';
 import { getRestaurantById, getRestaurantMenuById } from '../../mocks';
 import { NAV_ITEMS } from '../../navigation/navItems';
-import { restaurantApi } from '../../requests';
+import { restaurantApi, mealApi, resolveApiAssetUrl } from '../../requests';
 import {
   mapApiRestaurantToMenuRestaurant,
   parseRestaurantRouteId,
@@ -26,6 +27,39 @@ function parsePriceLabel(priceLabel) {
 
 function formatPrice(value) {
   return `$${value.toFixed(2)}`;
+}
+
+const FALLBACK_MEAL_IMAGE =
+  'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 640 480%22%3E%3Crect width=%22640%22 height=%22480%22 fill=%22%23f3ede8%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%236c6b66%22 font-family=%22Arial%22 font-size=%2232%22%3EMeal%3C/text%3E%3C/svg%3E';
+
+function mapMealsToMenu(meals, restaurantId) {
+  const available = meals.filter((meal) => meal.available !== false);
+  if (available.length === 0) return null;
+
+  const items = available.map((meal) => ({
+    name: meal.name,
+    description: meal.about ?? '',
+    price: `$${Number(meal.price).toFixed(2)}`,
+    image: resolveApiAssetUrl(meal.cardImage) || FALLBACK_MEAL_IMAGE,
+    imageAlt: meal.name,
+    alertIcon: meal.stock != null && meal.stock <= 5 && meal.stock > 0,
+    _basePrice: Number(meal.price),
+    _sizes: meal.sizes ?? [],
+    _extras: meal.extras ?? [],
+  }));
+
+  const [first, ...rest] = items;
+  return {
+    restaurantId: String(restaurantId),
+    sections: [
+      {
+        id: 'menu',
+        label: 'Menu',
+        featuredItem: { ...first, badgeLabel: 'Featured' },
+        items: rest,
+      },
+    ],
+  };
 }
 
 function buildItemHighlightTags(item, sectionLabel, restaurant) {
@@ -68,6 +102,18 @@ function buildItemHighlightTags(item, sectionLabel, restaurant) {
 }
 
 function buildSizeOptions(item, sectionLabel, restaurant) {
+  if (item._sizes?.length) {
+    return item._sizes.map((size, i) => ({
+      id: `size-${i}`,
+      label: size.name,
+      priceDelta: size.price != null ? size.price - item._basePrice : 0,
+      helper: i === 0 ? 'Included' : undefined,
+    }));
+  }
+  if (item._basePrice !== undefined) {
+    return [{ id: 'standard', label: 'Standard', priceDelta: 0, helper: 'Included' }];
+  }
+
   const lookup = `${restaurant.cuisine} ${sectionLabel} ${item.name} ${item.description}`.toLowerCase();
   const normalizedSection = sectionLabel.toLowerCase();
 
@@ -113,6 +159,14 @@ function buildSizeOptions(item, sectionLabel, restaurant) {
 }
 
 function buildExtraOptions(item, sectionLabel, restaurant) {
+  if (item._extras !== undefined) {
+    return item._extras.map((extra, i) => ({
+      id: `extra-${i}`,
+      label: extra.name,
+      priceDelta: extra.price ?? 0,
+    }));
+  }
+
   const lookup = `${restaurant.cuisine} ${sectionLabel} ${item.name} ${item.description}`.toLowerCase();
   const cuisine = restaurant.cuisine.toLowerCase();
 
@@ -367,7 +421,22 @@ function MenuItemDrawer({ restaurant, selection, onClose, onConfirm }) {
   }
 
   function handleConfirm() {
-    onConfirm({ quantity, totalPrice: orderTotal });
+    const noteParts: string[] = [];
+    if (sizeOptions.length > 1 && selectedSize) {
+      noteParts.push(selectedSize.label);
+    }
+    for (const extraId of selectedExtraIds) {
+      const extra = extraOptions.find((o) => o.id === extraId);
+      if (extra) noteParts.push(extra.label);
+    }
+    onConfirm({
+      quantity,
+      unitPrice,
+      itemName: item.name,
+      itemImage: item.image,
+      itemImageAlt: item.imageAlt ?? item.name,
+      note: noteParts.join(', '),
+    });
   }
 
   return (
@@ -811,6 +880,12 @@ export default function RestaurantMenu() {
     enabled: apiRestaurantId !== null,
     staleTime: 60_000,
   });
+  const { data: mealsData, isPending: isMealsPending } = useQuery({
+    queryKey: ['meals', apiRestaurantId],
+    queryFn: () => mealApi.getByRestaurant(apiRestaurantId!).then((r) => r.data),
+    enabled: apiRestaurantId !== null,
+    staleTime: 60_000,
+  });
   const restaurant = apiRestaurantId !== null
     ? restaurantData
       ? mapApiRestaurantToMenuRestaurant(restaurantData)
@@ -820,16 +895,20 @@ export default function RestaurantMenu() {
     apiRestaurantId !== null
       ? restaurantData?.slug?.trim() || null
       : mockRestaurantId;
+  const apiMenu = apiRestaurantId !== null && mealsData
+    ? mapMealsToMenu(mealsData, apiRestaurantId)
+    : null;
   const menu =
-    menuSlug === null ? null : getRestaurantMenuById(menuSlug);
-  const [cartCount, setCartCount] = useState(0);
-  const [cartTotal, setCartTotal] = useState(0);
+    apiRestaurantId !== null
+      ? apiMenu
+      : menuSlug === null ? null : getRestaurantMenuById(menuSlug);
+  const cart = useCart();
   const [drawerSelection, setDrawerSelection] = useState<DrawerSelection | null>(null);
   const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const { visible, fading, show } = useToast(3000);
 
-  if (isApiRestaurant && isPending) {
+  if (isApiRestaurant && (isPending || isMealsPending)) {
     return <RestaurantMenuLoading onBack={() => navigate({ to: '/' })} />;
   }
 
@@ -862,9 +941,16 @@ export default function RestaurantMenu() {
     setDrawerSelection({ item, sectionLabel });
   }
 
-  function handleConfirmAddToCart({ quantity, totalPrice }) {
-    setCartCount((count) => count + quantity);
-    setCartTotal((total) => total + totalPrice);
+  function handleConfirmAddToCart({ quantity, unitPrice, itemName, itemImage, itemImageAlt, note }) {
+    cart.addItem({
+      name: itemName,
+      image: itemImage,
+      imageAlt: itemImageAlt,
+      note,
+      unitPrice,
+      quantity,
+      restaurantName: restaurant.name,
+    });
     setDrawerSelection(null);
     show();
   }
@@ -950,9 +1036,9 @@ export default function RestaurantMenu() {
               >
                 <span className="material-symbols-outlined">shopping_bag</span>
               </Link>
-              {cartCount > 0 ? (
+              {cart.itemCount > 0 ? (
                 <span className="absolute right-0 top-0 flex h-4 w-4 items-center justify-center rounded-full border-2 border-surface bg-primary text-[10px] text-on-primary">
-                  {cartCount}
+                  {cart.itemCount}
                 </span>
               ) : null}
             </div>
@@ -1191,11 +1277,11 @@ export default function RestaurantMenu() {
           >
             <div className="flex items-center gap-3">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-bold">
-                {cartCount}
+                {cart.itemCount}
               </div>
               <span className="font-bold tracking-tight">View Your Order</span>
             </div>
-            <span className="text-lg font-extrabold">${cartTotal.toFixed(2)}</span>
+            <span className="text-lg font-extrabold">${cart.subtotal.toFixed(2)}</span>
           </Link>
         </Toast>
 

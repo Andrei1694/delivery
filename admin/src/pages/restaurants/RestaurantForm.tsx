@@ -18,6 +18,9 @@ import {
   StarIcon,
   TrashIcon,
 } from '../../components/AdminIcons';
+import RestaurantMealsTab, {
+  RestaurantMealsAside,
+} from './RestaurantMealsTab';
 import type {
   RestaurantBadgeDto,
   RestaurantRequestDto,
@@ -49,6 +52,8 @@ type RestaurantFormValues = RestaurantRequestDto & {
   heroImageFile: File | null;
   galleryFiles: File[];
 };
+
+type RestaurantEditorTab = 'details' | 'meals';
 
 const defaultValues: RestaurantFormValues = {
   name: '',
@@ -476,6 +481,7 @@ export default function RestaurantForm() {
   const params = useParams({ strict: false }) as { restaurantId?: string };
   const restaurantId = params.restaurantId ? Number(params.restaurantId) : undefined;
   const isEdit = restaurantId !== undefined;
+  const [activeTab, setActiveTab] = useState<RestaurantEditorTab>('details');
   const [cardImagePreviewUrl, setCardImagePreviewUrl] = useState('');
   const [heroImagePreviewUrl, setHeroImagePreviewUrl] = useState('');
   const [galleryPreviewUrls, setGalleryPreviewUrls] = useState<string[]>([]);
@@ -602,12 +608,23 @@ export default function RestaurantForm() {
     );
   }
 
+  const restaurantRecordName = existing?.name?.trim() || `Restaurant #${restaurantId}`;
+  const isMealsTab = activeTab === 'meals' && isEdit;
+  const editorDescription = isMealsTab
+    ? `Manage the live meal catalog for ${restaurantRecordName}. Changes in this tab sync directly with the restaurant meal endpoints.`
+    : 'Maintain restaurant content and operational metadata from a single structured editor. The side panel highlights validation and front-facing impact.';
+  const tabHint = isEdit
+    ? isMealsTab
+      ? 'Meal changes save independently from restaurant details and refresh the live catalog for this restaurant.'
+      : 'Switch tabs without losing in-progress restaurant detail edits during this session.'
+    : 'Save the restaurant once to unlock the Meals tab and connect menu items to a live restaurant record.';
+
   return (
     <AdminShell
       activeModule="restaurants"
       eyebrow="Restaurants module"
       title={isEdit ? 'Edit restaurant' : 'Create restaurant'}
-      description="Maintain restaurant content and operational metadata from a single structured editor. The side panel highlights validation and front-facing impact."
+      description={editorDescription}
       actions={
         <>
           <button
@@ -619,59 +636,112 @@ export default function RestaurantForm() {
             Back to restaurants
           </button>
 
-          <button
-            type="submit"
-            form={formId}
-            disabled={saveMutation.isPending}
-            className="button button--primary"
-          >
-            {saveMutation.isPending ? (
-              <>
-                <span className="button__spinner" />
-                Saving
-              </>
-            ) : (
-              <>
-                <CheckCircleIcon width={18} height={18} />
-                {isEdit ? 'Save changes' : 'Create restaurant'}
-              </>
-            )}
-          </button>
+          {!isMealsTab ? (
+            <button
+              type="submit"
+              form={formId}
+              disabled={saveMutation.isPending}
+              className="button button--primary"
+            >
+              {saveMutation.isPending ? (
+                <>
+                  <span className="button__spinner" />
+                  Saving
+                </>
+              ) : (
+                <>
+                  <CheckCircleIcon width={18} height={18} />
+                  {isEdit ? 'Save changes' : 'Create restaurant'}
+                </>
+              )}
+            </button>
+          ) : null}
         </>
       }
       aside={
-        <form.Subscribe selector={(state) => state.values}>
-          {(values) => (
-            <ValidationPanel
-              values={values}
-              isEdit={isEdit}
-              cardImagePreviewUrl={cardImagePreviewUrl}
-              heroImagePreviewUrl={heroImagePreviewUrl}
-            />
-          )}
-        </form.Subscribe>
+        isMealsTab && restaurantId ? (
+          <RestaurantMealsAside
+            restaurantId={restaurantId}
+            restaurantName={restaurantRecordName}
+          />
+        ) : (
+          <form.Subscribe selector={(state) => state.values}>
+            {(values) => (
+              <ValidationPanel
+                values={values}
+                isEdit={isEdit}
+                cardImagePreviewUrl={cardImagePreviewUrl}
+                heroImagePreviewUrl={heroImagePreviewUrl}
+              />
+            )}
+          </form.Subscribe>
+        )
       }
-      railStats={[
-        { label: 'Mode', value: isEdit ? 'Edit' : 'New' },
-        { label: 'Section', value: 'Catalog' },
-        { label: 'Sync', value: isEdit ? 'Live' : 'Draft' },
-      ]}
+      railStats={
+        isMealsTab && restaurantId
+          ? [
+              { label: 'Mode', value: 'Meals' },
+              { label: 'Restaurant', value: `#${restaurantId}` },
+              { label: 'Sync', value: 'Live' },
+            ]
+          : [
+              { label: 'Mode', value: isEdit ? 'Edit' : 'New' },
+              { label: 'Section', value: 'Catalog' },
+              { label: 'Sync', value: isEdit ? 'Live' : 'Draft' },
+            ]
+      }
     >
-      {saveMutation.isError ? (
-        <div className="notification notification--error" role="alert" aria-live="polite">
-          Failed to save. Review the required fields and try again.
+      <section className="panel page-section editor-tabs">
+        <div
+          className="editor-tabs__list"
+          role="tablist"
+          aria-label="Restaurant editor tabs"
+        >
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeTab === 'details'}
+            className={`editor-tab ${activeTab === 'details' ? 'editor-tab--active' : ''}`}
+            onClick={() => setActiveTab('details')}
+          >
+            Details
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeTab === 'meals'}
+            disabled={!isEdit}
+            className={`editor-tab ${activeTab === 'meals' ? 'editor-tab--active' : ''}`}
+            onClick={() => {
+              if (isEdit) {
+                setActiveTab('meals');
+              }
+            }}
+          >
+            Meals
+          </button>
         </div>
-      ) : null}
 
-      <form
-        id={formId}
-        onSubmit={(event) => {
-          event.preventDefault();
-          event.stopPropagation();
-          void form.handleSubmit();
-        }}
-        className="stack"
-      >
+        <p className="editor-tabs__hint">{tabHint}</p>
+      </section>
+
+      {!isMealsTab ? (
+        <>
+          {saveMutation.isError ? (
+            <div className="notification notification--error" role="alert" aria-live="polite">
+              Failed to save. Review the required fields and try again.
+            </div>
+          ) : null}
+
+          <form
+            id={formId}
+            onSubmit={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              void form.handleSubmit();
+            }}
+            className="stack"
+          >
         <SectionCard
           eyebrow="Core data"
           title="Identity and rating"
@@ -1430,7 +1500,14 @@ export default function RestaurantForm() {
             </button>
           </div>
         </section>
-      </form>
+          </form>
+        </>
+      ) : restaurantId ? (
+        <RestaurantMealsTab
+          restaurantId={restaurantId}
+          restaurantName={restaurantRecordName}
+        />
+      ) : null}
     </AdminShell>
   );
 }

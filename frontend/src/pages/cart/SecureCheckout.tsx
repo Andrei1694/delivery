@@ -8,8 +8,11 @@ import {
   getPaymentMethodDisplayLabel,
   useStoredPaymentMethods,
 } from '../../util/paymentMethods';
+import { useCart, SERVICE_FEE } from '../../cart';
 
-const ORDER_TOTAL = '$82.70';
+function formatCurrency(value: number) {
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
+}
 
 function buildDefaultForm(hasSavedMethods) {
   return {
@@ -20,6 +23,9 @@ function buildDefaultForm(hasSavedMethods) {
 
 export default function SecureCheckout() {
   const router = useRouter();
+  const cart = useCart();
+  const orderTotal = cart.subtotal + SERVICE_FEE;
+  const orderTotalLabel = formatCurrency(orderTotal);
   const [paymentMethods, setPaymentMethods] = useStoredPaymentMethods();
   const [selectedMethod, setSelectedMethod] = useState(
     () => paymentMethods.find((method) => method.active)?.id ?? paymentMethods[0]?.id ?? 'apple_pay',
@@ -124,7 +130,7 @@ export default function SecureCheckout() {
                 <p className="text-sm text-on-surface-variant">Including taxes and fees</p>
               </div>
             </div>
-            <p className="font-headline text-lg font-bold">{ORDER_TOTAL}</p>
+            <p className="font-headline text-lg font-bold">{orderTotalLabel}</p>
           </section>
 
           <section className="mt-8">
@@ -254,7 +260,7 @@ export default function SecureCheckout() {
             disabled={!resolvedSelectedMethod}
           >
             <span>Place Order</span>
-            <span>{ORDER_TOTAL}</span>
+            <span>{orderTotalLabel}</span>
           </button>
         </div>
       </div>

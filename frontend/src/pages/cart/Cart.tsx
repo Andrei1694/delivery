@@ -1,50 +1,7 @@
-import { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import PageHeader from '../../components/PageHeader';
 import OrderSummary from '../../components/OrderSummary';
-
-const initialCartItems = [
-  {
-    name: 'Wild Harvest Grain Bowl',
-    note: 'Extra Avocado, No Onions',
-    price: 18.5,
-    quantity: 1,
-    image:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuARxURdYlCEbFNERnCpgU3OsyDtkZi4iZtoDVRFc7ToxMzuWgVon1O2Nht8PJiMCs5aBkVJ8pJW_8sCjHvz1kHlL4H2GDBtCw6RQkb9HsYDTvObi4kW9lj19VpQ5KdaoupfRAjJvk6lghn5MM65g06cATD_INweNmEf1J8hG12DnKPBW99IDB5Rej8Qpyv5TNQ0fE93lzywfK53OpPfxyUInHH6MGGnn4TjWreLzpJgYyTWpPggb8MTd2CVgoOQiE8DGeyyXLGlVro',
-    imageAlt: 'Gourmet salad with fresh greens and seeds',
-  },
-  {
-    name: 'Truffle Burrata Pizza',
-    note: 'Standard 12" Crust',
-    price: 24,
-    quantity: 2,
-    image:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuATV2Ee2gDfIPmAZwvhTm5T80zTvH7S1de3GOwXAFnvKu_zJNj5YVlsz7XjXT70nAqgyTnDIupXANe1znZiBK3LGLLzI48Kb3W6_lGuvNNj1c5F9Ezb8mU5PhHQg74bpf06G87bNqhUAO_XPAmX7lORIVUnxSTR375wLTQz3mQq703JGtAoBPmAuGLlkQSGCjO4EWVlYx2CvZHGIuIX7XIzLGoEu6OuCn75FrSe8u8ZscRkoOjTIyZ97XlLK7ceODE80HXe-QVSdKo',
-    imageAlt: 'Wood-fired neapolitan pizza with basil',
-  },
-  {
-    name: 'Valrhona Lava Cake',
-    price: 12,
-    quantity: 1,
-    badge: "CHEF'S PICK",
-    highlight: true,
-    image:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuCpH4tZc7hkb0IRjHD54KaHTjXzzolMv4N2C47HR9a3HU131ToSaIZMqFEY9Uw9G4wNKJLo_JnfCjZI3uIVNxeb7Ff2AcktBQOkHP66hpGVc63WS-TV7evysTv69-Fi-0C7-NR3zMqV9KP9qDlXcDLIyH7gkU5MOMcvv8eKxnqyV4lUGUYBevOEJ9LUJN5GTlJmd_2J-ULn1dtzH-kV_9uOuQGwcIkDszG0cwZc5sVTBfWxG6BXavUlaVophlAexhszLdrOtBaYHIk',
-    imageAlt: 'Decadent chocolate lava cake dessert',
-  },
-  {
-    name: 'Truffle Fries',
-    note: 'Extra Parmesan',
-    price: 7.5,
-    quantity: 1,
-    image:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuATV2Ee2gDfIPmAZwvhTm5T80zTvH7S1de3GOwXAFnvKu_zJNj5YVlsz7XjXT70nAqgyTnDIupXANe1znZiBK3LGLLzI48Kb3W6_lGuvNNj1c5F9Ezb8mU5PhHQg74bpf06G87bNqhUAO_XPAmX7lORIVUnxSTR375wLTQz3mQq703JGtAoBPmAuGLlkQSGCjO4EWVlYx2CvZHGIuIX7XIzLGoEu6OuCn75FrSe8u8ZscRkoOjTIyZ97XlLK7ceODE80HXe-QVSdKo',
-    imageAlt: 'Crispy truffle fries in a serving basket',
-  },
-];
-
-
-const serviceFee = 4.2;
+import { useCart, SERVICE_FEE } from '../../cart';
 
 function formatCurrency(value) {
   return new Intl.NumberFormat('en-US', {
@@ -79,13 +36,7 @@ function QuantityControl({ quantity, onDecrease, onIncrease }) {
 
 function CartItem({ item, onDecrease, onIncrease }) {
   return (
-    <div
-      className={
-        item.highlight
-          ? 'flex gap-4 rounded-xl border border-tertiary/10 bg-tertiary-container/10 p-4 ambient-shadow'
-          : 'relative flex gap-4 overflow-hidden rounded-xl bg-surface-container-lowest p-4 ambient-shadow'
-      }
-    >
+    <div className="relative flex gap-4 overflow-hidden rounded-xl bg-surface-container-lowest p-4 ambient-shadow">
       <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-lg">
         <img
           alt={item.imageAlt}
@@ -95,23 +46,16 @@ function CartItem({ item, onDecrease, onIncrease }) {
       </div>
 
       <div className="flex flex-grow flex-col justify-between">
-        <div className={item.highlight ? 'flex items-start justify-between' : undefined}>
-          <div>
-            {item.badge ? (
-              <span className="mb-1 inline-block rounded-full bg-tertiary px-2 py-0.5 text-[10px] font-bold text-on-tertiary">
-                {item.badge}
-              </span>
-            ) : null}
-            <h3 className="font-headline font-bold leading-tight text-on-surface">{item.name}</h3>
-            {item.note ? (
-              <p className="mt-1 text-sm text-on-surface-variant font-label">{item.note}</p>
-            ) : null}
-          </div>
+        <div>
+          <h3 className="font-headline font-bold leading-tight text-on-surface">{item.name}</h3>
+          {item.note ? (
+            <p className="mt-1 text-sm text-on-surface-variant font-label">{item.note}</p>
+          ) : null}
         </div>
 
         <div className="mt-2 flex items-end justify-between">
           <span className="font-headline text-lg font-bold text-primary">
-            {formatCurrency(item.price)}
+            {formatCurrency(item.unitPrice)}
           </span>
           <QuantityControl
             quantity={item.quantity}
@@ -126,26 +70,7 @@ function CartItem({ item, onDecrease, onIncrease }) {
 
 export default function Cart() {
   const navigate = useNavigate();
-  const [cartItems, setCartItems] = useState(initialCartItems);
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-
-  const handleQuantityChange = (itemName, delta) => {
-    setCartItems((currentItems) =>
-      currentItems.flatMap((item) => {
-        if (item.name !== itemName) {
-          return [item];
-        }
-
-        const nextQuantity = item.quantity + delta;
-
-        if (nextQuantity <= 0) {
-          return [];
-        }
-
-        return [{ ...item, quantity: nextQuantity }];
-      })
-    );
-  };
+  const cart = useCart();
 
   return (
     <>
@@ -196,13 +121,13 @@ export default function Cart() {
           </div>
 
           <div className="space-y-6">
-            {cartItems.length > 0 ? (
-              cartItems.map((item) => (
+            {cart.items.length > 0 ? (
+              cart.items.map((item) => (
                 <CartItem
-                  key={item.name}
+                  key={item.id}
                   item={item}
-                  onDecrease={() => handleQuantityChange(item.name, -1)}
-                  onIncrease={() => handleQuantityChange(item.name, 1)}
+                  onDecrease={() => cart.updateQuantity(item.id, -1)}
+                  onIncrease={() => cart.updateQuantity(item.id, 1)}
                 />
               ))
             ) : (
@@ -215,10 +140,10 @@ export default function Cart() {
             )}
           </div>
 
-          {cartItems.length > 0 ? (
+          {cart.items.length > 0 ? (
             <div className="mt-12 space-y-4">
               <h4 className="font-headline text-lg font-bold text-on-surface">Order Summary</h4>
-              <OrderSummary subtotal={subtotal} serviceFee={serviceFee} />
+              <OrderSummary subtotal={cart.subtotal} serviceFee={SERVICE_FEE} />
             </div>
           ) : null}
         </main>
@@ -227,7 +152,7 @@ export default function Cart() {
           <div className="pointer-events-auto mx-auto max-w-lg">
             <button
               className="ambient-shadow flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-primary-container px-6 py-4 font-headline text-lg font-bold text-on-primary transition-all duration-300 active:scale-95 disabled:pointer-events-none disabled:opacity-50"
-              disabled={cartItems.length === 0}
+              disabled={cart.items.length === 0}
               type="button"
               onClick={() => navigate({ to: '/checkout' })}
             >
