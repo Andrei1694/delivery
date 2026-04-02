@@ -21,22 +21,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Embeddable
-@Getter
-@Setter
-class MealSize {
-    private String name;
-    private BigDecimal price;
-}
-
-@Embeddable
-@Getter
-@Setter
-class Extras {
-    private String name;
-    private BigDecimal price;
-}
-
 @Entity
 @Table(name = "meal")
 @NoArgsConstructor

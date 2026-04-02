@@ -39,6 +39,7 @@ public class RestaurantResponseDto {
 
     private List<String> gallery;
     private List<ReviewDto> reviews;
+    private List<MealDto> meals;
 
     @Data
     @NoArgsConstructor
